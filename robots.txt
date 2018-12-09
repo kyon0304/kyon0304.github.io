@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://kyon0304.github.io/sitemap.xml

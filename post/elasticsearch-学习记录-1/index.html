@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>ElasticSearch 学习记录 - kyon&#39;s wonderland with love</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="kyon" /><meta name="description" content="ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个" /><meta name="keywords" content="kyon, blog, java, spring, backend" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.52 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://kyon0304.github.io/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.93844dae.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="ElasticSearch 学习记录" />
+<meta property="og:description" content="ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kyon0304.github.io/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/" /><meta property="article:published_time" content="2018-11-11T15:51:10&#43;08:00"/>
+<meta property="article:modified_time" content="2018-11-11T15:51:10&#43;08:00"/>
+
+<meta itemprop="name" content="ElasticSearch 学习记录">
+<meta itemprop="description" content="ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个">
+
+
+<meta itemprop="datePublished" content="2018-11-11T15:51:10&#43;08:00" />
+<meta itemprop="dateModified" content="2018-11-11T15:51:10&#43;08:00" />
+<meta itemprop="wordCount" content="1468">
+
+
+
+<meta itemprop="keywords" content="elasticsearch,es,工具," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ElasticSearch 学习记录"/>
+<meta name="twitter:description" content="ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">kyon&#39;s wonderland</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">kyon&#39;s wonderland</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">ElasticSearch 学习记录</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Sunday, November 11, 2018 </span>
+        
+          <span class="more-meta"> 约 1468 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#es-的基本概念">ES 的基本概念</a></li>
+<li><a href="#es-的分布式架构">ES 的分布式架构</a></li>
+<li><a href="#es-的读写过程">ES 的读写过程</a>
+<ul>
+<li><a href="#es-的写过程">ES 的写过程</a></li>
+<li><a href="#shard-a-写数据过程详细">shard A 写数据过程详细</a></li>
+<li><a href="#查询">查询</a></li>
+<li><a href="#搜索">搜索</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      
+
+<h2 id="es-的基本概念">ES 的基本概念</h2>
+
+<ul>
+<li>使用 lucene 作为核心搜索库，倒排索引</li>
+<li><code>index</code> 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index</li>
+<li><code>document</code> 文档，类似于 sql 表中的一条数据，含有多个 field</li>
+<li><code>field</code> 类似于 sql 表中的一列，属性及其值</li>
+<li><code>node/cluster</code> es 可以在不同的机器（node）上运行不同的线程，组成 cluster 的形式提供服务</li>
+<li><code>shard</code> 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard</li>
+</ul>
+
+<h2 id="es-的分布式架构">ES 的分布式架构</h2>
+
+<p><img src="/img/01_elasticsearch%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E5%8E%9F%E7%90%86.png" alt="01_elasticsearch分布式架构原理" /></p>
+
+<ul>
+<li>不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分</li>
+<li>一个 shard 的 primary/replica 会在不同机器上，当一台机器挂掉后，可以从另一台机器的 shard 中读取/恢复数据</li>
+<li>写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端</li>
+<li>读 es 时，可以从 primary shard 读，也可以从 replica 读</li>
+</ul>
+
+<h2 id="es-的读写过程">ES 的读写过程</h2>
+
+<p><img src="/img/01_es%E8%AF%BB%E5%86%99%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90.png" alt="01_es读写底层原理剖析" /></p>
+
+<h3 id="es-的写过程">ES 的写过程</h3>
+
+<ol>
+<li>客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用</li>
+<li>协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点</li>
+<li>shard A 接收到数据后，进行存储，并同步到 replica shard</li>
+<li>协调节点等待 shard A 的写入和同步都完成后，向客户端发送写入成功回执</li>
+</ol>
+
+<h3 id="shard-a-写数据过程详细">shard A 写数据过程详细</h3>
+
+<ul>
+<li>shard A 收到数据后，会先缓存到内存 buffer 中，并写入一份到 translog<sup class="footnote-ref" id="fnref:translaog"><a href="#fn:translaog">1</a></sup> 文件的系统缓存（os cache），此时，该条数据虽然写入完成，但是没有经过进一步处理，客户端进行查询的话，是查询不到的</li>
+<li>buffer 写满/每隔一段时间（默认 1s），es 将 buffer 中的数据 <em>refresh</em> 到 segment file 的 os cache 中，数据写入 segment file 之后，同时就会建立好倒排索引，若 buffer 中没有数据则跳过</li>
+<li>由于 os cache 虽然不是 es 在管理，但也是内存，如果机器挂掉数据同样会丢失，所以 os cache 超过一定容量/每隔一段时间（默认 30min）会 <em>flush</em> 到磁盘，此时将会生成多个 segment file（上次 flush 到这次之间 refresh 个数的）</li>
+
+<li><p>translog 同样需要持久化，达到一定阈值/每隔一段时间（默认 5s）进行一次 <em>commit</em> 操作</p>
+
+<ol>
+<li>将 buffer 中的数据 refresh 到 os cache 中，清空 buffer</li>
+<li>将一个 commit point 写入磁盘文件，里面标识着这个 commit point 之前的所有 segment file</li>
+<li>将 os cache 中的所有数据强制 fsync 到磁盘</li>
+</ol></li>
+
+<li><p>由于每次 refresh 操作，都会生成一个 segment file，所以数量会急剧增多，到达一定阈值后，会触发 <em>merge</em> 操作，合并为一个大的 segment file，并将原来的小文件删除</p></li>
+
+<li><p>es 删除数据是标记删除，即删除请求到达后，会记录一个 <em>.del</em> 的磁盘文件，当搜索某条数据时，一旦发现在 .del 文件中被标记为删除，则不会返回；在 merge 被触发后，过程中检查 segment file 中的记录是否已经被标记删除，若是，则不会进入大的 segment file，以此达到删除的目的</p></li>
+</ul>
+
+<p><em>ES 的读过程</em>
+es 读数据分为两种
+- 根据 doc id 进行 get 查询
+- 搜索</p>
+
+<h3 id="查询">查询</h3>
+
+<ol>
+<li>客户端向协调节点发起查询请求</li>
+<li>协调节点根据 doc id 进行哈希，获得该条数据所在 shard 及其 node</li>
+<li>由于查询既可以向 primary 也可以向 replica 发起，因此这里选取路由时有一个 lb，从中选取一个 shard 及其 node 即可</li>
+<li>shard 将数据返回给协调节点，协调节点将数据返回客户端</li>
+</ol>
+
+<h3 id="搜索">搜索</h3>
+
+<ol>
+<li>客户端向协调节点发起搜索请求</li>
+<li>协调节点将关键词发给所有 shard（primary/replica 任选其一）</li>
+<li>各个 shard 根据关键词进行搜索，并返回匹配度较高的几条 doc 的 id 给协调节点</li>
+<li>协调节点接收到所有 shard 的返回后，根据匹配度进行排序，获取最优的几条，并根据 doc id 向 shard 查询对应的 document，返回给客户端</li>
+</ol>
+
+<hr />
+
+<p><strong>Ps.</strong> ES 是准实时的，因为在 buffer 中的内容 refresh 到 segment file 之前是搜索不到的，大概会有 1s 的时间差</p>
+
+<p><strong>Ps.s.</strong> ES 有可能会丢数据，在 buffer、translog 中有数据未落盘时机器宕机</p>
+
+<p><strong>Ps.s.s.</strong> refresh、flush、commit 操作都可以通过 rest API/Java API 手动触发</p>
+
+<p>参考资料：</p>
+
+<p>中华石杉码农，视频资料，可能是盗版的，无法找到来源了</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:translaog">translog 的作用：机器宕机重启时，会读取 translog 中的信息，并恢复到内存 buffer 和 os cache 中，减少数据丢失。
+ <a class="footnote-return" href="#fnref:translaog"><sup>[return]</sup></a></li>
+</ol>
+</div>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">kyon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">Sunday, November 11, 2018</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div><div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/Wechat.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/ali.jpeg">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/elasticsearch/">elasticsearch</a>
+          <a href="/tags/es/">es</a>
+          <a href="/tags/%E5%B7%A5%E5%85%B7/">工具</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">集合基数统计</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'kyon';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:kyon0304@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://stackoverflow.com/users/1196640/kyon" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://twitter.com/kyon_wy" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://www.instagram/kyon_wy" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://kyon0304.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">kyon</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js" integrity="sha256-jwCP0NAdCBloaIWTWHmW4i3snUNMHUNO+jr9rYd2iOI=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.locales.min.js" integrity="sha256-ZwofwC1Lf/faQCzN7nZtfijVV6hSwxjQMwXL4gn9qU8=" crossorigin="anonymous"></script>
+  <script><!-- NOTE: timeago.js uses the language code format like "zh_CN" (underscore and case sensitive) -->
+    var languageCode = "zh-cn".replace(/-/g, '_').replace(/_(.*)/, function ($0, $1) {return $0.replace($1, $1.toUpperCase());});
+    timeago().render(document.querySelectorAll('.timeago'), languageCode);
+    timeago.cancel();  
+  </script>
+<script type="text/javascript" src="/dist/even.ece58db6.min.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

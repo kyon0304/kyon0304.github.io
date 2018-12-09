@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kyon&#39;s wonderland with love</title>
+    <link>https://kyon0304.github.io/</link>
+    <description>Recent content on kyon&#39;s wonderland with love</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 09 Dec 2018 22:58:43 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon0304.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>关于</title>
+      <link>https://kyon0304.github.io/about/</link>
+      <pubDate>Sun, 09 Dec 2018 22:58:43 +0800</pubDate>
+      
+      <guid>https://kyon0304.github.io/about/</guid>
+      <description>关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽</description>
+    </item>
+    
+    <item>
+      <title>集合基数统计</title>
+      <link>https://kyon0304.github.io/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
+      
+      <guid>https://kyon0304.github.io/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
+      <description>集合基数：对于非无限集合，基数是指集合中元素的个数。 合并：将两个集合合并后，如何求新集合的基数。 Bitmap &amp;ndash;&amp;gt; Linear Count &amp;ndash;&amp;gt; LogLog Count &amp;ndash;&amp;gt; Adaptive Count &amp;ndash;&amp;gt; HyperLogLog Count 假设集合的基数为 n</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch 学习记录</title>
+      <link>https://kyon0304.github.io/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
+      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      
+      <guid>https://kyon0304.github.io/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
+      <description>ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个</description>
+    </item>
+    
+  </channel>
+</rss>
