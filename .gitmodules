@@ -4,4 +4,3 @@
 [submodule "public"]
 	path = public
 	url = git@github.com:kyon0304/kyon0304.github.io.git
-	branch = master
