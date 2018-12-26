@@ -7,6 +7,8 @@ hugo -t even # if using a theme, replace with `hugo -t <YOURTHEME>`
 
 # Go To Public folder
 cd public
+# Add CNAME
+echo 'kyon.life' > CNAME
 # Add changes to git.
 git add .
 
