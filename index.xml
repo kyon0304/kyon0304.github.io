@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>kyon&#39;s wonderland with love</title>
+    <title>kyon&#39;s wonderland with ❤️</title>
     <link>https://kyon0304.github.io/</link>
-    <description>Recent content on kyon&#39;s wonderland with love</description>
+    <description>Recent content on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Sun, 09 Dec 2018 22:58:43 +0800</lastBuildDate>
@@ -18,6 +18,15 @@
       
       <guid>https://kyon0304.github.io/about/</guid>
       <description>关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽</description>
+    </item>
+    
+    <item>
+      <title>Ambry LinkedIn 对象存储 论文翻译</title>
+      <link>https://kyon0304.github.io/post/ambry/</link>
+      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://kyon0304.github.io/post/ambry/</guid>
+      <description>原文由邹扒皮翻译，已刊于 邹扒皮实验室。本来是打算两个人校对后发布，但是本人校对太慢，相隔 13 天后终于完成，对方已经不接受 PR，又不忍心一腔热血</description>
     </item>
     
     <item>
