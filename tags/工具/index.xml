@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>工具 on kyon&#39;s wonderland with ❤️</title>
-    <link>https://kyon0304.github.io/tags/%E5%B7%A5%E5%85%B7/</link>
+    <link>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</link>
     <description>Recent content in 工具 on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Sun, 11 Nov 2018 15:51:10 +0800</lastBuildDate>
     
-	<atom:link href="https://kyon0304.github.io/tags/%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://kyon.life/tags/%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>ElasticSearch 学习记录</title>
-      <link>https://kyon0304.github.io/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
+      <link>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
       <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
       
-      <guid>https://kyon0304.github.io/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
+      <guid>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
       <description>ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个</description>
     </item>
     

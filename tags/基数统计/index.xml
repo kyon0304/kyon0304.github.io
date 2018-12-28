@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>基数统计 on kyon&#39;s wonderland with ❤️</title>
-    <link>https://kyon0304.github.io/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+    <link>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
     <description>Recent content in 基数统计 on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Sat, 01 Dec 2018 21:30:25 +0800</lastBuildDate>
     
-	<atom:link href="https://kyon0304.github.io/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>集合基数统计</title>
-      <link>https://kyon0304.github.io/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+      <link>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
       <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
       
-      <guid>https://kyon0304.github.io/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
+      <guid>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
       <description>集合基数：对于非无限集合，基数是指集合中元素的个数。 合并：将两个集合合并后，如何求新集合的基数。 Bitmap &amp;ndash;&amp;gt; Linear Count &amp;ndash;&amp;gt; LogLog Count &amp;ndash;&amp;gt; Adaptive Count &amp;ndash;&amp;gt; HyperLogLog Count 假设集合的基数为 n</description>
     </item>
     

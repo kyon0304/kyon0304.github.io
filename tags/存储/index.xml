@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>存储 on kyon&#39;s wonderland with ❤️</title>
-    <link>https://kyon0304.github.io/tags/%E5%AD%98%E5%82%A8/</link>
+    <link>https://kyon.life/tags/%E5%AD%98%E5%82%A8/</link>
     <description>Recent content in 存储 on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Wed, 26 Dec 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://kyon0304.github.io/tags/%E5%AD%98%E5%82%A8/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://kyon.life/tags/%E5%AD%98%E5%82%A8/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Ambry LinkedIn 对象存储 论文翻译</title>
-      <link>https://kyon0304.github.io/post/ambry/</link>
+      <link>https://kyon.life/post/ambry/</link>
       <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://kyon0304.github.io/post/ambry/</guid>
+      <guid>https://kyon.life/post/ambry/</guid>
       <description>原文由邹扒皮翻译，已刊于 邹扒皮实验室。本来是打算两个人校对后发布，但是本人校对太慢，相隔 13 天后终于完成，对方已经不接受 PR，又不忍心一腔热血</description>
     </item>
     
