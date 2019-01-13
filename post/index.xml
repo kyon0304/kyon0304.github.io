@@ -6,10 +6,19 @@
     <description>Recent content in Posts on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 26 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 13 Jan 2019 21:02:21 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>《架构整洁之道》读后</title>
+      <link>https://kyon.life/post/clean-architecture/</link>
+      <pubDate>Sun, 13 Jan 2019 21:02:21 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/clean-architecture/</guid>
+      <description>4&amp;frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完</description>
+    </item>
     
     <item>
       <title>Ambry LinkedIn 对象存储 论文翻译</title>

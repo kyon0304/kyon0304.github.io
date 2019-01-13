@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>《常识》摘抄 - kyon&#39;s wonderland with ❤️</title>
+  <title>《架构整洁之道》读后 - kyon&#39;s wonderland with ❤️</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="kyon" /><meta name="description" content="摘抄自梁文道的书 《常识》 在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座假" /><meta name="keywords" content="kyon, blog, java, backend" />
+<meta name="author" content="kyon" /><meta name="description" content="4&amp;frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完" /><meta name="keywords" content="kyon, blog, java, backend" />
 
 
 
@@ -26,7 +26,7 @@
 <meta name="generator" content="Hugo 0.52 with even 4.0.0" />
 
 
-<link rel="canonical" href="https://kyon.life/post/common-sense/" />
+<link rel="canonical" href="https://kyon.life/post/clean-architecture/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -38,26 +38,26 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="《常识》摘抄" />
-<meta property="og:description" content="摘抄自梁文道的书 《常识》 在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座假" />
+<meta property="og:title" content="《架构整洁之道》读后" />
+<meta property="og:description" content="4&frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://kyon.life/post/common-sense/" /><meta property="article:published_time" content="2018-12-17T00:17:19&#43;08:00"/>
-<meta property="article:modified_time" content="2018-12-17T00:17:19&#43;08:00"/>
+<meta property="og:url" content="https://kyon.life/post/clean-architecture/" /><meta property="article:published_time" content="2019-01-13T21:02:21&#43;08:00"/>
+<meta property="article:modified_time" content="2019-01-13T21:02:21&#43;08:00"/>
 
-<meta itemprop="name" content="《常识》摘抄">
-<meta itemprop="description" content="摘抄自梁文道的书 《常识》 在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座假">
-
-
-<meta itemprop="datePublished" content="2018-12-17T00:17:19&#43;08:00" />
-<meta itemprop="dateModified" content="2018-12-17T00:17:19&#43;08:00" />
-<meta itemprop="wordCount" content="1220">
+<meta itemprop="name" content="《架构整洁之道》读后">
+<meta itemprop="description" content="4&frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完">
 
 
+<meta itemprop="datePublished" content="2019-01-13T21:02:21&#43;08:00" />
+<meta itemprop="dateModified" content="2019-01-13T21:02:21&#43;08:00" />
+<meta itemprop="wordCount" content="1974">
 
-<meta itemprop="keywords" content="" />
+
+
+<meta itemprop="keywords" content="读后总结,读书笔记," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="《常识》摘抄"/>
-<meta name="twitter:description" content="摘抄自梁文道的书 《常识》 在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座假"/>
+<meta name="twitter:title" content="《架构整洁之道》读后"/>
+<meta name="twitter:description" content="4&frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -120,13 +120,15 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">《常识》摘抄</h1>
+      <h1 class="post-title">《架构整洁之道》读后</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 2018-12-17 </span>
-        
-          <span class="more-meta"> 约 1220 字 </span>
-          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        <span class="post-time"> 2019-01-13 </span>
+        <div class="post-category">
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"> 读书笔记 </a>
+            </div>
+          <span class="more-meta"> 约 1974 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
         <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
     </header>
@@ -138,52 +140,43 @@
   </div>
 </div>
     <div class="post-content">
-      <p>摘抄自梁文道的书 <a href="https://book.douban.com/subject/3344676/">《常识》</a></p>
+      <p><sup>4</sup>&frasl;<sub>5</sub> 星推荐</p>
 
-<blockquote>
-<p>在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座假设在河道上的工具，一种暧昧的情绪，甚至是风暴的形态。到了现在，这一切名字却像黏力消失的小纸片，从它们所在的东西上逐一剥落，逐一飞散。所以我们开始习惯不再相信言词。</p>
+<p>用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完合住书的情况下按照回忆来写的，写着写着就断掉了，苦不堪言，还是要时不时的回去看书啊。</p>
 
-<p>如果每个人都以类似的态度对待言词与事实的隔离，那么他们一定不会再轻信任何言词以及那些用言词表达的所有美好价值。而这个社会将不只是个信任匮乏的社会，它还必将滋生出一种犬儒的冷漠。</p>
+<p>相对于硬件，软件应当「柔软」，不与运行平台绑定，对新需求友好。</p>
 
-<p>我依然相信语言与事物的神奇对应，相信承诺必将履行，理念必得实现。这不是幼稚，而是公民存在的基本条件；不只是“我相信”，更是“我要相信”。</p>
+<p>编程范式有三种，面向过程编程，面向对象编程，函数式编程。这三种范式都是通过约束程序员的能力，换取程序的健壮性。面向过程编程约束了 goto 语句，不允许程序执行流程随意跳转，将函数的控制语句限制在 <code>if...else..</code>, <code>for..loop</code> 这几种，保证了程序的可推导性；面向对象编程约束了函数指针的使用，多态取而代之，使得依赖反转以及插件式设计更加容易；函数式编程约束了变量的可变性，即在函数式编程思想中，变量一旦赋值是不可更改的，从而在根源上避免了各种多线程并发问题。</p>
 
-<p>—— 空话/言语脱离现实之后的信任问题</p>
-</blockquote>
+<p>编程范式在源码层面保证了整洁，而架构设计也需要整洁。</p>
 
-<hr />
+<p>开发系统时，划分组件应当遵循的 SOLID 原则：</p>
 
-<blockquote>
-<p>“必须从一开始就对文本的异己性保持敏感。但这种敏感既不涉及所谓的‘中立’，也不意味泯除自我；而是为自己的现存之见与固有理解让出一块空地。对自己偏见的觉察是件重要的事，因为这样，文本才能呈现出它所有的他性，以及它那相对于读者固有理解的真理。”</p>
+<ul>
+<li>SRP 单一职责原则，同一个组件的代码实现的功能应当同属一个职责，同时也应当兼顾变更速度，否则会导致一个小的改动引起其他功能的错误或者至少是更多的回归测试</li>
+<li>OCP 开闭原则，对扩展友好，对修改拒绝。开发组件时应当考虑如何设计才能够使得以后引入新功能时，可以通过扩展实现，而尽量降低修改对原有代码的影响。一种模式是支持插件式设计。另外的考虑是，对依赖方向的控制。一般来说频繁的需求变更都不会影响核心业务逻辑，因此将核心业务逻辑放在依赖方向的最上层，依赖只会从下往上，以此下推，新需求只会影响下层的模块，而不需要大规模修改核心逻辑部分。</li>
+<li>LSP 里氏替换原则，继承实现的指导原则，在可以使用父类的地方，使用子类替换后，行为不能异常。</li>
+<li>ISP 接口隔离原则，通过接口隔离依赖，可以减少很多不必要的麻烦。</li>
+<li>DIP 依赖反转原则，控制流的依赖应当遵循依赖守则：单向的、由下层指向上层。而源码依赖和控制流依赖的方向通常是相反的。</li>
+</ul>
 
-<p>—— 浮躁/这个时代的集体病症</p>
-</blockquote>
+<p>划分组件时，我们一般会想到 MVC，model、view、controller，这是按照流程功能来做的归类，与特定系统处理的领域无关，即不管是哪个领域的软件系统，都可以按照这个模式划分为三块。但是这样却不够合理，一个系统的组件划分应该有自己鲜明的特征，就像建筑图纸，如果你看到了客厅、厨房、卧室，那这无疑是家的设计，而如果看到的是借阅室、还书区、公共阅读室那这肯定是图书馆。</p>
 
-<hr />
+<p>类似的，系统的组件划分<strong>应当</strong>是和它的领域相关的，一个新来的同事，应该可以很快的发现这个系统要做的事情。因此划分系统组件时，应当是用例主导的，并且不同用例的功能应当遵循单一职责原则进行隔离。识别出核心业务逻辑，所谓核心，就是这个业务中与赚钱最为相关的一部分逻辑。梳理依赖关系时，核心逻辑应当处于最顶层/或者是同心圆的最里层，其他模块依赖它，而它不会依赖下层的模块，下/外面一层是用例的处理逻辑，再外一层是展现/存储的转换层（presenter），最下/外一层是真正的展现/存储。</p>
 
-<blockquote>
-<p>政府若要施行有效的统治，要百姓心悦诚服地遵从法律政令，要纳税人心甘情愿地缴税，靠的不能只是暴力，还要靠对统治者的同意与信服，这是现代政治文明的常识；人民是国家的主人，人民必须同意政府的统治，政府才能有效地管治。
-然而，不客气地说，一个永远正确永不犯错的政权，这是在传统社会里才行得通的神话。改革开放三十年来的历程恰恰说明了，政权的合法性绝对不能只开一个不容动摇的神话史观，还要依靠凭绩效而来的良治经验。…… 由此看来，再去重复神话史观的力量不只是不合时宜，简直就是开倒车了。</p>
+<p>引入转换层，是因为 GUI 是难于测试的，而测试应当是系统的一部分（是的，系统不只包括开发功能的代码），为了避免出现系统无法测试的情况，展现部分应当没有任何处理逻辑，这些逻辑应当放在转换层，从而将系统从转换层这里划分为可测试部分和不可测试部分。而测试在系统中所处位置，是属于最底层/外层，它依赖于所需测试的模块，而没有模块依赖于它。但是测试不应当与功能模块耦和，避免出现功能模块一个小的改动，导致测试模块成千的失败。另外，必要时，应当为测试编写专门的 API，以便跳过各种安全、权限检查。</p>
 
-<p>—— 创世神话/新中国的历史问题</p>
-</blockquote>
+<p>GUI 只是一种展现方式，而 Web 只是一种 GUI方式，因此设计系统时，这部分属于实现细节，决策应当向后推迟，以便支持更多的展现方式，或者说遵循 OCP 原则，在后续有新的展现需求时可以更容易扩展。另外的展现方式还有 CLI 。</p>
 
-<hr />
+<p>数据库也只是一种实现细节，数据库的表/行结构如此流行，只不过是因为内存不够大/硬盘不够快，如果没有这样的限制，应当尽可能选择利于程序使用的结构，比如栈、堆、数组、哈希表等。另外的存储方式包括文件、缓存等。因此关于存储的决策也应当尽可能延迟。</p>
 
-<blockquote>
-<p>我们时常歌颂知识分子的独立人格，但很少去谈学术界文化界的“界格”。“界格”说白了，就是学术文化相对的独立地位；正因其独立，一个学者的话才有了分量。我们愿意相信他的发言他的研究，信服的是学术本身的逻辑，以真理的追求为目标，而非大量以取悦政治人物的喜好为原点。毕竟政治的逻辑和学术的逻辑是两套不同的逻辑。政治、经济、学术和文化等领域的分化发展是现代性的标志成就，显然它们彼此相关，但没有任何一个领域可以完全吞没另一个领域，也没有任何一个领域的逻辑可以完全取代另一套逻辑，更不可能让一套逻辑的目标成为所有领域活动的目标。</p>
+<p>不要迷信框架，对框架的使用程度，可以使用框架便利开发，但是不应当在业务逻辑中出现对框架的依赖，即保持框架可以方便地被去除/替换。</p>
 
-<p>—— 大学校长/校长的地位堪比国家元首</p>
-</blockquote>
+<p>架构的价值在于，使得系统开发的成本尽量降低。</p>
 
-<hr />
+<p>在系统全周期（开发、部署、运行、维护）中，好的架构都发挥着作用。开发时，系统架构应当和开发团队相匹配，方便系统开发；部署时，保持不同组件的独立性，修改其中一个不需要全部重新部署；运行时，好的架构应该可以起到解释系统运行过程的作用；维护包括系统的捉虫以及新需求的 patch，是整个周期中成本最高的，好的架构通过遵循开闭原则以及接口隔离原则，使得 debug 可以尽量少的影响原来代码，并方便扩展新加功能。</p>
 
-<blockquote>
-<p>不假思索地将“极少数”和“坏分子”联结起来，会起到使大脑迟钝、令焦点模糊的作用。</p>
-
-<p>二战之后的德国兴起纳粹语言学的研究，就是要分析政治语言的语法和词条，看看空洞的语言如何造成了思想的贫乏和虚无的热情。今天的中国已经正式告别过去的阶级斗争，迈向建设和发展之路，我们也需要相应的语言反省和重建。以“极少数”为例的老式术语虽不是“文革”的产物，却是可以总结那个年代的“斗争语言”代表，小心清理它过多的价值意蕴既合时宜且有益，否则说不定会闹出一些消化。</p>
-
-<p>—— 极少数/ 只限于坏人的一种量词</p>
-</blockquote>
+<p>好的架构应当使得系统的可选项尽可能久的尽可能多。</p>
 
     </div>
 
@@ -194,7 +187,7 @@
   </p>
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
-    <span class="item-content">2018-12-17</span>
+    <span class="item-content">2019-01-13</span>
   </p>
   
   <p class="copyright-item">
@@ -216,15 +209,14 @@
       </label>
   </div>
 </div><footer class="post-footer">
-      
+      <div class="post-tags">
+          <a href="/tags/%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/">读后总结</a>
+          <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">读书笔记</a>
+          </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/ambry/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Ambry LinkedIn 对象存储 论文翻译</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        <a class="next" href="/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/">
-            <span class="next-text nav-default">集合基数统计</span>
+        
+        <a class="next" href="/post/ambry/">
+            <span class="next-text nav-default">Ambry LinkedIn 对象存储 论文翻译</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -303,14 +295,6 @@
     timeago.cancel();  
   </script>
 <script type="text/javascript" src="/dist/even.ece58db6.min.js"></script>
-  <script type="text/javascript">
-    window.MathJax = {
-      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
-      showProcessingMessages: false,
-      messageStyle: 'none'
-    };
-  </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 
 
 <script type="application/javascript">
