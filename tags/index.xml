@@ -6,26 +6,80 @@
     <description>Recent content in Tags on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 26 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 03 Sep 2019 15:07:03 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>SIGMOD</title>
-      <link>https://kyon.life/tags/sigmod/</link>
-      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
+      <title>howto</title>
+      <link>https://kyon.life/tags/howto/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/sigmod/</guid>
+      <guid>https://kyon.life/tags/howto/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>ambry</title>
-      <link>https://kyon.life/tags/ambry/</link>
-      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
+      <title>product</title>
+      <link>https://kyon.life/tags/product/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/ambry/</guid>
+      <guid>https://kyon.life/tags/product/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>translation</title>
+      <link>https://kyon.life/tags/translation/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/translation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>architecture</title>
+      <link>https://kyon.life/tags/architecture/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/architecture/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>notes</title>
+      <link>https://kyon.life/tags/notes/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/notes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>reading</title>
+      <link>https://kyon.life/tags/reading/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/reading/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>基数统计</title>
+      <link>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>统计</title>
+      <link>https://kyon.life/tags/%E7%BB%9F%E8%AE%A1/</link>
+      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E7%BB%9F%E8%AE%A1/</guid>
       <description></description>
     </item>
     
@@ -48,74 +102,11 @@
     </item>
     
     <item>
-      <title>分布式系统</title>
-      <link>https://kyon.life/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/</link>
-      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>基数统计</title>
-      <link>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
-      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>存储</title>
-      <link>https://kyon.life/tags/%E5%AD%98%E5%82%A8/</link>
-      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%AD%98%E5%82%A8/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>对象存储</title>
-      <link>https://kyon.life/tags/%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/</link>
-      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>工具</title>
       <link>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</link>
       <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
       
       <guid>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>统计</title>
-      <link>https://kyon.life/tags/%E7%BB%9F%E8%AE%A1/</link>
-      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E7%BB%9F%E8%AE%A1/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>读书笔记</title>
-      <link>https://kyon.life/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
-      <pubDate>Sun, 13 Jan 2019 21:02:21 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>读后总结</title>
-      <link>https://kyon.life/tags/%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/</link>
-      <pubDate>Sun, 13 Jan 2019 21:02:21 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/</guid>
       <description></description>
     </item>
     

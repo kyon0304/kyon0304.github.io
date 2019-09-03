@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>关于 - kyon&#39;s wonderland with ❤️</title>
+  <title>The Three Buckets - kyon&#39;s wonderland with ❤️</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="kyon" /><meta name="description" content="关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽" /><meta name="keywords" content="kyon, blog, java, backend" />
+<meta name="author" content="kyon" /><meta name="description" content="翻译自 Guide to Product Planning: Three Feature Buckets，一篇 2009 年的文章。 把将要开发的功能的概念分类到下面三个桶里的一个： Metric Movers: 这些功能会很大程度上改变商业目标和产品" /><meta name="keywords" content="kyon, blog, java, backend" />
 
 
 
@@ -26,7 +26,7 @@
 <meta name="generator" content="Hugo 0.57.2 with even 4.0.0" />
 
 
-<link rel="canonical" href="https://kyon.life/about/" />
+<link rel="canonical" href="https://kyon.life/post/the-three-buckets/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -38,26 +38,26 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="关于" />
-<meta property="og:description" content="关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽" />
+<meta property="og:title" content="The Three Buckets" />
+<meta property="og:description" content="翻译自 Guide to Product Planning: Three Feature Buckets，一篇 2009 年的文章。 把将要开发的功能的概念分类到下面三个桶里的一个： Metric Movers: 这些功能会很大程度上改变商业目标和产品" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://kyon.life/about/" />
-<meta property="article:published_time" content="2018-12-09T22:58:43+08:00" />
-<meta property="article:modified_time" content="2018-12-09T22:58:43+08:00" />
-<meta itemprop="name" content="关于">
-<meta itemprop="description" content="关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽">
+<meta property="og:url" content="https://kyon.life/post/the-three-buckets/" />
+<meta property="article:published_time" content="2019-09-03T15:07:03+08:00" />
+<meta property="article:modified_time" content="2019-09-03T15:07:03+08:00" />
+<meta itemprop="name" content="The Three Buckets">
+<meta itemprop="description" content="翻译自 Guide to Product Planning: Three Feature Buckets，一篇 2009 年的文章。 把将要开发的功能的概念分类到下面三个桶里的一个： Metric Movers: 这些功能会很大程度上改变商业目标和产品">
 
 
-<meta itemprop="datePublished" content="2018-12-09T22:58:43&#43;08:00" />
-<meta itemprop="dateModified" content="2018-12-09T22:58:43&#43;08:00" />
-<meta itemprop="wordCount" content="129">
+<meta itemprop="datePublished" content="2019-09-03T15:07:03&#43;08:00" />
+<meta itemprop="dateModified" content="2019-09-03T15:07:03&#43;08:00" />
+<meta itemprop="wordCount" content="694">
 
 
 
-<meta itemprop="keywords" content="" />
+<meta itemprop="keywords" content="translation,howto,product," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="关于"/>
-<meta name="twitter:description" content="关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽"/>
+<meta name="twitter:title" content="The Three Buckets"/>
+<meta name="twitter:description" content="翻译自 Guide to Product Planning: Three Feature Buckets，一篇 2009 年的文章。 把将要开发的功能的概念分类到下面三个桶里的一个： Metric Movers: 这些功能会很大程度上改变商业目标和产品"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -118,23 +118,92 @@
       <div class="content-wrapper">
         <div id="content" class="content">
           <article class="post">
-  <div class="post-content">
-    <p>关于本博客：</p>
+    
+    <header class="post-header">
+      <h1 class="post-title">The Three Buckets</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-09-03 </span>
+        
+          <span class="more-meta"> 约 694 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    
+  </div>
+</div>
+    <div class="post-content">
+      <p>翻译自 <a href="https://adamnash.blog/2009/07/22/guide-to-product-planning-three-feature-buckets/">Guide to Product Planning: Three Feature Buckets</a>，一篇 2009 年的文章。</p>
+
+<p>把将要开发的功能的概念分类到下面三个桶里的一个：</p>
 
 <ul>
-<li>kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来</li>
-<li>wonderland 取自爱丽丝梦游仙境</li>
-<li>目前计划是：大部分学习笔记，一小部分吐槽，目标是能有完全原创的点子</li>
+<li><strong>Metric Movers</strong>: 这些功能会很大程度上改变商业目标和产品指标(These are features that will move your target business &amp; product metrics significantly.)。在大多数健康的产品组织中，都会有具体的原因和策略支持对某个产品或功能的投资决定。受雇，增长，年报。一般来说，很少功能真正属于这一类。要提前知道哪些功能是，因为产品的成败很大程度上取决于指标的评估。</li>
+<li><strong>Customer Requests</strong>: 这些功能是你的客户不断要求的。没什么好说的。倾听你的客户，弄清楚哪些是他们最想要的。你不必非要实现他们要求的所有功能，但是专业的项目管理需要谨慎的倾听直接来自客户的要求，并且十分谦虚和考虑周全，因为没有什么比把客户曾经要求的功能回滚更能激怒他们。</li>
+<li><strong>Customer Delight</strong>: 这些功能客户没有要求过，但是使用的时候他们会很高兴。一般来说完成这些功能需要以下几点：倾听客户找到他们的痛点，了解在技术上如何可行，富有创新的设计以获得优雅而令人愉悦的操作体验。</li>
 </ul>
 
-<p>关于我：</p>
+<p>有些功能可能可以同时放入多个桶，但是一般不会同时可以放到所有桶里。</p>
 
-<p>平时写写 Java 的增删改查，可以说位于程序员鄙视链的最底层。</p>
+<p>我发现，把功能从这三个桶的维度进行分类，会强迫产品团队直视他们为什么想要完成某项功能，是客户想要吗？还是公司想要（Metric Movers）？或者只是他们自己觉得很酷。</p>
 
-<p><del>奈何本咸鱼不服气，有志于翻身。</del></p>
+<hr />
 
+<p>以上算是摘抄式翻译，有两段介绍作者写这篇文章原因的文字略过，后面关于使用这种方式的好处也略过了。</p>
+
+<p>另外，最为关键的 <strong>Metrics Movers</strong> 这个分类，感觉吃不准，作者想表达的到底是完成这项功能以后，产品就会向着预期的目标迈进一大步，还是会大幅度改变产品原来的目标。搜了下原文的评论，似乎没人有这个困惑，可能属于 101 的内容，我这个大外行才不懂。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">kyon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2019-09-03</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div><div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/Wechat.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/ali.jpeg">
+        <span>支付宝打赏</span>
+      </label>
   </div>
-</article>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/translation/">translation</a>
+          <a href="/tags/howto/">howto</a>
+          <a href="/tags/product/">product</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/how-to-be-a-great-product-manager/">
+            <span class="next-text nav-default">How to Be a Great Product Manager</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
         </div>
         <div id="disqus_thread"></div>
     <script type="text/javascript">
