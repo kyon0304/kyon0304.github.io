@@ -153,7 +153,6 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   [params.social]                                         # 社交链接
     a-email = "mailto:kyon0304@gmail.com"
     b-stack-overflow = "https://stackoverflow.com/users/1196640/kyon"
-    c-twitter = "https://twitter.com/kyon_wy"
     m-instagram = "https://www.instagram/kyon_wy"
 
 # See https://gohugo.io/about/hugo-and-gdpr/
