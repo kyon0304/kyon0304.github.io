@@ -11,28 +11,6 @@
     
     
     <item>
-      <title>关于</title>
-      <link>https://kyon.life/about/</link>
-      <pubDate>Sun, 09 Dec 2018 22:58:43 +0800</pubDate>
-      
-      <guid>https://kyon.life/about/</guid>
-      <description>&lt;p&gt;关于本博客：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来&lt;/li&gt;
-&lt;li&gt;wonderland 取自爱丽丝梦游仙境&lt;/li&gt;
-&lt;li&gt;目前计划是：大部分学习笔记，一小部分吐槽，目标是能有完全原创的点子&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;关于我：&lt;/p&gt;
-
-&lt;p&gt;平时写写 Java 的增删改查，可以说位于程序员鄙视链的最底层。&lt;/p&gt;
-
-&lt;p&gt;&lt;del&gt;奈何本咸鱼不服气，有志于翻身。&lt;/del&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
       <title>不要为了避免使用锁定而被限制</title>
       <link>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</link>
       <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
@@ -425,6 +403,274 @@
 &lt;p&gt;在系统全周期（开发、部署、运行、维护）中，好的架构都发挥着作用。开发时，系统架构应当和开发团队相匹配，方便系统开发；部署时，保持不同组件的独立性，修改其中一个不需要全部重新部署；运行时，好的架构应该可以起到解释系统运行过程的作用；维护包括系统的捉虫以及新需求的 patch，是整个周期中成本最高的，好的架构通过遵循开闭原则以及接口隔离原则，使得 debug 可以尽量少的影响原来代码，并方便扩展新加功能。&lt;/p&gt;
 
 &lt;p&gt;好的架构应当使得系统的可选项尽可能久的尽可能多。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>「常识」摘抄</title>
+      <link>https://kyon.life/post/common-sense/</link>
+      <pubDate>Mon, 17 Dec 2018 15:17:22 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/common-sense/</guid>
+      <description>&lt;p&gt;摘抄自梁文道的书 &lt;a href=&#34;https://book.douban.com/subject/3344676/&#34;&gt;《常识》&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座假设在河道上的工具，一种暧昧的情绪，甚至是风暴的形态。到了现在，这一切名字却像黏力消失的小纸片，从它们所在的东西上逐一剥落，逐一飞散。所以我们开始习惯不再相信言词。&lt;/p&gt;
+
+&lt;p&gt;如果每个人都以类似的态度对待言词与事实的隔离，那么他们一定不会再轻信任何言词以及那些用言词表达的所有美好价值。而这个社会将不只是个信任匮乏的社会，它还必将滋生出一种犬儒的冷漠。&lt;/p&gt;
+
+&lt;p&gt;我依然相信语言与事物的神奇对应，相信承诺必将履行，理念必得实现。这不是幼稚，而是公民存在的基本条件；不只是“我相信”，更是“我要相信”。&lt;/p&gt;
+
+&lt;p&gt;—— 空话/言语脱离现实之后的信任问题&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;“必须从一开始就对文本的异己性保持敏感。但这种敏感既不涉及所谓的‘中立’，也不意味泯除自我；而是为自己的现存之见与固有理解让出一块空地。对自己偏见的觉察是件重要的事，因为这样，文本才能呈现出它所有的他性，以及它那相对于读者固有理解的真理。”&lt;/p&gt;
+
+&lt;p&gt;浮躁/这个时代的集体病症&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;政府若要施行有效的统治，要百姓心悦诚服地遵从法律政令，要纳税人心甘情愿地缴税，靠的不能只是暴力，还要靠对统治者的同意与信服，这是现代政治文明的常识；人民是国家的主人，人民必须同意政府的统治，政府才能有效地管治。
+然而，不客气地说，一个永远正确永不犯错的政权，这是在传统社会里才行得通的神话。改革开放三十年来的历程恰恰说明了，政权的合法性绝对不能只开一个不容动摇的神话史观，还要依靠凭绩效而来的良治经验。…… 由此看来，再去重复神话史观的力量不只是不合时宜，简直就是开倒车了。&lt;/p&gt;
+
+&lt;p&gt;——创世神话/新中国的历史问题&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;我们时常歌颂知识分子的独立人格，但很少去谈学术界文化界的“界格”。“界格”说白了，就是学术文化相对的独立地位；正因其独立，一个学者的话才有了分量。我们愿意相信他的发言他的研究，信服的是学术本身的逻辑，以真理的追求为目标，而非大量以取悦政治人物的喜好为原点。毕竟政治的逻辑和学术的逻辑是两套不同的逻辑。政治、经济、学术和文化等领域的分化发展是现代性的标志成就，显然它们彼此相关，但没有任何一个领域可以完全吞没另一个领域，也没有任何一个领域的逻辑可以完全取代另一套逻辑，更不可能让一套逻辑的目标成为所有领域活动的目标。&lt;/p&gt;
+
+&lt;p&gt;—— 大学校长/校长的地位堪比国家元首&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;不假思索地将“极少数”和“坏分子”联结起来，会起到使大脑迟钝、令焦点模糊的作用。&lt;/p&gt;
+
+&lt;p&gt;二战之后的德国兴起纳粹语言学的研究，就是要分析政治语言的语法和词条，看看空洞的语言如何造成了思想的贫乏和虚无的热情。今天的中国已经正式告别过去的阶级斗争，迈向建设和发展之路，我们也需要相应的语言反省和重建。以“极少数”为例的老式术语虽不是“文革”的产物，却是可以总结那个年代的“斗争语言”代表，小心清理它过多的价值意蕴既合时宜且有益，否则说不定会闹出一些消化。&lt;/p&gt;
+
+&lt;p&gt;—— 极少数/ 只限于坏人的一种量词&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>集合基数统计</title>
+      <link>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;集合基数&lt;/strong&gt;：对于非无限集合，基数是指集合中元素的个数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：将两个集合合并后，如何求新集合的基数。&lt;/p&gt;
+
+&lt;p&gt;Bitmap &amp;ndash;&amp;gt; Linear Count &amp;ndash;&amp;gt; LogLog Count &amp;ndash;&amp;gt; Adaptive Count &amp;ndash;&amp;gt; HyperLogLog Count&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;假设集合的基数为 n&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;bitmap&#34;&gt;Bitmap&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;原理&lt;/strong&gt;：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;内存占用&lt;/strong&gt;：需要 n bit，空间复杂度 O(n)&lt;/p&gt;
+
+&lt;h2 id=&#34;linear-count&#34;&gt;Linear Count&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;原理&lt;/strong&gt;：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。
+&lt;img src=&#34;https://kyon.life/media/15436750409657/15436750409657.jpg&#34; alt=&#34;LC 将集合元素存入 bitmap 示意图&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：和 bitmap 相同&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;内存占用&lt;/strong&gt;：由于当桶满的情况（即所有 bit 都为 1）下，u=0，公式得到的值趋近无穷，不再生效，因此需要控制满桶出现的概率足够小，并且需要控制误差在可接受范围内，经过一系列计算，可以得出 m 和 n 的一个表格，表示不同集合基数 n 时，需要控制满桶概率的 m 的值，可以总结出一个规律，m 大约为 n/10，即只需要 bitmap 方式占用空间的十分之一。但是从渐进复杂性的角度看，空间复杂度仍为 O(n)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;误差&lt;/strong&gt;：由 n 的量级和 m 的量级共同决定，当可以容忍的误差为 ∆ 则可以推导得到  $m &amp;gt; \frac {e^t-t-1}{(∆t)^2}$ 其中 t = n/m&lt;/p&gt;
+
+&lt;h2 id=&#34;loglog-count&#34;&gt;LogLog Count&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;前置要求&lt;/strong&gt;：
+1. 哈希的结果分布近似均匀
+2. 哈希结果碰撞的概率足够小
+3. 哈希的结果表示为二进制后长度固定&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;原理&lt;/strong&gt;：
+将集合中一个元素进行哈希后，表示为 m 位二进制存入 bitmap，存入时与原 bitmap 中的值做 或(or) 操作，由前置要求的第 x 条可知，每一 bit 为 0 或为 1 是互相独立的，各有 &lt;sup&gt;1&lt;/sup&gt;&amp;frasl;&lt;sub&gt;2&lt;/sub&gt; 的概率，因此将集合中所有元素全部存入 bitmap 的过程可以看作是 &lt;code&gt;伯努利过程&lt;/code&gt;，那么第 k 位第一次出现 1 的概率为 $P_n(x=k) = \frac {1}{2^k}$。接下来用反证法证明，集合的基数 $n ≈ 2^k$&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;bitmap 中 1 第一次出现在 k 位之前的概率 $P_n(x≤k) = (1-P_n(x=k))^n = (1 - \frac {1}{2^k})^n$&lt;/li&gt;
+&lt;li&gt;那么 bitmap 中 1 第一次出现在 k 之后的概率 $P_n(x&amp;gt;k) = (1 - P_n(x≤k)) = (1 - (1 - \frac {1}{2^k})^n)$&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;首先，假设 $n » 2^k$ 那么 $P_n(x&amp;gt;k)$ 趋近于 0，而当 $n « 2^k$ 时，$P_n(x≤k)$ 则趋近于 0，于是 n 可以近似由  $2^k$ 求得。&lt;/p&gt;
+
+&lt;p&gt;此时已经可以得到集合的基数为 $$n ≈ 2^k$$ 其中 k 为 bitmap 中从高位数起，1 第一次出现的位数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;桶平均&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;接下来，为了抵消一些偶然因素，LLC 引入了桶分组，类似于物理实验中的多次实验求平均值。&lt;/p&gt;
+
+&lt;p&gt;将元素哈希后的 m 位二进制表示，拆分为两部分，前 p 位表示桶序号，后面的 m-p 位作为真正用于估计基数的比特串。桶序号相同的元素被分配到同一个桶，估计基数时，首先计算桶内比特串 1 第一次出现的位置，记为 P[i]，然后对 p 个桶加和取平均后再进行估算，此时 n 的估计值变为
+$$n ≈ 2^{\frac {∑P[i]}{p}}$$&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：以桶为合并的最小单位，桶序号相同的比特串进行 bitmap 的合并
+&lt;strong&gt;内存占用&lt;/strong&gt;：内存使用与分桶数及哈希后的二进制位长度相关，假设哈希后数值表示为二进制为 32 位，则每个桶需要 5bit 内存来存当前桶第一个 1 出现的位置，内存占用即为 $$\frac {5*p}8 byte$$
+&lt;strong&gt;误差&lt;/strong&gt;：误差主要由分桶的数目决定，如果要将误差控制在 ∆ 之内，则分桶数 p 的取值为 $$p &amp;gt; (\frac {1.30}{∆})^2$$&lt;/p&gt;
+
+&lt;p&gt;假设基数为一亿的集合（约为 $2^27$），分桶数为 p=1024，那么需要占用的内存为 5*&lt;sup&gt;1024&lt;/sup&gt;&amp;frasl;&lt;sub&gt;8&lt;/sub&gt;=640 字节，误差由 $1024 &amp;gt; (\frac {1.30}∆)^2$ 可算得 $∆ &amp;lt; 0.040625$ 即小于 4%&lt;/p&gt;
+
+&lt;h2 id=&#34;adaptive-count&#34;&gt;Adaptive Count&lt;/h2&gt;
+
+&lt;p&gt;基数比较小时，用 LC，比较大时用 LLC&lt;/p&gt;
+
+&lt;h2 id=&#34;hyperloglog-count&#34;&gt;HyperLogLog Count&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;注意，这里的分桶数，使用 m 来表示，而不是 p&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;将 LLC 中桶分组的几何平均替换为调和平均，使用调和平均数代替几何平均数后，估计公式变为如下&lt;/p&gt;
+
+&lt;p&gt;$$\hat{n}=\frac{\alpha_m m^2}{\sum{2^{-M}}}$$&lt;/p&gt;
+
+&lt;p&gt;其中&lt;/p&gt;
+
+&lt;p&gt;$$\alpha_m=(m\int _0^\infty (log_2(\frac{2+u}{1+u}))^m du)^{-1}$$
+替换求平均方式的原因是，几何平均对离群值非常敏感，导致有空桶出现时，估计结果有较大扰动&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;参考：&lt;/p&gt;
+
+&lt;p&gt;[1]. &lt;a href=&#34;http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-ii.html&#34;&gt;解读Cardinality Estimation算法（第二部分：Linear Counting）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[2]. &lt;a href=&#34;http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-iii.html&#34;&gt;解读Cardinality Estimation算法（第三部分：LogLog Counting）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[3]. &lt;a href=&#34;http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-iv.html&#34;&gt;解读Cardinality Estimation算法（第四部分：HyperLogLog Counting及Adaptive Counting）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[4]. &lt;a href=&#34;https://djhworld.github.io/hyperloglog/&#34;&gt;HyperLogLog&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[5]. &lt;a href=&#34;https://www.soasme.com/techshack.weekly/verses/a4335a0c-7b1f-4b0e-9f79-15201ed79998.html&#34;&gt;Hyperloglog 算法简介&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch 学习记录</title>
+      <link>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
+      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
+      <description>
+
+&lt;h2 id=&#34;es-的基本概念&#34;&gt;ES 的基本概念&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用 lucene 作为核心搜索库，倒排索引&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;index&lt;/code&gt; 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;document&lt;/code&gt; 文档，类似于 sql 表中的一条数据，含有多个 field&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;field&lt;/code&gt; 类似于 sql 表中的一列，属性及其值&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;node/cluster&lt;/code&gt; es 可以在不同的机器（node）上运行不同的线程，组成 cluster 的形式提供服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;shard&lt;/code&gt; 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;es-的分布式架构&#34;&gt;ES 的分布式架构&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/img/01_elasticsearch%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E5%8E%9F%E7%90%86.png&#34; alt=&#34;01_elasticsearch分布式架构原理&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分&lt;/li&gt;
+&lt;li&gt;一个 shard 的 primary/replica 会在不同机器上，当一台机器挂掉后，可以从另一台机器的 shard 中读取/恢复数据&lt;/li&gt;
+&lt;li&gt;写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端&lt;/li&gt;
+&lt;li&gt;读 es 时，可以从 primary shard 读，也可以从 replica 读&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;es-的读写过程&#34;&gt;ES 的读写过程&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/img/01_es%E8%AF%BB%E5%86%99%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90.png&#34; alt=&#34;01_es读写底层原理剖析&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;es-的写过程&#34;&gt;ES 的写过程&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用&lt;/li&gt;
+&lt;li&gt;协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点&lt;/li&gt;
+&lt;li&gt;shard A 接收到数据后，进行存储，并同步到 replica shard&lt;/li&gt;
+&lt;li&gt;协调节点等待 shard A 的写入和同步都完成后，向客户端发送写入成功回执&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;shard-a-写数据过程详细&#34;&gt;shard A 写数据过程详细&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;shard A 收到数据后，会先缓存到内存 buffer 中，并写入一份到 translog&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:translaog&#34;&gt;&lt;a href=&#34;#fn:translaog&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; 文件的系统缓存（os cache），此时，该条数据虽然写入完成，但是没有经过进一步处理，客户端进行查询的话，是查询不到的&lt;/li&gt;
+&lt;li&gt;buffer 写满/每隔一段时间（默认 1s），es 将 buffer 中的数据 &lt;em&gt;refresh&lt;/em&gt; 到 segment file 的 os cache 中，数据写入 segment file 之后，同时就会建立好倒排索引，若 buffer 中没有数据则跳过&lt;/li&gt;
+&lt;li&gt;由于 os cache 虽然不是 es 在管理，但也是内存，如果机器挂掉数据同样会丢失，所以 os cache 超过一定容量/每隔一段时间（默认 30min）会 &lt;em&gt;flush&lt;/em&gt; 到磁盘，此时将会生成多个 segment file（上次 flush 到这次之间 refresh 个数的）&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;translog 同样需要持久化，达到一定阈值/每隔一段时间（默认 5s）进行一次 &lt;em&gt;commit&lt;/em&gt; 操作&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;将 buffer 中的数据 refresh 到 os cache 中，清空 buffer&lt;/li&gt;
+&lt;li&gt;将一个 commit point 写入磁盘文件，里面标识着这个 commit point 之前的所有 segment file&lt;/li&gt;
+&lt;li&gt;将 os cache 中的所有数据强制 fsync 到磁盘&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;由于每次 refresh 操作，都会生成一个 segment file，所以数量会急剧增多，到达一定阈值后，会触发 &lt;em&gt;merge&lt;/em&gt; 操作，合并为一个大的 segment file，并将原来的小文件删除&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;es 删除数据是标记删除，即删除请求到达后，会记录一个 &lt;em&gt;.del&lt;/em&gt; 的磁盘文件，当搜索某条数据时，一旦发现在 .del 文件中被标记为删除，则不会返回；在 merge 被触发后，过程中检查 segment file 中的记录是否已经被标记删除，若是，则不会进入大的 segment file，以此达到删除的目的&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;ES 的读过程&lt;/em&gt;
+es 读数据分为两种
+- 根据 doc id 进行 get 查询
+- 搜索&lt;/p&gt;
+
+&lt;h3 id=&#34;查询&#34;&gt;查询&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端向协调节点发起查询请求&lt;/li&gt;
+&lt;li&gt;协调节点根据 doc id 进行哈希，获得该条数据所在 shard 及其 node&lt;/li&gt;
+&lt;li&gt;由于查询既可以向 primary 也可以向 replica 发起，因此这里选取路由时有一个 lb，从中选取一个 shard 及其 node 即可&lt;/li&gt;
+&lt;li&gt;shard 将数据返回给协调节点，协调节点将数据返回客户端&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;搜索&#34;&gt;搜索&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端向协调节点发起搜索请求&lt;/li&gt;
+&lt;li&gt;协调节点将关键词发给所有 shard（primary/replica 任选其一）&lt;/li&gt;
+&lt;li&gt;各个 shard 根据关键词进行搜索，并返回匹配度较高的几条 doc 的 id 给协调节点&lt;/li&gt;
+&lt;li&gt;协调节点接收到所有 shard 的返回后，根据匹配度进行排序，获取最优的几条，并根据 doc id 向 shard 查询对应的 document，返回给客户端&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Ps.&lt;/strong&gt; ES 是准实时的，因为在 buffer 中的内容 refresh 到 segment file 之前是搜索不到的，大概会有 1s 的时间差&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ps.s.&lt;/strong&gt; ES 有可能会丢数据，在 buffer、translog 中有数据未落盘时机器宕机&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ps.s.s.&lt;/strong&gt; refresh、flush、commit 操作都可以通过 rest API/Java API 手动触发&lt;/p&gt;
+
+&lt;p&gt;参考资料：&lt;/p&gt;
+
+&lt;p&gt;中华石杉码农，视频资料，可能是盗版的，无法找到来源了&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+
+&lt;hr /&gt;
+
+&lt;ol&gt;
+&lt;li id=&#34;fn:translaog&#34;&gt;translog 的作用：机器宕机重启时，会读取 translog 中的信息，并恢复到内存 buffer 和 os cache 中，减少数据丢失。
+ &lt;a class=&#34;footnote-return&#34; href=&#34;#fnref:translaog&#34;&gt;&lt;sup&gt;[return]&lt;/sup&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
 </description>
     </item>
     
