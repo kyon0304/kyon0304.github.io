@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>企业级架构 on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%9E%B6%E6%9E%84/</link>
+    <description>Recent content in 企业级架构 on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 17 Sep 2019 09:43:54 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%9E%B6%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>不要为了避免使用锁定而被限制</title>
+      <link>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</link>
+      <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</guid>
+      <description>翻译自 Don&amp;rsquo;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -9,6 +9,55 @@
   </url>
   
   <url>
+    <loc>https://kyon.life/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/post/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%9E%B6%E6%9E%84/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E6%9E%B6%E6%9E%84/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E7%BF%BB%E8%AF%91/</loc>
+    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://kyon.life/tags/howto/</loc>
     <lastmod>2019-09-03T15:07:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -16,28 +65,7 @@
   </url>
   
   <url>
-    <loc>https://kyon.life/</loc>
-    <lastmod>2019-09-03T15:07:03+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/post/</loc>
-    <lastmod>2019-09-03T15:07:03+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://kyon.life/tags/product/</loc>
-    <lastmod>2019-09-03T15:07:03+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/</loc>
     <lastmod>2019-09-03T15:07:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

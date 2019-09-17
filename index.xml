@@ -6,7 +6,7 @@
     <description>Recent content on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 03 Sep 2019 15:07:03 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 17 Sep 2019 09:43:54 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/index.xml" rel="self" type="application/rss+xml" />
     
@@ -18,6 +18,15 @@
       
       <guid>https://kyon.life/about/</guid>
       <description>关于本博客： kyon 凉宫春日的男主角，早期看的动画里非常喜欢的一个角色，就这样用了下来 wonderland 取自爱丽丝梦游仙境 目前计划是：大部分学习笔记，一小部分吐槽</description>
+    </item>
+    
+    <item>
+      <title>不要为了避免使用锁定而被限制</title>
+      <link>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</link>
+      <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</guid>
+      <description>翻译自 Don&amp;rsquo;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行</description>
     </item>
     
     <item>

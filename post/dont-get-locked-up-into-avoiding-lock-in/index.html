@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>不要为了避免使用锁定而被限制 - kyon&#39;s wonderland with ❤️</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="kyon" /><meta name="description" content="翻译自 Don&amp;rsquo;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行" /><meta name="keywords" content="kyon, blog, java, backend" />
+
+
+
+<meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
+
+
+<meta name="generator" content="Hugo 0.57.2 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link href="/dist/even.93844dae.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/share.min.css">
+
+
+<meta property="og:title" content="不要为了避免使用锁定而被限制" />
+<meta property="og:description" content="翻译自 Don&rsquo;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/" />
+<meta property="article:published_time" content="2019-09-17T09:43:54+08:00" />
+<meta property="article:modified_time" content="2019-09-17T09:43:54+08:00" />
+<meta itemprop="name" content="不要为了避免使用锁定而被限制">
+<meta itemprop="description" content="翻译自 Don&rsquo;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行">
+
+
+<meta itemprop="datePublished" content="2019-09-17T09:43:54&#43;08:00" />
+<meta itemprop="dateModified" content="2019-09-17T09:43:54&#43;08:00" />
+<meta itemprop="wordCount" content="9035">
+
+
+
+<meta itemprop="keywords" content="翻译,企业级架构,架构," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="不要为了避免使用锁定而被限制"/>
+<meta name="twitter:description" content="翻译自 Don&rsquo;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">kyon&#39;s wonderland</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">kyon&#39;s wonderland</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">不要为了避免使用锁定而被限制</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-09-17 </span>
+        
+          <span class="more-meta"> 约 9035 字 </span>
+          <span class="more-meta"> 预计阅读 19 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#开源混合多云-避免使用锁定">开源混合多云 == 避免使用锁定？</a></li>
+<li><a href="#灰色的使用锁定">灰色的使用锁定</a></li>
+<li><a href="#通过使用模型做出更好的决策">通过使用模型做出更好的决策</a></li>
+<li><a href="#使用锁定作为一个-2x2-的矩阵">使用锁定作为一个 2x2 的矩阵</a></li>
+<li><a href="#使用锁定真正的代价">使用锁定真正的代价</a></li>
+<li><a href="#减少使用锁定-执行价格-the-strike-price">减少使用锁定：执行价格（The strike price）</a></li>
+<li><a href="#避免使用锁定的总代价">避免使用锁定的总代价</a></li>
+<li><a href="#综合考虑">综合考虑</a>
+<ul>
+<li><a href="#部署容器">部署容器</a></li>
+<li><a href="#关系型数据库访问">关系型数据库访问</a></li>
+<li><a href="#迁移至云">迁移至云</a></li>
+<li><a href="#多云">多云</a></li>
+</ul></li>
+<li><a href="#以思考的速度做架构">以思考的速度做架构</a></li>
+<li><a href="#致谢">致谢</a></li>
+<li><a href="#重大修订">重大修订</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      
+
+<p>翻译自 <a href="https://martinfowler.com/articles/oss-lockin.html">Don&rsquo;t get locked up into avoiding lock-in</a></p>
+
+<hr />
+
+<p>架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行之。然而，使用锁定并不是一件非对即错的事情：避免某一方面的使用锁定经常会使得你在另一方面的使用被锁定。流行的观念，比如开源软件魔法般地自动消除了使用锁定，也被证明是不完全正确的。是时候近距离看一下使用锁定了，这样你就不会为了避免使用锁定而被限制！</p>
+
+<hr />
+
+<p>作者介绍</p>
+
+<p>略</p>
+
+<hr />
+
+<p>架构师的重要目标之一是<a href="https://architectelevator.com/architecture/architecture-options/">创造选择</a>。这些选择使得系统可以容忍变更，这样我们就可以推迟作决定的时机，等到更多可用的信息，或者对没有预见的事件作出应对。使用锁定则起反作用：它使得方案切换变得困难。所以很多架构师可能会把使用锁定视为他们架构路上的敌人，而他们自己则是可以随意替换和连接组件的自由的 IT 系统的守卫。</p>
+
+<blockquote>
+<p>使用锁定 —— 一个架构师的架构之敌？</p>
+</blockquote>
+
+<p>但是架构从来不会那么简单 —— 这是充满权衡的工作。经验丰富的架构师知道，使用锁定背后有更多需要关注的东西，而不是直接宣布应该避免。使用锁定有很多方面，有时甚至会成为优先的方案。所以让我们近距离看一下使用锁定。</p>
+
+<h2 id="开源混合多云-避免使用锁定">开源混合多云 == 避免使用锁定？</h2>
+
+<p>近来我们部署软件的平台变得越来越强大 —— 现代的云平台不仅可以<a href="https://www.slideshare.net/bretmc/machine-learning-with-google-machine-learning-apis-puppy-or-muffin">识别我们的照片中有小狗还是松饼</a>，还可以编译我们的代码、部署它、配置必须的基础设施、存储我们的数据。</p>
+
+<p>这样巨大的便利和效率提升也带来了全新的使用锁定。混合/多云配置，看上去最近吸引了很多架构师的注意，是一个考虑使用锁定时的好例子。假设你有一个应用想上云，非常容易办到。但是从架构师的角度来说，有许多选择和更多的权衡，尤其是和使用锁定有关时。</p>
+
+<p>你可能想把应用部署到容器中。这听起来不错，但是要用 AWS 的 Elastic Container Service(ECS) 吗？毕竟，这是亚马逊云专有的。倾向于 Kubernetes？它是开源的并且可以运行在大多数环境中，包括自有环境 (on premises)。问题解决了吗？并没有完全解决 —— 你现在和 Kubernetes 绑定了 —— 想想那些至关重要的 YAML 文件吧！所以你从一个使用锁定跳到了另外一个，不是吗？而且如果你使用了托管的 Kubernetes 服务，比如 Google 的 GKE 或 Amazon 的 EKS，你可能还被限制到 Kubernetes 的一个特定版本和这些云服务商的专有扩展中。</p>
+
+<p>如果你想在自有环境中运行应用，你也可以选择 <a href="https://aws.amazon.com/outposts/">AWS Outposts</a>，这样你就会有一些选择权。但是这说到底还是专有的。它和 VMWare 集成，这就导致你可能已经被锁定到只能使用 VMWare 了，所以这真的有什么过人之处吗？Google 最新推出的竞品 Anthos 虽然是使用开源组件构建的，但仍然是一个专有产品：你可以将应用在不同的云提供商之间迁移 —— 前提是你要一直使用 Anthos。这不就正是使用锁定的定义吗？</p>
+
+<p>再或者，如果你将应用的运行时和自动化部署彻底地区分开，不就可以非常简单的转换底层基础设施，减少所有这些使用锁定的影响吗？甚至还有跨平台的将基础设施作为代码(infrastructure-as-code)的工具。难道所有这些不能解除使用锁定的担心吗？</p>
+
+<p>对于存储的需求，AWS S3 怎么样？其他云服务提供商提供了和 S3 兼容的 API，所以 S3 可以被认为是跨云兼容而且没有使用锁定吗，即使它本身是专有产品？你也可以把所有的数据访问封装一层抽象，这样就可以本地化任何依赖。这是个好主意吗？</p>
+
+<p>看上去避免使用锁定并不那么简单，而且甚至可能会把你限制在逃离使用锁定的境况。尽管如此，为了表明基于云的架构仍然是非常有趣的，我在此推荐(原文怀疑笔误，defer to -&gt; refer to) <a href="https://twitter.com/swardley/status/908031162668474368">Simon Wardley&rsquo;s take on hybrid cloud</a></p>
+
+<h2 id="灰色的使用锁定">灰色的使用锁定</h2>
+
+<blockquote>
+<p>使用锁定不是一个全是/全不是的东西</p>
+</blockquote>
+
+<p>别人只能看到黑白的地方，乘坐架构电梯（可以参考作者的另一篇文章 <a href="https://architectelevator.com/">Architect Elevator</a>）的人可以看到不同程度的灰色。当考虑系统设计时，他们会意识到，对于像使用锁定这种公共的属性，并不是二元的选择。两个系统不会简单的，就像你不会被某个产品完全锁定或完全未锁定。这两种属性都有很多方面。举例来说，使用锁定可以分解为很多不同维度：</p>
+
+<ul>
+<li><strong>提供商使用锁定</strong>：搞 IT 的人提到「使用锁定」时，通常都是指这种。它描述了从一个提供商切换到它的竞争者时的困难。比方说，如果从 Sieble CRM 迁移到 SalesForce CRM 或从 IBM DB2 迁移到 Oracle 基本会费掉你一根胳膊和一条腿，你被「锁定」了。这种类型的使用锁定很常见，因为提供商一般（不管是否明显）会从中获利。这种使用锁定包括商业安排，比如可以为你赢得打折的长期使用许可和售后服务协议。</li>
+<li><strong>产品使用锁定</strong>：和上一个相关，但这次是被锁定到了某个产品。当从一个提供商的产品迁移到另一个提供商的产品时，你经常需要同时更换提供商和产品，所以这两种使用锁定很容易混淆。开源产品可能可以避免提供商锁定，但是他们不能免除产品锁定：如果你正在使用 Kubernetes 或 Cassandra，你肯定就会被限制使用特定产品的 API，配置和功能。如果你在一个专业的（尤其是企业）环境工作，你还需要商业支持，而这将会再次将你限制到某个提供商的合同中 —— 参考上一条。过多的个性化配置、集成和专有扩展是某种形式的产品使用锁定 —— 他们使你很难切换到其他产品，即使它是开源的。</li>
+<li><strong>版本使用锁定</strong>：除了被锁定在某一个产品，你还可能被锁定到具体的某个版本。版本升级可能会非常困难，如果他们不再兼容现有的个性化配置和你构建的扩展。一些使得你必须重写应用的版本升级 —— AngularJS vs Angular。情况还有可能变得更糟，版本锁定会传播：某个产品版本可能会使用另外一个特定（经常是过时）的操作系统版本等等，这使得任何迁移的尝试变得非常困难。当提供商决定弃用或不再继续支持整个产品线时，这种类型的锁定将会使你更难过：你必须在不再享有售后服务和作一次彻底的修改之间作出决定。情况甚至还可以变得更糟，比如，当你使用的老版本中被发现安全漏洞但是不再被提供 patch。</li>
+<li><strong>架构使用锁定</strong>：你也可能被限制在某个特定的架构。举例来说，当你到处使用 Kubernetes 时，有很大可能你在构建暴露 API 接口的微小的服务，并且作为容器部署。如果你想迁移到 serverless 的架构，你会想要把你的服务的粒度进一步改为单个的函数，将状态管理放到外部处理。这种改变将是你应用的一次彻底重构。</li>
+<li><strong>平台使用锁定</strong>：对某种产品的偏好会导致平台锁定，尤其是云平台。这种平台不仅运行你的应用，它们也保存了你的用户账号和关联的访问权限、安全策略、基础设施划分和许多其他方面。它们也提供了应用级别的服务，比如存储和机器学习服务，一般都是专有的。和这些服务保持距离看上去是一个减少平台锁定的方式，但这会大大消减最开始选择上云的动机。非软件从业者把这称为两难境地（finding yourself between a rock and a hard place）</li>
+<li><strong>技能使用锁定</strong>：随着开发者对某种特定的产品或架构越来越熟悉，你将会遇到技能使用锁定：重新训练或招聘其他产品或技术的开发人员会耗费时间。由于在如今的 IT 商店中，技能可用性是其中一种主要的限制，这种类型的使用锁定非常真实。一些企业应用对开发人员有特别的限制，使得花费在开发上的开销增多。当产品使用的定制化语言或者，有些讽刺的，「仅需配置」/不需要代码的框架时，这种效果尤其明显。</li>
+<li><strong>法规使用锁定</strong>：你可能会由于法律原因而被锁定在某个特定的解决方案，比如合规要求。举例来说，如果另外一家云服务提供商的数据中心没坐落在你的国家，那么你可能无法将你的数据迁移过去。你使用的软件的许可协议可能不允许你将系统迁移至云上，即使他们可以在云上流畅运行。如果你不管这些决定就这么干，你将会违反许可协议的条款。法律法规对工程的渗透远超我们预期：你的飞行器的小发动机可能早在 1970 年就设计好了，并且非常耗费燃料：新的引擎设计面临着高昂的法规不利条件。</li>
+<li><strong>智力使用锁定</strong>：最不明显，但是最危险的使用锁定的类型，就是会影响你的思考方式。当使用一系列提供商和架构工作过一段时间后，你很可能会将他们的假设纳入你做的决定中，而这将会使你拒绝掉其他可选项。举例来说，你可能以低效为理由拒绝扩容底层架构，因为他们不是线性伸缩的（将硬件提升两倍并不会两倍提升性能）。虽然技术上说是准确的，但是这种考虑问题的方式忽略了可伸缩性而不是效率才是最重要的这样一个事实。或者你可能会厌恶较短的发布周期，因为你观察到频繁的更新会导致更多的缺陷。当然了，你被告知过，写代码是奢侈、耗时并易于出错的，所以你应该通过配置完成所有事情。</li>
+</ul>
+
+<blockquote>
+<p>开源软件不是使用锁定的魔法解药</p>
+</blockquote>
+
+<p>总的来说，使用锁定完全不属于「是/不是」的二维范畴，所以理解这些不同的方面可以帮助你做出更明智的架构决定。这个列表也揭穿了一些常见的迷思，比如使用开源软件可以神奇地消除掉使用锁定。开源软件可以减少提供商锁定，但是大多数其他类型的使用锁定仍然存在。这并不意味着开源不好，只是它不是使用锁定的魔法解药。</p>
+
+<h2 id="通过使用模型做出更好的决策">通过使用模型做出更好的决策</h2>
+
+<p>经验丰富的架构师不仅可以看到更多不同的灰度，他们也会实践良好的决策原则。这非常重要，因为我们远没有一般愿意认为的那样善于做出决定 —— 如果怀疑的话，你可以看下 Kahneman 的 <a href="https://amzn.to/2Xnx7od">「思考，快与慢」</a></p>
+
+<p>改善决策最有效的一种方式是使用模型。甚至，或者说尤其是，简单的模型可以令人称奇地提改善决策制定。</p>
+
+<blockquote>
+<p>简单却容易记忆的模型是伟大的科学家的签名，而过于详尽参数过多的模型则是平庸的标志</p>
+
+<p>—— <a href="https://en.wikipedia.org/wiki/All_models_are_wrong#Quotations_of_George_Box">George Box</a></p>
+</blockquote>
+
+<p>这就是你不应该嘲笑管理顾问钟爱的非常闻名的 2x2 矩形的原因。它是最简单也因此最有效的模型之一，我们不久将会看到。</p>
+
+<blockquote>
+<p>环境越是不确定，越是结构化的模型将帮助你做出更好的决定。</p>
+</blockquote>
+
+<p>关于模型第二重要的点：一种常见的观点是，当面对不确定时，你非常可能不得不随意做决定（shoot from the hip）—— 反正一切都在变动中。对立面其实才是真实的：我们本来就很差的做决定的能力，在需要处理许多相互依赖、高度不确定性和很小的概率时，只会变得更加糟糕。因此，在我们做决定时，模型会带来所需的结构和原则，派上大用场。决定是否接受使用锁定以及接受到什么程度非常完美地契合到这种做决定的类型，所以让我们用一些模型。</p>
+
+<h2 id="使用锁定作为一个-2x2-的矩阵">使用锁定作为一个 2x2 的矩阵</h2>
+
+<p>一个简单的模型可以帮助我们跨过「使用锁定=坏」的境地。首先，我们需要意识到，想要完全免除使用锁定是非常困难的，所以适量的使用锁定是不可避免的。其次，如果得到相应的好处，比如，竞品不提供的独特的功能或者使用便利，我们也可以很愉快地接受一定程度的使用锁定。</p>
+
+<p>让我们用一个非常简单的模型来表示这些因素 —— 一个 2x2 的矩阵</p>
+
+<p><img src="/media/lockin/lockin_matrix.png" alt="lockin_matrix" /></p>
+
+<p>这个矩阵通过 2 个轴来表示我们的选择：</p>
+
+<ul>
+<li>切换代价（也就是「使用锁定」）：当我们想切换到其他方案时将会有多困难？</li>
+<li>独特的功能：与其他可选方案相比，我们可以从当前方案可以多获得多少？</li>
+</ul>
+
+<p>现在我们可以对四个象限做比较了：</p>
+
+<ul>
+<li><strong>方便替换（Disposable）</strong>：没有独特功能也可以简单替换的组件，可能是最不需要我们担心的。我们可以让它们保持原样，或者如果我们遇到问题了，可以简单地替换它们。Not a bad place to be for run-of-the-mill stuff. 比如，大多数开发 IDE（EMACS 可能是个引人注目的例外！）就属于这个分类：可以根据你的喜好混合使用，而且不会过于依赖它们。存放了你的照片和其他个人数据的云端存储使得你的智能手机也被划分到这个分类，后面还会详细讨论。</li>
+<li><strong>可接受的使用锁定（Acceptted Lock-in）</strong>：对角线上，会使得你被锁定到某个产品或提供商，但是同时给你提供了独特的功能作为回报。虽然一般我们倾向于更少的使用锁定，但是这种折中也是可以接受的。你可能使用了像 Google Cloud BigQuery 或 AWS 裸金属这样的产品，非常清楚地知道被锁定了，这就是基于你所能得到的好处做了一个很清醒的决定。对于较小的应用，你也可能愉快的使用原生 AWS 服务，因为不太可能做迁移，而在开发和运维中节省的力气则是很受欢迎的。</li>
+<li><strong>警告（Caution）</strong>：最不受欢迎的，既锁定了你，但又没有提供什么独特的功能。传统的关系型数据库可能属于这一类 —— 使用专有数据库可以提升你的年报吗？并不见得。然而，想要迁移走却是非常困难的，所以你最好能确保你不需要那样做。如果你为嵌入式系统选择了一个特别的硬件，然后要把这个系统发射到外太空，这样是可以的 —— 需要迁移的可能性足够低了。</li>
+<li><strong>理想情况（Ideal）</strong>：最棒的产品，提供了独特的功能，同时又可以非常方便地被替换。虽然听上去是要努力达到的理想状况，但是你需要知道这是有点矛盾的：如果一个方案提供了独特的功能，根据定义来说，竞品是不会提供的，这就会使得迁移变困难。S3 可能是这个分类的一个合适的例子 —— 多个云提供商采用了相同的 API，使得迁移，比如迁移到 GCP，相对简单。然而，每个实现都有一些不同的优势，比如地区、性能等。为了保护这种不同产品间的可迁移性，<a href="https://en.wikipedia.org/wiki/Oracle_America,_Inc._v._Google,_Inc.">不允许 API 被注册为专利</a>是非常重要的。</li>
+</ul>
+
+<p>虽然模型确实很简单，将你的软件（可能还有硬件）组件放到这个矩阵中则值得实践。不仅可以可视化你暴露的东西，而且还可以将你的决定和不同的股东更好的交流。</p>
+
+<p><img src="/media/lockin/lockin_example.jpg" alt="lockin_example" /></p>
+
+<p>举一个每天都会用到的四象限的例子，你可能决定使用下面这些东西，它们给你带来了不同程度的使用锁定和便利（从右上角开始逆时针说）：</p>
+
+<ul>
+<li>你钟爱的 <strong>iPhone</strong> 将你锁定在一个提供商的生态中，但是它也提供了独特的功能，所以你可能觉得<strong>接受这样的锁定是 OK 的（Accepted Lock-in）</strong>。</li>
+<li>你的<strong>移动数据提供商合同</strong>将你锁定在单一的网络中，但是相对其他网络并没有真正提供多少便利。最好将它放入<strong>警告（Caution）</strong>中</li>
+<li>你的<strong>手机充电器</strong>有标准接口。可惜很多 iPhone 没有，但是幸运的是转接线仍旧使得这种零件<strong>方便替换（Disposable）</strong></li>
+<li>很多 <strong>应用，比如短信</strong>，提供了独特的功能，比如联络朋友，但是它们仍然被设计为易于替换，比如使用你手机上的联系人列表。这是<strong>理想情况（Ideal）</strong></li>
+</ul>
+
+<blockquote>
+<p>产品的独特功能并不总是满足你的独特需求</p>
+</blockquote>
+
+<p>关于独特功能的一条警告：每个提供商都会提供某些形式的独特功能 —— 这是他们区别于其他家的手段。然后，重要的是，这种功能是否可以满足你或你的公司的某个确切的需求。举例来说，一些云提供商可以在他们令人称赞的全球网络中运行了数十亿用户服务。这是非常让人印象深刻和独特的，然而对一般企业来说，他们只需要服务一百万客户而且可能只在一个国家提供服务，这种对大规模的支持就不那么吸引人了。有些人坚持在有限速的小州购买法拉利，所以显然不是所有的决定都是完全理智的，但是也有可能是一辆法拉利可以比云平台在更多方面提供便利。</p>
+
+<hr />
+
+<h2 id="使用锁定真正的代价">使用锁定真正的代价</h2>
+
+<p>由于这个简单的矩阵如此好用，让我们再做另外一个。上一个矩阵将切换代价作为一个单一的元素（或维度）对待。一个好的架构师可以将它分解为两个维度：</p>
+
+<p><img src="/media/lockin/lockin_cost.png" alt="lockin_cost" /></p>
+
+<p>这个矩阵将切换的代价和可能性区分开。不大可能切换并且切换代价也低的东西不应该太打扰你，然而它的对端，切换代价高并且很有可能切换的东西非常不好而且应该被解决。在另一条对角线上，你则是在边缘试探，这些东西会使得你付出代价，但是却很少出现 —— 你会想买入一些保险，比如限制改变的范围或增加维护预算。你也可能接受这份风险 —— 有多大的概率你真的需要从 Oracle 切换到 DB2，或者反之？最后，如果切换很可能发生并且很容易，那你就达成了敏捷 —— 你拥抱变化并且将系统设计的易于改变。奇怪的是，这个象限经常比左上角的到的关注更少，尽管有许许多多的小变化在很快的被加上。这是我们糟糕的决策制定在作祟：不大可能发生的 drama 会得到更多的关注，因为<em>万一呢！</em></p>
+
+<p>当讨论使用锁定的可能性时，你会考虑各种使你想要切换方案的场景：提供商可能倒闭、提高价格，或者无法继续支持你的规模或功能需求。有趣的是，减少使用锁定的努力有时候会导致某些形式的协商工具：当协商延续使用协议时，你可以暗示提供商，你将系统架构为可以从他们产品中很容易的迁移走。这会帮助你协商得到一个更低的价格，因为你的备选方案很便宜。这是一种不一定真的会被用到的架构选择 —— 它是一种威慑物，有点像冷战时期的兵器储备。你也可以假装拥有而不真正的减少使用锁定，但是你最好是一个谈判好手，以防提供商揭穿了你的虚张声势，比如通过在饮水机旁和你的开发这聊天。</p>
+
+<h2 id="减少使用锁定-执行价格-the-strike-price">减少使用锁定：执行价格（The strike price）</h2>
+
+<p>再次将开头的<a href="https://architectelevator.com/architecture/architecture-options/">可选项比喻</a>纳入考虑，如果避免使用锁定为你提供了更多的选择，那么切换时的代价就是这些选择的执行价格了：它是你执行这个选项时真正的花费。如果你想达到越低的切换代价，这个选项的价值就会越高因此价格也会越高。虽然我们梦想所有系统都在「绿盒子」中，切换代价都最小，但是可能不能清偿所需的投资。</p>
+
+<blockquote>
+<p>将切换代价降至最低可能不是最经济的选择。</p>
+</blockquote>
+
+<p>举例来说，很多架构师倾向于不被一家数据库提供商或云提供商锁定。然而，切换的可能性有多高呢？可能 5%，甚至更低？而你将切换代价从假如说五万刀（半手动迁移）降到接近零又需要花费多少？很可能要比两千五百刀（$50000x5%）多很多。因此，降低切换代价不是唯一的目标，而且很可能导致过度投资。这有点类似于超额投保：花费巨额溢价将免赔额降至零可能会让你感觉安心，但是一般来说并不是最经济，也即理智，的决定。</p>
+
+<p>最终的模型（这次终于不是矩阵了）可以帮助你决定应当为减少切换代价做多少投资。下面的图像展示了你的责任，定义为产品的切换代价乘以与前期投资相关的切换的可能性（蓝色线条）。</p>
+
+<p><img src="/media/lockin/option_switching_cost.png" alt="option_switching_cost" /></p>
+
+<p>通过对可选项的投资，不管是降低切换的可能性，还是减少执行时的代价，当然可以减少责任。举例来说，使用一个像 Hibernate 这样的 ORM(Object-relational Mapping) 框架，就是一种减少数据库提供商锁定的小额投资。你也可以创建一种可以翻译为不同数据库提供商原生存储过程语法的元语言。它将使得你可以在不依赖数据库的前提下能够充分发挥数据库的性能，但是它将会需要非常多的前期努力，只是为了一个相对不常见的场景。</p>
+
+<p>因此比较有趣的部分时红色线条，它将前期投资和潜在责任做了加和。这是你总共的代价以及你应当追求最小化的东西。在大多数场景中，随着前期投资升高，你将会朝最优范围迈进。为了减少使用锁定的额外投资其实会导致更高的总共代价。原因很简单：投资的回报消失了，尤其是对于基本不可能发生的切换。如果我们将架构做得过于灵活，我们很可能就会困在过度投资的区域了。信奉 <a href="https://martinfowler.com/bliki/Yagni.html">Yagni（你不会用到这个功能的）</a> 的家伙们则在光谱的另一端 —— 老生常谈了，诀窍是找到合理的中间地带。</p>
+
+<h2 id="避免使用锁定的总代价">避免使用锁定的总代价</h2>
+
+<p>既然现在我们有一个评价使用锁定的代价和潜在好处的不错的工具，让我们仔细研究下避免使用锁定的总代价。在前面的模型中，我们假设避免使用锁定是简单的一种代价。然而现实中，这种代价可以分解为几种组成部分</p>
+
+<blockquote>
+<p>复杂度可能会是减少使用锁定时最大的拦路虎。</p>
+</blockquote>
+
+<ul>
+<li><strong>功夫（Effort）</strong>：这是在人工时间方面需要的额外工作。如果我们选择在 kubernetes 集群中部署容器的方式来减少云提供商使用锁定，这一类将会包括学习新工具、编写 Docker 文件、配置 Kubernetes 等的功夫。</li>
+<li><strong>花费（Expense）</strong>：这是额外的现金花费，比如，产品使用许可证，招聘外面的提供商，或者是参加 KubeCon。</li>
+<li><strong>使用不足（Underutilization）</strong>：出现这种间接代价是由于避免使用锁定经常使得你无法使用提供商提供的特定功能。结果是，你无法从所使用的软件中得到所有便利。接下来就会导致为了完成缺失的功能而付出更多的努力或者导致你产品中的弱点。</li>
+<li><strong>复杂度（Complexity）</strong>：复杂度是等式中的核心元素，而又太经常被忽略。许多为了减少使用锁定的努力会引入一层额外的抽象层：JDBC，容器，公用 APIs。虽然这些都是有用的工具，额外的一层就会增加另一个活动部件，都会给整个系统增加复杂度。这就会增加团队新成员学习难度和出现系统级错误的概率。</li>
+<li><strong>新的使用锁定（New Lock-ins）</strong>：避免一个使用锁定经常导致另外一个使用锁定。举例来说，你可能不用 AWS CloudFormation 而选择 Hashicorp 的 Terraform 或 Pulumi，这些都提供支持跨云支持。然而，现在你被锁定在其他提供商的另外的产品中了，你需要考虑这对你是否 OK。</li>
+</ul>
+
+<p>当计算避免使用锁定的代价时，架构师应当快速地过一遍这份列表来避免盲点。同时，请注意避免使用锁定的尝试可能会有遗漏，和 <a href="https://architectelevator.com/architecture/failure-doesnt-respect-abstraction/">leaky abstractions</a> 非常类似。举例来说，Terraform 是一个很不错的工具，但是它的脚本使用了许多和提供商强关联的构建。实现细节因此被渗透，使得从一个云切换到另外一个不可能是零代价。</p>
+
+<h2 id="综合考虑">综合考虑</h2>
+
+<p>说了这么多理论，让我们看一些具体的例子。</p>
+
+<h3 id="部署容器">部署容器</h3>
+
+<p>我在一家将他们大部分代码打包到 Docker 容器并部署到 AWS ECS 的公司工作。因此他们被限制在了 AWS。他们应该用开源的 Kubernetes 代替目前的容器编排吗？鉴于他们目前主要关注于功能开发速度，而且 ECS 的解决方案对他们来说很适用，我不认为迁移可以带来足够的好处。迁移到其他云提供商的可能性很低，他们目前有更重要的事情要做（bigger fish to fry）.</p>
+
+<p><strong>建议</strong>：接受使用锁定。</p>
+
+<h3 id="关系型数据库访问">关系型数据库访问</h3>
+
+<p>许多应用都在使用关系型数据库，许多提供商和开源选择都提供数据库支持。然而，SQL 方言、存储过程和定制的管理控制台都可能导致数据库使用锁定。你应该为了避免使用锁定投入多少呢？对于大多数语言和运行时，公共映射框架比如 Hibernate 以较低的代价提供了一定级别的数据库中立性。如果你想进一步减少你的执行价格，你可能需要避免使用 SQL 函数和存储过程，这可能降低你的产品的性能或需要你使用更多硬件。</p>
+
+<p><strong>建议</strong>：使用低成本低机制来减少使用锁定。不要试图得到零转换代价。</p>
+
+<h3 id="迁移至云">迁移至云</h3>
+
+<p>相较于从一个数据库提供商切换到另一个，你可能对将应用，包括它使用的数据库，一起迁移到云端更感兴趣。除了技术方面的考虑，你还需要谨慎考虑提供商的使用许可，它可能将使迁移变得不划算。在这些情况下，选择一个开源数据库更划算。</p>
+
+<p><strong>建议</strong>：选择一个可以满足你们运营和售后支持的开源数据库，但是也要接受一定程度的使用锁定。</p>
+
+<h3 id="多云">多云</h3>
+
+<p>许多企业着迷于可迁移的多云部署，提出了更精细和复杂（和昂贵）的计划使得他们表面上可以避免云服务商使用锁定。然而，大部分方法和你最初想要上云的原因相违背：减少碎片和使用像存储或数据库这种托管服务的能力。</p>
+
+<p><strong>建议</strong>：实践警告。阅读我的关于多云的<a href="https://architectelevator.com/cloud/hybrid-multi-cloud/">文章</a></p>
+
+<h2 id="以思考的速度做架构">以思考的速度做架构</h2>
+
+<p>似乎人们可以投入大量时间考虑使用锁定的问题。一些人甚至会认为我们的讨论过于「学院派」，虽然我很难把这个词理解为贬义，因为那是我们大多数人接受教育的地方。然而，之前的非黑即白的架构方法难道不是更简单，也就是更高效吗？</p>
+
+<blockquote>
+<p>如果你专注于并坚持简单模型的话，架构思维实际上会惊人的快</p>
+</blockquote>
+
+<p>现实生活中，思索其实非常迅速。过一遍本文中提到的所有模型可能只需要几分钟时间，然后就可以产生记录良好的决定。除了一张纸或一块白板以为并不需要什么花哨的工具。快速的架构思维的关键只是专注的能力。</p>
+
+<p>与之相对的是，为了提前几周就安排好，但是却几乎没有具有能够做出明智决定的实际专业经验的人参加的漫长的指导委员会会议，去准备详尽的 PPT 而付出的努力。</p>
+
+<p>我们还是倾向于将在等待开会的时间花在思考上。</p>
+
+<h2 id="致谢">致谢</h2>
+
+<p>略</p>
+
+<h2 id="重大修订">重大修订</h2>
+
+<p>略</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">kyon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2019-09-17</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div><div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/Wechat.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/ali.jpeg">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div>
+    <div class="social-share" data-initialized="true" data-wechat-qrcode-title="扫描分享">
+    <center>
+        <span style="font-size:16px;color:#c05b4d;">分享到：</span>
+        <a href="#" class="social-share-icon icon-weibo"></a>
+        <a href="#" class="social-share-icon icon-wechat"></a>
+        <a href="#" class="social-share-icon icon-twitter"></a>
+        <a href="#" class="social-share-icon icon-qq"></a>
+        <a href="#" class="social-share-icon icon-qzone"></a>
+    </center>
+</div>
+
+<script src="/js/social-share.min.js"></script>
+
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E7%BF%BB%E8%AF%91/">翻译</a>
+          <a href="/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%9E%B6%E6%9E%84/">企业级架构</a>
+          <a href="/tags/%E6%9E%B6%E6%9E%84/">架构</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/the-three-buckets/">
+            <span class="next-text nav-default">The Three Buckets</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'yabsk';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:kyon0304@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://stackoverflow.com/users/1196640/kyon" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://www.instagram/kyon_wy" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://kyon.life/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">kyon</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js" integrity="sha256-jwCP0NAdCBloaIWTWHmW4i3snUNMHUNO+jr9rYd2iOI=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.locales.min.js" integrity="sha256-ZwofwC1Lf/faQCzN7nZtfijVV6hSwxjQMwXL4gn9qU8=" crossorigin="anonymous"></script>
+  <script><!-- NOTE: timeago.js uses the language code format like "zh_CN" (underscore and case sensitive) -->
+    var languageCode = "zh-cn".replace(/-/g, '_').replace(/_(.*)/, function ($0, $1) {return $0.replace($1, $1.toUpperCase());});
+    timeago().render(document.querySelectorAll('.timeago'), languageCode);
+    timeago.cancel();  
+  </script>
+<script type="text/javascript" src="/dist/even.ece58db6.min.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-131420074-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+<script src="/js/social-share.min.js"></script>
+
+
+</body>
+</html>
