@@ -9,22 +9,50 @@
   </url>
   
   <url>
+    <loc>https://kyon.life/tags/config-server/</loc>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/disconf/</loc>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://kyon.life/</loc>
-    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/post/</loc>
-    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/spring-boot/</loc>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/tags/</loc>
-    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</loc>
+    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>spring-boot on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/spring-boot/</link>
+    <description>Recent content in spring-boot on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 03 Nov 2019 13:01:01 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/spring-boot/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>基于 spring boot &#43; disconf 的配置中心</title>
+      <link>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</guid>
+      <description>disconf 简介 disconf 是百度的某位员工开源的分布式配置中心，文档地址，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化</description>
+    </item>
+    
+  </channel>
+</rss>
