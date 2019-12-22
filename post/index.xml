@@ -6,18 +6,18 @@
     <description>Recent content in Posts on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 03 Nov 2019 13:01:01 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 22 Dec 2019 18:24:10 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>基于 spring boot &#43; disconf 的配置中心</title>
-      <link>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</link>
-      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
+      <title>Threadlocal 梳理</title>
+      <link>https://kyon.life/post/threadlocal/</link>
+      <pubDate>Sun, 22 Dec 2019 18:24:10 +0800</pubDate>
       
-      <guid>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</guid>
-      <description>disconf 简介 disconf 是百度的某位员工开源的分布式配置中心，文档地址，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化</description>
+      <guid>https://kyon.life/post/threadlocal/</guid>
+      <description>使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见</description>
     </item>
     
     <item>
