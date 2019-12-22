@@ -32,6 +32,7 @@ public class ThreadLocal<T> {
 使用 ThreadLocal 时，代码调用逻辑。
 
 调用以下代码时 ThreadLocal 的执行逻辑
+
 ```Java
 ThreadLocal<Integer> threadLocal = new ThreadLocal<Integer>() {
     @Override
