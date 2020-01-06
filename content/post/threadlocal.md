@@ -1,6 +1,8 @@
 ---
 title: "Threadlocal 梳理"
 date: 2019-12-22T18:24:10+08:00
+lastMod: 2020-01-06
+tags: ["java", "学习笔记"] 
 ---
 
 ## 使用场景

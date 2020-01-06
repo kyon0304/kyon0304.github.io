@@ -1,7 +1,7 @@
 ---
 title: "Http3 的过去现在及将来"
 date: 2020-01-06T10:13:03+08:00
-draft: false
+tags: ["http", "学习笔记"]
 ---
 
 看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。
