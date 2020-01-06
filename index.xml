@@ -52,9 +52,19 @@
 
 &lt;h2 id=&#34;实现&#34;&gt;实现&lt;/h2&gt;
 
-&lt;p&gt;ThreadLocal 包含两个静态内部类，ThreadLocalMap 和 Entry，如下所示，其中 Entry 是弱引用的子类，referent 是 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。&lt;/p&gt;
+&lt;p&gt;ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。&lt;/p&gt;
 
-&lt;p&gt;内部类 ThreadLocalMap 名字中虽然包含 Map，但与一般的 hashmap 并没有什么关系，其实是内部维护了一个 Entry[] 类型的数组，索引自己的内部类 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。&lt;/p&gt;
+&lt;h3 id=&#34;如何存储&#34;&gt;如何存储&lt;/h3&gt;
+
+&lt;p&gt;首先，用一张图来表示一下 threadlocal 是如何存储数据的：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/threadlocal/threadlocal.png&#34; alt=&#34;threadlocal.png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 &lt;code&gt;table&lt;/code&gt;，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。&lt;/p&gt;
+
+&lt;p&gt;ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 &lt;code&gt;table&lt;/code&gt;，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。&lt;/p&gt;
+
+&lt;p&gt;ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Java&#34; data-lang=&#34;Java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -87,9 +97,9 @@
 &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;使用 ThreadLocal 时，代码调用逻辑。&lt;/p&gt;
+&lt;h3 id=&#34;获取过程&#34;&gt;获取过程&lt;/h3&gt;
 
-&lt;p&gt;调用以下代码时 ThreadLocal 的执行逻辑&lt;/p&gt;
+&lt;p&gt;上面说明了 ThreadLocal 数据是如何存储的，那么当使用 ThreadLocal 时，是如何创建和获取数据的呢？一个简单的使用 ThreadLocal 的代码片段如下所示：&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Java&#34; data-lang=&#34;Java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
@@ -110,7 +120,7 @@
 &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;ThreadLocal 的构造函数是一个空函数，所以 &lt;code&gt;new&lt;/code&gt; 的时候没有什么特殊操作，接下来看下 &lt;code&gt;get&lt;/code&gt; 函数都做了哪些事情：&lt;/p&gt;
+&lt;p&gt;相较于创建，我们先来看下 ThreadLocal 更高频使用的 &lt;code&gt;get()&lt;/code&gt; 方法：&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -151,30 +161,106 @@
 &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;首先获取当前线程，然后获取当前线程持有的 ThreadLocalMap 对象，这个对象是 Thread 对象持有的成员变量，具体管理则由 ThreadLocal 类实现。&lt;/p&gt;
+&lt;p&gt;可以看到，在这个方法中会去获取当前线程&lt;code&gt;t&lt;/code&gt;，然后使用 &lt;code&gt;t&lt;/code&gt; 获取当前线程持有的 ThreadLocalMap 实例变量 &lt;code&gt;map&lt;/code&gt;，然后根据 &lt;code&gt;map&lt;/code&gt; 和 &lt;code&gt;this&lt;/code&gt; 得到对应的 Entry 实例 &lt;code&gt;e&lt;/code&gt;，最终获取用户数据 &lt;code&gt;e.value&lt;/code&gt;。如果获取不到，则调用 &lt;code&gt;setInitialValue()&lt;/code&gt; 进行初始化。&lt;/p&gt;
+
+&lt;p&gt;获取当前线程 &lt;code&gt;t&lt;/code&gt; 和获取 &lt;code&gt;map&lt;/code&gt; 都是比较直白的过程，直接略过，先看下 &lt;code&gt;ThreadLocalMap.Entry e = map.getEntry(this)&lt;/code&gt; 是如何获取 Entry &lt;code&gt;e&lt;/code&gt; 的：&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;cm&#34;&gt;/**
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * Get the entry associated with key.  This method
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * itself handles only the fast path: a direct hit of existing
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * key. It otherwise relays to getEntryAfterMiss.  This is
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * designed to maximize performance for direct hits, in part
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * by making this method readily inlinable.
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    *
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  key the thread local object
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @return the entry associated with key, or null if no such
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    */&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
     &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocalHashCode&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
     &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
     &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
     &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getEntryAfterMiss&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;cm&#34;&gt;/**
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * Version of getEntry method for use when key is not found in
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * its direct hash slot.
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    *
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  key the thread local object
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  i the table index for key&amp;#39;s hash code
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  e the entry at table[i]
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @return the entry associated with key, or null if no such
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    */&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntryAfterMiss&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tab&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;len&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;expungeStaleEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nextIndex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
 &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;得到 ThreadLocalMap 对象后，再使用当前 threadLocal 对象获取 Entry 对象。如果可以获取到，则返回 Entry 中存储的 value 值，如果获取不到，则进行初始化。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;this&lt;/code&gt; 是当前 ThreadLocal 对象实例，使用它作为 key，在 ThreadLocalMap 持有的 &lt;code&gt;Entry[] table&lt;/code&gt; 中索引相应的 Entry &lt;code&gt;e&lt;/code&gt;，可以看到，这里便是上面说到的索引 Entry 的两种方式：首先根据 hashcode 快速索引，如果找不到，则调用 &lt;code&gt;getEntryAfterMiss()&lt;/code&gt; 方法，将当前 ThreadLocal 对象实例 &lt;code&gt;this&lt;/code&gt; 作为 key，与 Entry 的 referant 作比对，获取相应的 entry。&lt;/p&gt;
+
+&lt;h3 id=&#34;创建过程&#34;&gt;创建过程&lt;/h3&gt;
+
+&lt;p&gt;接下来看下如果获取不到 Entry，ThreadLocal 如何通过 &lt;code&gt;setInitialValue()&lt;/code&gt; 进行初始化：&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -279,13 +365,17 @@
 &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;初始化的流程，首先调用 &lt;code&gt;initialValue()&lt;/code&gt; 获取初始值，我们创建 threadLocal 对象时 override 了这个方法，因此会返回 5，获取值后，再使用当前线程获取 threadLocals 即这里的变量 map，如果 map 存在，则将值放入对应的 entry，不存在则创建。从这里可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。&lt;/p&gt;
+&lt;p&gt;首先，调用 &lt;code&gt;initialValue()&lt;/code&gt; 拿到用户需要存储的值。我们创建 ThreadLocal 对象时可以 override &lt;code&gt;initialValue()&lt;/code&gt; 方法，并返回需要存储的数据。&lt;/p&gt;
 
-&lt;p&gt;最后，用一张图来表示一下&lt;/p&gt;
+&lt;p&gt;获取值后，再通过 &lt;code&gt;getMap(t)&lt;/code&gt; 获取当前线程所持有的 ThreadLocalMap 实例即这里的变量 &lt;code&gt;map&lt;/code&gt;，如果 &lt;code&gt;map&lt;/code&gt; 不为空，则调用 &lt;code&gt;set(ThreadLocal&amp;lt;?&amp;gt; key, Object value)&lt;/code&gt;将用户数据放入 referant 与当前 threadlocal 实例对象对应的 entry，为空则调用 &lt;code&gt;createMap(Thread t, T firstValue)&lt;/code&gt; 进行创建，并赋值。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/threadlocal/threadlocal.png&#34; alt=&#34;threadlocal.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;从这里也可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。&lt;/p&gt;
 
-&lt;p&gt;总结：每个线程通过持有 ThreadLocal.ThreadLocalMap 实例，来访问到真正需要的数据：存储在 Entry 实例中的成员变量 value。而不同的线程 thread-1, thread-2 即使访问相同的 ThreadLocal 实例，也会为它们创建各自线程独享的成员变量，ThreadLocalMap，从而持有线程独享的本地变量。threadlocal 实例的 get 方法，只是将这个流程包装了一下。&lt;/p&gt;
+&lt;h3 id=&#34;总结&#34;&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;同一个线程中，不同的 ThreadLocal 实例，都会存储在线程成员变量 &lt;code&gt;ThreadLocal.ThreadLocalMap threadlocals&lt;/code&gt; 的 &lt;code&gt;Entry[] table&lt;/code&gt; 数组中，不同的 ThreadLocal 实例，通过 ThreadLocal 实例的 hashcode/ Entry 变量的弱引用 referant 进行区分。&lt;/p&gt;
+
+&lt;p&gt;同一个 ThreadLocal 类型变量的定义，不同线程去执行时，会在自己的线程中单独创建、获取，从而持有线程独享的本地变量。&lt;/p&gt;
 
 &lt;h2 id=&#34;垃圾回收&#34;&gt;垃圾回收&lt;/h2&gt;
 
@@ -317,7 +407,7 @@
 &lt;/div&gt;
 &lt;h2 id=&#34;一种使用方式&#34;&gt;一种使用方式&lt;/h2&gt;
 
-&lt;p&gt;一种便利函数，将 threadlocal 存储的本地变量设置为 map，这样需要用到时可以随时 put/get，而不需要为每个要使用的全局变量都单独创建一个 threadlocal 实例。&lt;/p&gt;
+&lt;p&gt;一种便利函数，相比于不同变量分别去创建 ThreadLocal 类型的变量，在 Entry 中通过 referant 去区分，不如直接自己创建一个 HashMap 放到同一个 ThreadLocal 实例中（即只使用一个 Entry），在业务逻辑层面直接对不同变量通过名字进行映射，这样需要用到时可以随时 &lt;code&gt;put()&lt;/code&gt;/&lt;code&gt;get()&lt;/code&gt;，而不需要为每个要使用的全局变量都单独创建一个 ThreadLocal 实例。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1

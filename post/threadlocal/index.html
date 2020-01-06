@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2019-12-22T18:24:10&#43;08:00" />
 <meta itemprop="dateModified" content="2019-12-22T18:24:10&#43;08:00" />
-<meta itemprop="wordCount" content="1926">
+<meta itemprop="wordCount" content="2596">
 
 
 
@@ -126,8 +126,8 @@
       <div class="post-meta">
         <span class="post-time"> 2019-12-22 </span>
         
-          <span class="more-meta"> 约 1926 字 </span>
-          <span class="more-meta"> 预计阅读 4 分钟 </span>
+          <span class="more-meta"> 约 2596 字 </span>
+          <span class="more-meta"> 预计阅读 6 分钟 </span>
         <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
     </header>
@@ -140,7 +140,13 @@
 <li>
 <ul>
 <li><a href="#使用场景">使用场景</a></li>
-<li><a href="#实现">实现</a></li>
+<li><a href="#实现">实现</a>
+<ul>
+<li><a href="#如何存储">如何存储</a></li>
+<li><a href="#获取过程">获取过程</a></li>
+<li><a href="#创建过程">创建过程</a></li>
+<li><a href="#总结">总结</a></li>
+</ul></li>
 <li><a href="#垃圾回收">垃圾回收</a></li>
 <li><a href="#一种使用方式">一种使用方式</a></li>
 <li><a href="#其他">其他</a></li>
@@ -159,9 +165,19 @@
 
 <h2 id="实现">实现</h2>
 
-<p>ThreadLocal 包含两个静态内部类，ThreadLocalMap 和 Entry，如下所示，其中 Entry 是弱引用的子类，referent 是 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。</p>
+<p>ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。</p>
 
-<p>内部类 ThreadLocalMap 名字中虽然包含 Map，但与一般的 hashmap 并没有什么关系，其实是内部维护了一个 Entry[] 类型的数组，索引自己的内部类 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。</p>
+<h3 id="如何存储">如何存储</h3>
+
+<p>首先，用一张图来表示一下 threadlocal 是如何存储数据的：</p>
+
+<p><img src="/media/threadlocal/threadlocal.png" alt="threadlocal.png" /></p>
+
+<p>可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 <code>table</code>，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。</p>
+
+<p>ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 <code>table</code>，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。</p>
+
+<p>ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt"> 1
@@ -194,9 +210,9 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>使用 ThreadLocal 时，代码调用逻辑。</p>
+<h3 id="获取过程">获取过程</h3>
 
-<p>调用以下代码时 ThreadLocal 的执行逻辑</p>
+<p>上面说明了 ThreadLocal 数据是如何存储的，那么当使用 ThreadLocal 时，是如何创建和获取数据的呢？一个简单的使用 ThreadLocal 的代码片段如下所示：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt">1
@@ -217,7 +233,7 @@
 <span class="n">threadLocal</span><span class="p">.</span><span class="na">get</span><span class="p">();</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>ThreadLocal 的构造函数是一个空函数，所以 <code>new</code> 的时候没有什么特殊操作，接下来看下 <code>get</code> 函数都做了哪些事情：</p>
+<p>相较于创建，我们先来看下 ThreadLocal 更高频使用的 <code>get()</code> 方法：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
@@ -258,30 +274,106 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>首先获取当前线程，然后获取当前线程持有的 ThreadLocalMap 对象，这个对象是 Thread 对象持有的成员变量，具体管理则由 ThreadLocal 类实现。</p>
+<p>可以看到，在这个方法中会去获取当前线程<code>t</code>，然后使用 <code>t</code> 获取当前线程持有的 ThreadLocalMap 实例变量 <code>map</code>，然后根据 <code>map</code> 和 <code>this</code> 得到对应的 Entry 实例 <code>e</code>，最终获取用户数据 <code>e.value</code>。如果获取不到，则调用 <code>setInitialValue()</code> 进行初始化。</p>
+
+<p>获取当前线程 <code>t</code> 和获取 <code>map</code> 都是比较直白的过程，直接略过，先看下 <code>ThreadLocalMap.Entry e = map.getEntry(this)</code> 是如何获取 Entry <code>e</code> 的：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="nf">Entry</span> <span class="n">getEntry</span><span class="p">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="cm">/**
+</span><span class="cm">    * Get the entry associated with key.  This method
+</span><span class="cm">    * itself handles only the fast path: a direct hit of existing
+</span><span class="cm">    * key. It otherwise relays to getEntryAfterMiss.  This is
+</span><span class="cm">    * designed to maximize performance for direct hits, in part
+</span><span class="cm">    * by making this method readily inlinable.
+</span><span class="cm">    *
+</span><span class="cm">    * @param  key the thread local object
+</span><span class="cm">    * @return the entry associated with key, or null if no such
+</span><span class="cm">    */</span>
+<span class="kd">private</span> <span class="nf">Entry</span> <span class="n">ThreadLocalMap</span><span class="p">.</span><span class="na">getEntry</span><span class="p">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">int</span> <span class="nf">i</span> <span class="o">=</span> <span class="n">key</span><span class="p">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">table</span><span class="p">.</span><span class="na">length</span> <span class="o">-</span> <span class="n">1</span><span class="p">);</span>
     <span class="n">Entry</span> <span class="nf">e</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">e</span><span class="p">.</span><span class="na">get</span><span class="p">()</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
     <span class="k">else</span>
         <span class="k">return</span> <span class="n">getEntryAfterMiss</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="cm">/**
+</span><span class="cm">    * Version of getEntry method for use when key is not found in
+</span><span class="cm">    * its direct hash slot.
+</span><span class="cm">    *
+</span><span class="cm">    * @param  key the thread local object
+</span><span class="cm">    * @param  i the table index for key&#39;s hash code
+</span><span class="cm">    * @param  e the entry at table[i]
+</span><span class="cm">    * @return the entry associated with key, or null if no such
+</span><span class="cm">    */</span>
+<span class="kd">private</span> <span class="nf">Entry</span> <span class="n">ThreadLocalMap</span><span class="p">.</span><span class="na">getEntryAfterMiss</span><span class="p">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span> <span class="n">Entry</span> <span class="nf">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Entry</span><span class="p">[]</span> <span class="nf">tab</span> <span class="o">=</span> <span class="n">table</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="nf">len</span> <span class="o">=</span> <span class="n">tab</span><span class="p">.</span><span class="na">length</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span>
+            <span class="n">expungeStaleEntry</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>得到 ThreadLocalMap 对象后，再使用当前 threadLocal 对象获取 Entry 对象。如果可以获取到，则返回 Entry 中存储的 value 值，如果获取不到，则进行初始化。</p>
+<p><code>this</code> 是当前 ThreadLocal 对象实例，使用它作为 key，在 ThreadLocalMap 持有的 <code>Entry[] table</code> 中索引相应的 Entry <code>e</code>，可以看到，这里便是上面说到的索引 Entry 的两种方式：首先根据 hashcode 快速索引，如果找不到，则调用 <code>getEntryAfterMiss()</code> 方法，将当前 ThreadLocal 对象实例 <code>this</code> 作为 key，与 Entry 的 referant 作比对，获取相应的 entry。</p>
+
+<h3 id="创建过程">创建过程</h3>
+
+<p>接下来看下如果获取不到 Entry，ThreadLocal 如何通过 <code>setInitialValue()</code> 进行初始化：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
@@ -386,13 +478,17 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>初始化的流程，首先调用 <code>initialValue()</code> 获取初始值，我们创建 threadLocal 对象时 override 了这个方法，因此会返回 5，获取值后，再使用当前线程获取 threadLocals 即这里的变量 map，如果 map 存在，则将值放入对应的 entry，不存在则创建。从这里可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。</p>
+<p>首先，调用 <code>initialValue()</code> 拿到用户需要存储的值。我们创建 ThreadLocal 对象时可以 override <code>initialValue()</code> 方法，并返回需要存储的数据。</p>
 
-<p>最后，用一张图来表示一下</p>
+<p>获取值后，再通过 <code>getMap(t)</code> 获取当前线程所持有的 ThreadLocalMap 实例即这里的变量 <code>map</code>，如果 <code>map</code> 不为空，则调用 <code>set(ThreadLocal&lt;?&gt; key, Object value)</code>将用户数据放入 referant 与当前 threadlocal 实例对象对应的 entry，为空则调用 <code>createMap(Thread t, T firstValue)</code> 进行创建，并赋值。</p>
 
-<p><img src="/media/threadlocal/threadlocal.png" alt="threadlocal.png" /></p>
+<p>从这里也可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。</p>
 
-<p>总结：每个线程通过持有 ThreadLocal.ThreadLocalMap 实例，来访问到真正需要的数据：存储在 Entry 实例中的成员变量 value。而不同的线程 thread-1, thread-2 即使访问相同的 ThreadLocal 实例，也会为它们创建各自线程独享的成员变量，ThreadLocalMap，从而持有线程独享的本地变量。threadlocal 实例的 get 方法，只是将这个流程包装了一下。</p>
+<h3 id="总结">总结</h3>
+
+<p>同一个线程中，不同的 ThreadLocal 实例，都会存储在线程成员变量 <code>ThreadLocal.ThreadLocalMap threadlocals</code> 的 <code>Entry[] table</code> 数组中，不同的 ThreadLocal 实例，通过 ThreadLocal 实例的 hashcode/ Entry 变量的弱引用 referant 进行区分。</p>
+
+<p>同一个 ThreadLocal 类型变量的定义，不同线程去执行时，会在自己的线程中单独创建、获取，从而持有线程独享的本地变量。</p>
 
 <h2 id="垃圾回收">垃圾回收</h2>
 
@@ -424,7 +520,7 @@
 </div>
 <h2 id="一种使用方式">一种使用方式</h2>
 
-<p>一种便利函数，将 threadlocal 存储的本地变量设置为 map，这样需要用到时可以随时 put/get，而不需要为每个要使用的全局变量都单独创建一个 threadlocal 实例。</p>
+<p>一种便利函数，相比于不同变量分别去创建 ThreadLocal 类型的变量，在 Entry 中通过 referant 去区分，不如直接自己创建一个 HashMap 放到同一个 ThreadLocal 实例中（即只使用一个 Entry），在业务逻辑层面直接对不同变量通过名字进行映射，这样需要用到时可以随时 <code>put()</code>/<code>get()</code>，而不需要为每个要使用的全局变量都单独创建一个 ThreadLocal 实例。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
