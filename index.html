@@ -23,7 +23,7 @@
 <meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
 
 
-<meta name="generator" content="Hugo 0.57.2 with theme even" />
+<meta name="generator" content="Hugo 0.54.0 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://kyon.life/" />
@@ -35,8 +35,8 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+
+<link href="/dist/even.93844dae.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/share.min.css">
 
@@ -46,7 +46,8 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kyon.life/" />
 
-<meta property="og:updated_time" content="2020-01-06T10:13:03+08:00" />
+<meta property="og:updated_time" content="2018-12-09T22:58:43&#43;08:00"/>
+
 <meta itemprop="name" content="kyon&#39;s wonderland with ❤️">
 <meta itemprop="description" content="个人博客，技术学习笔记夹杂一些随笔">
 
@@ -115,21 +116,21 @@
           <section id="posts" class="posts">
     <article class="post">
   <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/http3/">Http3 的过去现在及将来</a></h1>
+    <h1 class="post-title"><a class="post-link" href="/post/threadlocal/">Threadlocal 梳理</a></h1>
     <div class="post-meta">
-      <span class="post-time"> 2020-01-06 </span>
+      <span class="post-time"> 2019-12-22 </span>
       
-        <span class="more-meta"> 约 1008 字 </span>
-        <span class="more-meta"> 预计阅读 3 分钟 </span>
+        <span class="more-meta"> 约 1926 字 </span>
+        <span class="more-meta"> 预计阅读 4 分钟 </span>
     </div>
   </header>
   
   <div class="post-content">
     <div class="post-summary">
-      看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。 以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。 http/1 每
+      使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见
     </div>
     <div class="read-more">
-      <a href="/post/http3/" class="read-more-link">阅读更多</a>
+      <a href="/post/threadlocal/" class="read-more-link">阅读更多</a>
     </div>
   </div>
 </article>
@@ -251,11 +252,7 @@
     <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
   </span>
 
-  <div class="busuanzi-footer">
-    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
-      <span class="division">|</span>
-    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
-  </div>
+  
 
   <span class="copyright-year">
     &copy; 
