@@ -212,15 +212,15 @@
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;cm&#34;&gt;/**
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * Get the entry associated with key.  This method
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * itself handles only the fast path: a direct hit of existing
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * key. It otherwise relays to getEntryAfterMiss.  This is
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * designed to maximize performance for direct hits, in part
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * by making this method readily inlinable.
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    *
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  key the thread local object
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @return the entry associated with key, or null if no such
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    */&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * Get the entry associated with key.  This method
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * itself handles only the fast path: a direct hit of existing
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * key. It otherwise relays to getEntryAfterMiss.  This is
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * designed to maximize performance for direct hits, in part
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * by making this method readily inlinable.
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; *
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  key the thread local object
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @return the entry associated with key, or null if no such
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; */&lt;/span&gt;
 &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
     &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocalHashCode&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
     &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
@@ -230,14 +230,14 @@
         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getEntryAfterMiss&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
 &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
 &lt;span class=&#34;cm&#34;&gt;/**
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * Version of getEntry method for use when key is not found in
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * its direct hash slot.
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    *
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  key the thread local object
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  i the table index for key&amp;#39;s hash code
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @param  e the entry at table[i]
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    * @return the entry associated with key, or null if no such
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;    */&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * Version of getEntry method for use when key is not found in
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * its direct hash slot.
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; *
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  key the thread local object
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  i the table index for key&amp;#39;s hash code
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  e the entry at table[i]
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @return the entry associated with key, or null if no such
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; */&lt;/span&gt;
 &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntryAfterMiss&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
     &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tab&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
     &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;len&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;

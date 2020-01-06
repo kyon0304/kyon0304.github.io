@@ -325,15 +325,15 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="cm">/**
-</span><span class="cm">    * Get the entry associated with key.  This method
-</span><span class="cm">    * itself handles only the fast path: a direct hit of existing
-</span><span class="cm">    * key. It otherwise relays to getEntryAfterMiss.  This is
-</span><span class="cm">    * designed to maximize performance for direct hits, in part
-</span><span class="cm">    * by making this method readily inlinable.
-</span><span class="cm">    *
-</span><span class="cm">    * @param  key the thread local object
-</span><span class="cm">    * @return the entry associated with key, or null if no such
-</span><span class="cm">    */</span>
+</span><span class="cm"> * Get the entry associated with key.  This method
+</span><span class="cm"> * itself handles only the fast path: a direct hit of existing
+</span><span class="cm"> * key. It otherwise relays to getEntryAfterMiss.  This is
+</span><span class="cm"> * designed to maximize performance for direct hits, in part
+</span><span class="cm"> * by making this method readily inlinable.
+</span><span class="cm"> *
+</span><span class="cm"> * @param  key the thread local object
+</span><span class="cm"> * @return the entry associated with key, or null if no such
+</span><span class="cm"> */</span>
 <span class="kd">private</span> <span class="nf">Entry</span> <span class="n">ThreadLocalMap</span><span class="p">.</span><span class="na">getEntry</span><span class="p">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">int</span> <span class="nf">i</span> <span class="o">=</span> <span class="n">key</span><span class="p">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">table</span><span class="p">.</span><span class="na">length</span> <span class="o">-</span> <span class="n">1</span><span class="p">);</span>
     <span class="n">Entry</span> <span class="nf">e</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
@@ -343,14 +343,14 @@
         <span class="k">return</span> <span class="n">getEntryAfterMiss</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="cm">/**
-</span><span class="cm">    * Version of getEntry method for use when key is not found in
-</span><span class="cm">    * its direct hash slot.
-</span><span class="cm">    *
-</span><span class="cm">    * @param  key the thread local object
-</span><span class="cm">    * @param  i the table index for key&#39;s hash code
-</span><span class="cm">    * @param  e the entry at table[i]
-</span><span class="cm">    * @return the entry associated with key, or null if no such
-</span><span class="cm">    */</span>
+</span><span class="cm"> * Version of getEntry method for use when key is not found in
+</span><span class="cm"> * its direct hash slot.
+</span><span class="cm"> *
+</span><span class="cm"> * @param  key the thread local object
+</span><span class="cm"> * @param  i the table index for key&#39;s hash code
+</span><span class="cm"> * @param  e the entry at table[i]
+</span><span class="cm"> * @return the entry associated with key, or null if no such
+</span><span class="cm"> */</span>
 <span class="kd">private</span> <span class="nf">Entry</span> <span class="n">ThreadLocalMap</span><span class="p">.</span><span class="na">getEntryAfterMiss</span><span class="p">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span> <span class="n">Entry</span> <span class="nf">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Entry</span><span class="p">[]</span> <span class="nf">tab</span> <span class="o">=</span> <span class="n">table</span><span class="p">;</span>
     <span class="kt">int</span> <span class="nf">len</span> <span class="o">=</span> <span class="n">tab</span><span class="p">.</span><span class="na">length</span><span class="p">;</span>
