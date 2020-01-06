@@ -9,9 +9,19 @@ date: 2019-12-22T18:24:10+08:00
 
 ## 实现
 
-ThreadLocal 包含两个静态内部类，ThreadLocalMap 和 Entry，如下所示，其中 Entry 是弱引用的子类，referent 是 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。
+ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。
 
-内部类 ThreadLocalMap 名字中虽然包含 Map，但与一般的 hashmap 并没有什么关系，其实是内部维护了一个 Entry[] 类型的数组，索引自己的内部类 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
+### 如何存储
+
+首先，用一张图来表示一下 threadlocal 是如何存储数据的：
+
+![threadlocal.png](/media/threadlocal/threadlocal.png)
+
+可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 `table`，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
+
+ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 `table`，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
+
+ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
 
 ```Java
 public class ThreadLocal<T> {    
@@ -29,9 +39,9 @@ public class ThreadLocal<T> {
 }
 ```
 
-使用 ThreadLocal 时，代码调用逻辑。
+### 获取过程
 
-调用以下代码时 ThreadLocal 的执行逻辑
+上面说明了 ThreadLocal 数据是如何存储的，那么当使用 ThreadLocal 时，是如何创建和获取数据的呢？一个简单的使用 ThreadLocal 的代码片段如下所示：
 
 ```Java
 ThreadLocal<Integer> threadLocal = new ThreadLocal<Integer>() {
@@ -43,7 +53,7 @@ ThreadLocal<Integer> threadLocal = new ThreadLocal<Integer>() {
 threadLocal.get();
 ```
 
-ThreadLocal 的构造函数是一个空函数，所以 `new` 的时候没有什么特殊操作，接下来看下 `get` 函数都做了哪些事情：
+相较于创建，我们先来看下 ThreadLocal 更高频使用的 `get()` 方法：
 
 ```java
 public T get() {
@@ -65,10 +75,22 @@ ThreadLocalMap getMap(Thread t) {
 }
 ```
 
-首先获取当前线程，然后获取当前线程持有的 ThreadLocalMap 对象，这个对象是 Thread 对象持有的成员变量，具体管理则由 ThreadLocal 类实现。
+可以看到，在这个方法中会去获取当前线程`t`，然后使用 `t` 获取当前线程持有的 ThreadLocalMap 实例变量 `map`，然后根据 `map` 和 `this` 得到对应的 Entry 实例 `e`，最终获取用户数据 `e.value`。如果获取不到，则调用 `setInitialValue()` 进行初始化。
+
+获取当前线程 `t` 和获取 `map` 都是比较直白的过程，直接略过，先看下 `ThreadLocalMap.Entry e = map.getEntry(this)` 是如何获取 Entry `e` 的：
 
 ```java
-private Entry getEntry(ThreadLocal<?> key) {
+/**
+    * Get the entry associated with key.  This method
+    * itself handles only the fast path: a direct hit of existing
+    * key. It otherwise relays to getEntryAfterMiss.  This is
+    * designed to maximize performance for direct hits, in part
+    * by making this method readily inlinable.
+    *
+    * @param  key the thread local object
+    * @return the entry associated with key, or null if no such
+    */
+private Entry ThreadLocalMap.getEntry(ThreadLocal<?> key) {
     int i = key.threadLocalHashCode & (table.length - 1);
     Entry e = table[i];
     if (e != null && e.get() == key)
@@ -76,9 +98,38 @@ private Entry getEntry(ThreadLocal<?> key) {
     else
         return getEntryAfterMiss(key, i, e);
 }
+/**
+    * Version of getEntry method for use when key is not found in
+    * its direct hash slot.
+    *
+    * @param  key the thread local object
+    * @param  i the table index for key's hash code
+    * @param  e the entry at table[i]
+    * @return the entry associated with key, or null if no such
+    */
+private Entry ThreadLocalMap.getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    while (e != null) {
+        ThreadLocal<?> k = e.get();
+        if (k == key)
+            return e;
+        if (k == null)
+            expungeStaleEntry(i);
+        else
+            i = nextIndex(i, len);
+        e = tab[i];
+    }
+    return null;
+}
 ```
 
-得到 ThreadLocalMap 对象后，再使用当前 threadLocal 对象获取 Entry 对象。如果可以获取到，则返回 Entry 中存储的 value 值，如果获取不到，则进行初始化。
+`this` 是当前 ThreadLocal 对象实例，使用它作为 key，在 ThreadLocalMap 持有的 `Entry[] table` 中索引相应的 Entry `e`，可以看到，这里便是上面说到的索引 Entry 的两种方式：首先根据 hashcode 快速索引，如果找不到，则调用 `getEntryAfterMiss()` 方法，将当前 ThreadLocal 对象实例 `this` 作为 key，与 Entry 的 referant 作比对，获取相应的 entry。
+
+### 创建过程
+
+接下来看下如果获取不到 Entry，ThreadLocal 如何通过 `setInitialValue()` 进行初始化：
 
 ```java
 private T setInitialValue() {
@@ -132,14 +183,17 @@ ThreadLocalMap.ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
 }
 ```
 
-初始化的流程，首先调用 `initialValue()` 获取初始值，我们创建 threadLocal 对象时 override 了这个方法，因此会返回 5，获取值后，再使用当前线程获取 threadLocals 即这里的变量 map，如果 map 存在，则将值放入对应的 entry，不存在则创建。从这里可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。
+首先，调用 `initialValue()` 拿到用户需要存储的值。我们创建 ThreadLocal 对象时可以 override `initialValue()` 方法，并返回需要存储的数据。
 
+获取值后，再通过 `getMap(t)` 获取当前线程所持有的 ThreadLocalMap 实例即这里的变量 `map`，如果 `map` 不为空，则调用 `set(ThreadLocal<?> key, Object value)`将用户数据放入 referant 与当前 threadlocal 实例对象对应的 entry，为空则调用 `createMap(Thread t, T firstValue)` 进行创建，并赋值。
 
-最后，用一张图来表示一下
+从这里也可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。
 
-![threadlocal.png](/media/threadlocal/threadlocal.png)
+### 总结
 
-总结：每个线程通过持有 ThreadLocal.ThreadLocalMap 实例，来访问到真正需要的数据：存储在 Entry 实例中的成员变量 value。而不同的线程 thread-1, thread-2 即使访问相同的 ThreadLocal 实例，也会为它们创建各自线程独享的成员变量，ThreadLocalMap，从而持有线程独享的本地变量。threadlocal 实例的 get 方法，只是将这个流程包装了一下。
+同一个线程中，不同的 ThreadLocal 实例，都会存储在线程成员变量 `ThreadLocal.ThreadLocalMap threadlocals` 的 `Entry[] table` 数组中，不同的 ThreadLocal 实例，通过 ThreadLocal 实例的 hashcode/ Entry 变量的弱引用 referant 进行区分。
+
+同一个 ThreadLocal 类型变量的定义，不同线程去执行时，会在自己的线程中单独创建、获取，从而持有线程独享的本地变量。
 
 ## 垃圾回收
 
@@ -162,7 +216,7 @@ public void remove() {
 
 ## 一种使用方式
 
-一种便利函数，将 threadlocal 存储的本地变量设置为 map，这样需要用到时可以随时 put/get，而不需要为每个要使用的全局变量都单独创建一个 threadlocal 实例。
+一种便利函数，相比于不同变量分别去创建 ThreadLocal 类型的变量，在 Entry 中通过 referant 去区分，不如直接自己创建一个 HashMap 放到同一个 ThreadLocal 实例中（即只使用一个 Entry），在业务逻辑层面直接对不同变量通过名字进行映射，这样需要用到时可以随时 `put()`/`get()`，而不需要为每个要使用的全局变量都单独创建一个 ThreadLocal 实例。
 
 ```java
 public class ThreadLocalUtil {
