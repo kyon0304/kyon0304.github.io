@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>java on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/java/</link>
+    <description>Recent content in java on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 22 Dec 2019 18:24:10 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Threadlocal 梳理</title>
+      <link>https://kyon.life/post/threadlocal/</link>
+      <pubDate>Sun, 22 Dec 2019 18:24:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/threadlocal/</guid>
+      <description>使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见</description>
+    </item>
+    
+  </channel>
+</rss>

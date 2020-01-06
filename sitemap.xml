@@ -9,6 +9,13 @@
   </url>
   
   <url>
+    <loc>https://kyon.life/tags/http/</loc>
+    <lastmod>2020-01-06T10:13:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://kyon.life/post/http3/</loc>
     <lastmod>2020-01-06T10:13:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -30,8 +37,29 @@
   </url>
   
   <url>
+    <loc>https://kyon.life/tags/</loc>
+    <lastmod>2020-01-06T10:13:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2020-01-06T10:13:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/java/</loc>
+    <lastmod>2020-01-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://kyon.life/post/threadlocal/</loc>
-    <lastmod>2019-12-22T18:24:10+08:00</lastmod>
+    <lastmod>2020-01-06T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -52,13 +80,6 @@
   
   <url>
     <loc>https://kyon.life/tags/spring-boot/</loc>
-    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/</loc>
     <lastmod>2019-11-03T13:01:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
