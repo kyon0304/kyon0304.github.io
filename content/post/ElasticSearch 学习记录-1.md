@@ -1,8 +1,8 @@
 ---
 title: "ElasticSearch 学习记录"
 date: 2018-11-11T15:51:10+08:00
-draft: false
-tags: ["elasticsearch", "es", "工具"]
+lastMod: 2020-01-07
+tags: ["elasticsearch", "工具", "学习笔记"]
 ---
 
 ## ES 的基本概念
@@ -14,7 +14,7 @@ tags: ["elasticsearch", "es", "工具"]
 - `shard` 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard
 
 ## ES 的分布式架构
-![01_elasticsearch分布式架构原理](/img/01_elasticsearch%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E5%8E%9F%E7%90%86.png)
+![01_elasticsearch分布式架构原理](/media/es/ES-architecture.png)
 
 
 - 不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分
@@ -22,11 +22,9 @@ tags: ["elasticsearch", "es", "工具"]
 - 写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端
 - 读 es 时，可以从 primary shard 读，也可以从 replica 读
 
+![01_es读写底层原理剖析](/media/es/ES-write.png)
 
-## ES 的读写过程
-![01_es读写底层原理剖析](/img/01_es%E8%AF%BB%E5%86%99%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90.png)
-
-### ES 的写过程
+## ES 的写过程
 1. 客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用
 2. 协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点
 3. shard A 接收到数据后，进行存储，并同步到 replica shard
@@ -44,8 +42,10 @@ tags: ["elasticsearch", "es", "工具"]
 - 由于每次 refresh 操作，都会生成一个 segment file，所以数量会急剧增多，到达一定阈值后，会触发 _merge_ 操作，合并为一个大的 segment file，并将原来的小文件删除
 - es 删除数据是标记删除，即删除请求到达后，会记录一个 _.del_ 的磁盘文件，当搜索某条数据时，一旦发现在 .del 文件中被标记为删除，则不会返回；在 merge 被触发后，过程中检查 segment file 中的记录是否已经被标记删除，若是，则不会进入大的 segment file，以此达到删除的目的
 
-_ES 的读过程_
+## ES 的读过程
+
 es 读数据分为两种
+
 - 根据 doc id 进行 get 查询
 - 搜索
 
@@ -74,4 +74,4 @@ es 读数据分为两种
 
 参考资料：
 
-中华石杉码农，视频资料，可能是盗版的，无法找到来源了
+中华石杉码农，视频资料
