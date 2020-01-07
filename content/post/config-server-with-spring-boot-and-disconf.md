@@ -1,8 +1,7 @@
 ---
-title: "基于 spring boot + disconf 的配置中心"
+title: "基于 Spring Boot + Disconf 的配置中心"
 date: 2019-11-03T13:01:01+08:00
-draft: false
-tags: ["spring-boot", "disconf", "config-server"]
+tags: ["spring-boot", "disconf", "配置中心", "工具", "实操"]
 ---
 
 

@@ -2,7 +2,7 @@
 title: "「常识」摘抄"
 date: 2018-12-17T15:17:22+08:00
 draft: false
-tags: ["reading"]
+tags: ["读过", "朝花夕拾"]
 ---
 
 摘抄自梁文道的书 [《常识》](https://book.douban.com/subject/3344676/)
