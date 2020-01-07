@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Http3 的过去现在及将来</title>
+      <title>HTTP/3 的过去、现在及将来</title>
       <link>https://kyon.life/post/http3/</link>
       <pubDate>Mon, 06 Jan 2020 10:13:03 +0800</pubDate>
       
@@ -27,6 +27,33 @@
       
       <guid>https://kyon.life/post/threadlocal/</guid>
       <description>使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见</description>
+    </item>
+    
+    <item>
+      <title>《架构整洁之道》读后</title>
+      <link>https://kyon.life/post/clean-architecture/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/clean-architecture/</guid>
+      <description>4&amp;frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完</description>
+    </item>
+    
+    <item>
+      <title>集合基数统计</title>
+      <link>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
+      <description>集合基数：对于非无限集合，基数是指集合中元素的个数。 合并：将两个集合合并后，如何求新集合的基数。 Bitmap &amp;ndash;&amp;gt; Linear Count &amp;ndash;&amp;gt; LogLog Count &amp;ndash;&amp;gt; Adaptive Count &amp;ndash;&amp;gt; HyperLogLog Count 假设集合的基数为 n</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch 学习记录</title>
+      <link>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
+      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
+      <description>ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个</description>
     </item>
     
   </channel>

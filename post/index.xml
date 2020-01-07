@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Http3 的过去现在及将来</title>
+      <title>HTTP/3 的过去、现在及将来</title>
       <link>https://kyon.life/post/http3/</link>
       <pubDate>Mon, 06 Jan 2020 10:13:03 +0800</pubDate>
       
@@ -30,7 +30,7 @@
     </item>
     
     <item>
-      <title>基于 spring boot &#43; disconf 的配置中心</title>
+      <title>基于 Spring Boot &#43; Disconf 的配置中心</title>
       <link>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</link>
       <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       
