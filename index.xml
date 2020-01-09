@@ -11,12 +11,1505 @@
     
     
     <item>
-      <title>Posts</title>
-      <link>https://kyon.life/post/</link>
+      <title>HTTP/3 的过去、现在及将来</title>
+      <link>https://kyon.life/post/http3/</link>
       <pubDate>Mon, 06 Jan 2020 10:13:03 +0800</pubDate>
       
-      <guid>https://kyon.life/post/</guid>
-      <description></description>
+      <guid>https://kyon.life/post/http3/</guid>
+      <description>&lt;p&gt;看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。&lt;/p&gt;
+
+&lt;p&gt;以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。&lt;/p&gt;
+
+&lt;p&gt;http/1 每个 tcp 连接只能承载一个 http 请求，而建立 tcp 的代价很高，三次握手、拥塞控制、加密协议握手，这就导致 http 通信成本很高。&lt;/p&gt;
+
+&lt;p&gt;http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，可以将握手及慢启动耗费的时间平摊到多个请求中，但问题是，一个 tcp 连接中的多个 http 请求是串行的，所以对每个连接来说，客户端和服务端依旧只能处理单个请求，而现代的网站通常会并行的向同一个服务器请求多个文件，css、js 等，于是需要建立多个 tcp 连接，问题回到 http/1。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/http3/http1.1vshttp2.jpg&#34; alt=&#34;http1.1vshttp2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。&lt;/p&gt;
+
+&lt;p&gt;http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;原文链接：&lt;a href=&#34;https://blog.cloudflare.com/http3-the-past-present-and-future/&#34;&gt;https://blog.cloudflare.com/http3-the-past-present-and-future/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;cloudflare 对 quic 的一个 rust 实现：&lt;a href=&#34;https://github.com/cloudflare/quiche&#34;&gt;https://github.com/cloudflare/quiche&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Threadlocal 梳理</title>
+      <link>https://kyon.life/post/threadlocal/</link>
+      <pubDate>Sun, 22 Dec 2019 18:24:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/threadlocal/</guid>
+      <description>
+
+&lt;h2 id=&#34;使用场景&#34;&gt;使用场景&lt;/h2&gt;
+
+&lt;p&gt;用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见的使用场景，比如存储登录用户信息，同一个 request 的 trace id 等。&lt;/p&gt;
+
+&lt;h2 id=&#34;实现&#34;&gt;实现&lt;/h2&gt;
+
+&lt;p&gt;ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。&lt;/p&gt;
+
+&lt;h3 id=&#34;如何存储&#34;&gt;如何存储&lt;/h3&gt;
+
+&lt;p&gt;首先，用一张图来表示一下 threadlocal 是如何存储数据的：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/threadlocal/threadlocal.png&#34; alt=&#34;threadlocal.png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 &lt;code&gt;table&lt;/code&gt;，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。&lt;/p&gt;
+
+&lt;p&gt;ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 &lt;code&gt;table&lt;/code&gt;，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。&lt;/p&gt;
+
+&lt;p&gt;ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Java&#34; data-lang=&#34;Java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Java&#34; data-lang=&#34;Java&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;    
+    &lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;extends&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;WeakReference&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;cm&#34;&gt;/** The value associated with this ThreadLocal. */&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+            &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+                &lt;span class=&#34;kd&#34;&gt;super&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+                &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+            &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;获取过程&#34;&gt;获取过程&lt;/h3&gt;
+
+&lt;p&gt;上面说明了 ThreadLocal 数据是如何存储的，那么当使用 ThreadLocal 时，是如何创建和获取数据的呢？一个简单的使用 ThreadLocal 的代码片段如下所示：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Java&#34; data-lang=&#34;Java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Java&#34; data-lang=&#34;Java&#34;&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;threadLocal&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Integer&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nd&#34;&gt;@Override&lt;/span&gt;
+    &lt;span class=&#34;kd&#34;&gt;protected&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;initValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;相较于创建，我们先来看下 ThreadLocal 更高频使用的 &lt;code&gt;get()&lt;/code&gt; 方法：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;currentThread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;map&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;map&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;map&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;nd&#34;&gt;@SuppressWarnings&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;unchecked&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;setInitialValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;可以看到，在这个方法中会去获取当前线程&lt;code&gt;t&lt;/code&gt;，然后使用 &lt;code&gt;t&lt;/code&gt; 获取当前线程持有的 ThreadLocalMap 实例变量 &lt;code&gt;map&lt;/code&gt;，然后根据 &lt;code&gt;map&lt;/code&gt; 和 &lt;code&gt;this&lt;/code&gt; 得到对应的 Entry 实例 &lt;code&gt;e&lt;/code&gt;，最终获取用户数据 &lt;code&gt;e.value&lt;/code&gt;。如果获取不到，则调用 &lt;code&gt;setInitialValue()&lt;/code&gt; 进行初始化。&lt;/p&gt;
+
+&lt;p&gt;获取当前线程 &lt;code&gt;t&lt;/code&gt; 和获取 &lt;code&gt;map&lt;/code&gt; 都是比较直白的过程，直接略过，先看下 &lt;code&gt;ThreadLocalMap.Entry e = map.getEntry(this)&lt;/code&gt; 是如何获取 Entry &lt;code&gt;e&lt;/code&gt; 的：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;cm&#34;&gt;/**
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * Get the entry associated with key.  This method
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * itself handles only the fast path: a direct hit of existing
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * key. It otherwise relays to getEntryAfterMiss.  This is
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * designed to maximize performance for direct hits, in part
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * by making this method readily inlinable.
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; *
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  key the thread local object
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @return the entry associated with key, or null if no such
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; */&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocalHashCode&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getEntryAfterMiss&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;cm&#34;&gt;/**
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * Version of getEntry method for use when key is not found in
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * its direct hash slot.
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; *
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  key the thread local object
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  i the table index for key&amp;#39;s hash code
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @param  e the entry at table[i]
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @return the entry associated with key, or null if no such
+&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; */&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getEntryAfterMiss&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tab&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;len&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;expungeStaleEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nextIndex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;this&lt;/code&gt; 是当前 ThreadLocal 对象实例，使用它作为 key，在 ThreadLocalMap 持有的 &lt;code&gt;Entry[] table&lt;/code&gt; 中索引相应的 Entry &lt;code&gt;e&lt;/code&gt;，可以看到，这里便是上面说到的索引 Entry 的两种方式：首先根据 hashcode 快速索引，如果找不到，则调用 &lt;code&gt;getEntryAfterMiss()&lt;/code&gt; 方法，将当前 ThreadLocal 对象实例 &lt;code&gt;this&lt;/code&gt; 作为 key，与 Entry 的 referant 作比对，获取相应的 entry。&lt;/p&gt;
+
+&lt;h3 id=&#34;创建过程&#34;&gt;创建过程&lt;/h3&gt;
+
+&lt;p&gt;接下来看下如果获取不到 Entry，ThreadLocal 如何通过 &lt;code&gt;setInitialValue()&lt;/code&gt; 进行初始化：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;setInitialValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;initialValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;currentThread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;map&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;map&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;map&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;set&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;createMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;set&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tab&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;len&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocalHashCode&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nextIndex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)])&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;replaceStaleEntry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;n&#34;&gt;tab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;sz&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;size&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cleanSomeSlots&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;threshold&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rehash&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;createMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;firstValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocals&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;firstValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ThreadLocalMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;firstKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;firstValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;INITIAL_CAPACITY&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;firstKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;threadLocalHashCode&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;INITIAL_CAPACITY&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Entry&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;firstKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;firstValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;size&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;setThreshold&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;INITIAL_CAPACITY&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;首先，调用 &lt;code&gt;initialValue()&lt;/code&gt; 拿到用户需要存储的值。我们创建 ThreadLocal 对象时可以 override &lt;code&gt;initialValue()&lt;/code&gt; 方法，并返回需要存储的数据。&lt;/p&gt;
+
+&lt;p&gt;获取值后，再通过 &lt;code&gt;getMap(t)&lt;/code&gt; 获取当前线程所持有的 ThreadLocalMap 实例即这里的变量 &lt;code&gt;map&lt;/code&gt;，如果 &lt;code&gt;map&lt;/code&gt; 不为空，则调用 &lt;code&gt;set(ThreadLocal&amp;lt;?&amp;gt; key, Object value)&lt;/code&gt;将用户数据放入 referant 与当前 threadlocal 实例对象对应的 entry，为空则调用 &lt;code&gt;createMap(Thread t, T firstValue)&lt;/code&gt; 进行创建，并赋值。&lt;/p&gt;
+
+&lt;p&gt;从这里也可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。&lt;/p&gt;
+
+&lt;h3 id=&#34;总结&#34;&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;同一个线程中，不同的 ThreadLocal 实例，都会存储在线程成员变量 &lt;code&gt;ThreadLocal.ThreadLocalMap threadlocals&lt;/code&gt; 的 &lt;code&gt;Entry[] table&lt;/code&gt; 数组中，不同的 ThreadLocal 实例，通过 ThreadLocal 实例的 hashcode/ Entry 变量的弱引用 referant 进行区分。&lt;/p&gt;
+
+&lt;p&gt;同一个 ThreadLocal 类型变量的定义，不同线程去执行时，会在自己的线程中单独创建、获取，从而持有线程独享的本地变量。&lt;/p&gt;
+
+&lt;h2 id=&#34;垃圾回收&#34;&gt;垃圾回收&lt;/h2&gt;
+
+&lt;p&gt;ThreadLocal 中的 Entry 类是弱引用的子类，弱引用的使用方式是，如果弱引用对象指向的对象，只有弱引用这一条路径，则该对象会在下一次 YGC 中被回收。Entry 的 referant 是 threadlocal 对象，也即，当只有 Entry 指向这个 threadlocal 实例时，不会劫持对象，影响垃圾回收。另一方面来讲，当 Entry 实例检测到 referant 指向为 null 时，会将成员变量 value 也设置为 null，方便垃圾回收。&lt;/p&gt;
+
+&lt;p&gt;但是为了方便使用，threadlocal 对象都是声明为静态的，这就是说，它不会随着线程结束而销毁，这就意味着两个问题&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;内存泄漏，因为类变量不会随着线程终止而销毁&lt;/li&gt;
+&lt;li&gt;更严重的是，当使用线程池时，threadlocal 中的值可能会被重复使用，导致错误的赋值&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;解决这个问题的办法是线程结束前，调用 ThreadLocal 实例的 remove 方法&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;remove&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;ThreadLocalMap&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;currentThread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;());&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;m&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;remove&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;一种使用方式&#34;&gt;一种使用方式&lt;/h2&gt;
+
+&lt;p&gt;一种便利函数，相比于不同变量分别去创建 ThreadLocal 类型的变量，在 Entry 中通过 referant 去区分，不如直接自己创建一个 HashMap 放到同一个 ThreadLocal 实例中（即只使用一个 Entry），在业务逻辑层面直接对不同变量通过名字进行映射，这样需要用到时可以随时 &lt;code&gt;put()&lt;/code&gt;/&lt;code&gt;get()&lt;/code&gt;，而不需要为每个要使用的全局变量都单独创建一个 ThreadLocal 实例。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocalUtil&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;final&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Logger&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;logger&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;LoggerFactory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getLogger&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadLocalUtil&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;class&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;threadLocal&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;put&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;logger&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;===== put key: [{}] value: [{}] in threadLocal =====&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SerializeUtil&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;toJsonString&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;));&lt;/span&gt;
+
+        &lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;threadContext&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Objects&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;isNull&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;threadContext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;threadContext&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;set&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;threadContext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;threadContext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;put&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;logger&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;===== get value of key: [{}] from threadLocal =====&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+        &lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;context&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Objects&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;isNull&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Class&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;clazz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;logger&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;===== get value of key: [{}] class: [{}] from threadLocal =====&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;clazz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getName&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;());&lt;/span&gt;
+
+        &lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;context&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Objects&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;isNull&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;clazz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;clear&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;logger&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;====== clear threadLocal =====&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;remove&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setThreadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadLocal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getThreadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;threadLocal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThreadContext&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Map&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;ThreadContext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;contextMap&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;HashMap&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Class&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;clazz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;clazz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;cast&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;));&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;put&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;put&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Map&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getContextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;setContextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Map&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Object&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;contextMap&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contextMap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;其他&#34;&gt;其他&lt;/h2&gt;
+
+&lt;p&gt;因为目前还没有用到，这里先备注一下，以后要用到的话，可以搜一下用法：ThreadLocal 是支持子线程继承的，即将父线程的本地变量拷贝到子线程中使用。&lt;/p&gt;
+
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://book.douban.com/subject/30333948/&#34;&gt;码出高效：Java开发手册&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Java ThreadLocal 实现源码&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>基于 Spring Boot &#43; Disconf 的配置中心</title>
+      <link>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</guid>
+      <description>
+
+&lt;h2 id=&#34;disconf-简介&#34;&gt;disconf 简介&lt;/h2&gt;
+
+&lt;p&gt;disconf 是百度的某位员工开源的分布式配置中心，&lt;a href=&#34;https://disconf.readthedocs.io/zh_CN/latest/index.html&#34;&gt;文档地址&lt;/a&gt;，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化查看/更新配置。相比于 spring boot admin 中提供的 refresh context 功能，优势在于可以一次更改，应用于所有同类机器配置，而 spring boot admin 需要对每个实例进行单独修改。除此之外，spring boot admin 在界面及交互上吊打 disconf。&lt;/p&gt;
+
+&lt;h3 id=&#34;设计架构&#34;&gt;设计架构&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;server 端包含 springmvc 用于处理业务逻辑，mysql 用于存储配置文件，两个 redis 用于用户登录，zk 用于配置更新的通知， web 端用于用户登录后统一查看/更新配置&lt;/li&gt;
+&lt;li&gt;client 端以 pom 方式引入项目内即可（需要魔改一下，见后）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;运行流程&#34;&gt;运行流程&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/disconf/diconf-client-process.jpg&#34; alt=&#34;process.jpeg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;启动事件A：&lt;/strong&gt;
+以下按顺序发生。
+* A3：扫描静态注解类数据，并注入到配置仓库里。
+* A4+A2：根据仓库里的配置文件、配置项，去 disconf-web 平台里下载配置数据。这里会有主备竞争
+* A5：将下载得到的配置数据值注入到仓库里。
+* A6：根据仓库里的配置文件、配置项，去ZK上监控结点。
+* A7+A2：根据XML配置定义，到 disconf-web 平台里下载配置文件，放在仓库里，并监控ZK结点。这里会有主备竞争。
+* A8：A1-A6均是处理静态类数据。A7是处理动态类数据，包括：实例化配置的回调函数类；将配置的值注入到配置实体里。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;更新配置事件B：&lt;/strong&gt;
+以下按顺序发生。
+* B1：管理员在 Disconf-web 平台上更新配置。
+* B2：Disconf-web 平台发送配置更新消息给ZK指定的结点。
+* B3：ZK通知 Disconf-cient 模块。
+* B4：与A4一样。
+* B5：与A5一样。
+* B6：基本与A4一样，唯一的区别是，这里还会将配置的新值注入到配置实体里。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;主备机切换事件C：&lt;/strong&gt;
+以下按顺序发生。
+* C1：发生主机挂机事件。
+* C2：ZK通知所有被影响到的备机。
+* C4：与A2一样。
+* C5：与A4一样。
+* C6：与A5一样。
+* C7：与A6一样。&lt;/p&gt;
+
+&lt;p&gt;以上完全引用自 &lt;a href=&#34;https://disconf.readthedocs.io/zh_CN/latest/design/src/disconf-client%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3.html&#34;&gt;disconf 官方文档&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;这边使用时，只使用了基于 xml 的静态配置部分，即配置文件的托管和下载，动态加载部分，由于 disconf 要求配置文件的拆分方式需要按不同组件划分，并对应不同的 java config bean，而且和 spring 自动加载的 bean 的配合也不好，所以放弃使用。&lt;/p&gt;
+
+&lt;h2 id=&#34;disconf-使用准备-魔改&#34;&gt;disconf 使用准备（魔改）&lt;/h2&gt;
+
+&lt;p&gt;由于 disconf 已经三年多没有更新（最新一次版本发布在 20160911），使用的时候需要对 client 端做一些 hack，这边主要做了两处修改：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;依赖的 spring 提供的 hook 函数已经先是 deprecated 现在已经被删除了，&lt;/li&gt;
+&lt;li&gt;依赖的 zookeeper 版本过低，和项目中作为注册中心使用的 zookeeper 冲突&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;code&gt;ReloadingPropertyPlaceholderConfigurer.java&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;org&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;springframework&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ApplicationContext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+ &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;org&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;springframework&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ApplicationContextAware&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+ &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;org&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;springframework&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ObjectUtils&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;org&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;springframework&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;PropertyPlaceholderHelper&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+ &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;org&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;springframework&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;StringValueResolver&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+         &lt;span class=&#34;c1&#34;&gt;// then, business as usual. no recursive reloading placeholders please.
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;super&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;parseStringValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;buf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;toString&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;props&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;visitedPlaceholders&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;        &lt;span class=&#34;n&#34;&gt;PropertyPlaceholderHelper&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;helper&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;PropertyPlaceholderHelper&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;placeholderPrefix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;placeholderSuffix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;valueSeparator&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ignoreUnresolvablePlaceholders&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;helper&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;replacePlaceholders&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;strVal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;props&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+     &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;修改 &lt;code&gt;pom.xml&lt;/code&gt; 升级一些第三方依赖版本&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;diff --git a/pom.xml b/pom.xml
+index fc62fef0..dd203736 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -89,7 +89,7 @@
+             &lt;span class=&#34;nt&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+                 &lt;span class=&#34;nt&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.google.code.gson&lt;span class=&#34;nt&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                 &lt;span class=&#34;nt&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;gson&lt;span class=&#34;nt&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+-                &lt;span class=&#34;nt&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.2.4&lt;span class=&#34;nt&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
++                &lt;span class=&#34;nt&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.8.5&lt;span class=&#34;nt&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+             &lt;span class=&#34;nt&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+ 
+             &lt;span class=&#34;nt&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+@@ -151,7 +151,7 @@
+             &lt;span class=&#34;nt&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+                 &lt;span class=&#34;nt&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.zookeeper&lt;span class=&#34;nt&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                 &lt;span class=&#34;nt&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;zookeeper&lt;span class=&#34;nt&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+-                &lt;span class=&#34;nt&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.3.6&lt;span class=&#34;nt&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
++                &lt;span class=&#34;nt&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.4.10&lt;span class=&#34;nt&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+                 &lt;span class=&#34;nt&#34;&gt;&amp;lt;exclusions&amp;gt;&lt;/span&gt;
+                     &lt;span class=&#34;nt&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
+                         &lt;span class=&#34;nt&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.sun.jmx&lt;span class=&#34;nt&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+@@ -165,6 +165,10 @@
+                         &lt;span class=&#34;nt&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.jms&lt;span class=&#34;nt&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                         &lt;span class=&#34;nt&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jms&lt;span class=&#34;nt&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                     &lt;span class=&#34;nt&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
++                    &lt;span class=&#34;nt&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
++                        &lt;span class=&#34;nt&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.slf4j&lt;span class=&#34;nt&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
++                        &lt;span class=&#34;nt&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;slf4j-log4j12&lt;span class=&#34;nt&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
++                    &lt;span class=&#34;nt&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
+                 &lt;span class=&#34;nt&#34;&gt;&amp;lt;/exclusions&amp;gt;&lt;/span&gt;
+             &lt;span class=&#34;nt&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;修改后重新打包引入项目。&lt;/p&gt;
+
+&lt;p&gt;disconf server 端有别人准备好的 &lt;a href=&#34;https://github.com/zq2599/docker_disconf&#34;&gt;docker-compose 文件&lt;/a&gt;，直接下载使用即可。这里有一点需要注意，tomcat 依赖的服务都是以 link 方式注入容器的，所以 server 告知 client 的 zookeeper 的连接信息不是 ip（还好不是）而是 servername（zkhost），需要在本地配置下 hosts 文件，指向 zookeeper 的连接地址。&lt;/p&gt;
+
+&lt;h2 id=&#34;集成到项目中&#34;&gt;集成到项目中&lt;/h2&gt;
+
+&lt;p&gt;考虑配置中心需要完成的事情：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;项目配置统一存储、查看&lt;/li&gt;
+&lt;li&gt;一处修改，直接下发到多个环境、节点，省去修改配置需要重新打包部署的麻烦&lt;/li&gt;
+&lt;li&gt;配置更新热加载&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;disconf 提供了不同环境的区分，但是这边没有使用，而是继续使用启动参数中 &lt;code&gt;-Dspring.profiles.active=dev&lt;/code&gt; 的方式做区分。&lt;/p&gt;
+
+&lt;p&gt;disconf 虽然也提供了热加载，但是对代码侵入性高，需要使用它提供的 &lt;code&gt;@DisconfItem&lt;/code&gt; 之类的注解，并且对于数据库这类由 spring 负责读取配置文件然后自动初始化并加载的第三方组件，根本找不到放注解的地方，需要深入 spring 启动的加载过程才好做，看了一些文档和视频，不是短期内能搞懂的。&lt;/p&gt;
+
+&lt;p&gt;期间了解了一下 spring cloud 提供的 config client + config server 的机制，非常傻瓜式，config server 负责连接存储配置的后端，配置更新后（以 git 后端为例，是 &lt;code&gt;git commit&lt;/code&gt; 操作后），用户调用 spring boot actuator 提供的 &lt;code&gt;http get http://localhost:8080/actuator/refresh&lt;/code&gt; endpoint 触发 config client 更新带有 &lt;code&gt;@RefreshScope&lt;/code&gt; 注解的配置，实现配置更新热加载。&lt;/p&gt;
+
+&lt;p&gt;spring cloud config 优势在于和 spring boot 完美结合，原有代码完全不需要改动，只需要在需要更新的类/方法上加 &lt;code&gt;@RefreshScope&lt;/code&gt; 注解。缺点是没有图形化界面（勉强算上 spring boot admin 的话，缺点在上面说过了，多实例的应用配置需要单独修改）。&lt;/p&gt;
+
+&lt;p&gt;在某天晚上回家的路上，经&lt;a href=&#34;https://zou.cool/&#34;&gt;邹扒皮&lt;/a&gt;同学提醒，为什么要费劲吧啦的去研究 spring 的启动加载呢，disconf 更新配置以后，通知 spring 去做更新就好了呀，这不正是用户调用 &lt;code&gt;/actuator/refresh&lt;/code&gt; 接口做的事情吗。后面的事情就比较顺理成章了。&lt;/p&gt;
+
+&lt;p&gt;disconf 提供了配置更新时的接口供用户实现 hook 类，在这个 hook 中调用 &lt;code&gt;/actuator/refresh&lt;/code&gt; 接口就可以通知到 spring 去做配置更新。&lt;/p&gt;
+
+&lt;p&gt;所以整个流程是这样的：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;在 disconf 提供的 web 中上传需要统一配置的 properties 文件&lt;/li&gt;
+&lt;li&gt;启动应用，加载远端属性（如果没有则使用本地的）&lt;/li&gt;
+&lt;li&gt;在 disconf web 端修改属性，应用中引入的 disconf client 监听到属性变化，执行用户实现的 hook 方法&lt;/li&gt;
+&lt;li&gt;hook 方法中调用 &lt;code&gt;http get http://localhost:8080/actuator/refresh&lt;/code&gt; 通知 spring 配置已更新，请重新加载带有 &lt;code&gt;@RefreshScope&lt;/code&gt; 注解的类或方法&lt;/li&gt;
+&lt;li&gt;spring 重新加载，完成热更新&lt;/li&gt;
+&lt;li&gt;spring 无法重新加载/兼容性有问题，则需要手动重新启动应用，此时回到第二步&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;嗯，还是比较顺滑的。&lt;/p&gt;
+
+&lt;h2 id=&#34;遇到的问题&#34;&gt;遇到的问题&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;定时任务注解 &lt;code&gt;@Scheduled&lt;/code&gt; 和 &lt;code&gt;@RefreshScope&lt;/code&gt; 不兼容&lt;/li&gt;
+&lt;li&gt;加密组件 jasypt-spring-boot-starter 的解密流程在 spring 重新加载 bean 时没有被执行到，加密属性直接作为属性值传给 bean 导致报错&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;问题一找到一个&lt;a href=&#34;http://stuartingram.com/2016/11/07/joy-and-pain-with-schedule-and-refreshscope-in-springboot-2/&#34;&gt;解法&lt;/a&gt;，但是这边没有尝试，因为目前看定时任务的热加载还不是强需求，重启可以加载最新配置就可以满足需求。&lt;/p&gt;
+
+&lt;p&gt;问题二在 jasypt 的 gitter 频道里找到了解决办法&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/disconf/jasypt.jpg&#34; alt=&#34;jasypt.png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;具体来说，把 &lt;code&gt;@EnableEncryptableProperties&lt;/code&gt; 注解去掉，使用&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SpringApplicationBuilder&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;environment&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;StandardEncryptableEnvironment&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;sources&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ManagerApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;class&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;代替&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;n&#34;&gt;SpringApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ManagerApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;class&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;相应的，引入的 pom 也从 jasypt-spring-boot-starter 改为 jasypt-spring-boot&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;以上大概就是在集成和使用 disconf 的过程中遇到的问题以及解决，可能不全，因为做这个功能拖的时间实在太久。那么，就这样结束吧。&lt;/p&gt;
+
+&lt;p&gt;参考链接：&lt;/p&gt;
+
+&lt;p&gt;[1]. &lt;a href=&#34;https://disconf.readthedocs.io/zh_CN/latest/index.html&#34;&gt;disconf 官方文档&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[2]. &lt;a href=&#34;https://github.com/zq2599/docker_disconf&#34;&gt;disconf server 端 docker-compose 方式安装&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[3]. &lt;a href=&#34;https://blog.kazaff.me/2016/07/15/disconf+spring%20boot+mybatis/?nsukey=80nDxFilbD6GC4bgyWWWrWixPUwI01dszm5ayo%2BLgHiCUGGA0576Ap6SA7%2Bvbab28SUtfjHPqDWhc3Sc3lvVcf4j3J%2F0s1WzN%2BTvEhuV3c9QXy1Brr80d7bUt8r30dXrYY%2FQY7qBXMwiKRZCxIuaJaf6GRd06JWnsZMcA%2B%2FcJnXorFncVr3ezE5vwwMvAwlCqcqhLQNX9z0BSFI3xkQuKw%3D%3D#%E4%B8%8Emybatis%E7%BB%93%E5%90%88&#34;&gt;Disconf+spring boot+mybatis&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[4]. &lt;a href=&#34;https://cloud.spring.io/spring-cloud-commons/multi/multi__spring_cloud_context_application_context_services.html&#34;&gt;spring cloud context&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>不要为了避免使用锁定而被限制</title>
+      <link>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</link>
+      <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</guid>
+      <description>
+
+&lt;p&gt;翻译自 &lt;a href=&#34;https://martinfowler.com/articles/oss-lockin.html&#34;&gt;Don&amp;rsquo;t get locked up into avoiding lock-in&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行之。然而，使用锁定并不是一件非对即错的事情：避免某一方面的使用锁定经常会使得你在另一方面的使用被锁定。流行的观念，比如开源软件魔法般地自动消除了使用锁定，也被证明是不完全正确的。是时候近距离看一下使用锁定了，这样你就不会为了避免使用锁定而被限制！&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;作者介绍&lt;/p&gt;
+
+&lt;p&gt;略&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;架构师的重要目标之一是&lt;a href=&#34;https://architectelevator.com/architecture/architecture-options/&#34;&gt;创造选择&lt;/a&gt;。这些选择使得系统可以容忍变更，这样我们就可以推迟作决定的时机，等到更多可用的信息，或者对没有预见的事件作出应对。使用锁定则起反作用：它使得方案切换变得困难。所以很多架构师可能会把使用锁定视为他们架构路上的敌人，而他们自己则是可以随意替换和连接组件的自由的 IT 系统的守卫。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;使用锁定 —— 一个架构师的架构之敌？&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;但是架构从来不会那么简单 —— 这是充满权衡的工作。经验丰富的架构师知道，使用锁定背后有更多需要关注的东西，而不是直接宣布应该避免。使用锁定有很多方面，有时甚至会成为优先的方案。所以让我们近距离看一下使用锁定。&lt;/p&gt;
+
+&lt;h2 id=&#34;开源混合多云-避免使用锁定&#34;&gt;开源混合多云 == 避免使用锁定？&lt;/h2&gt;
+
+&lt;p&gt;近来我们部署软件的平台变得越来越强大 —— 现代的云平台不仅可以&lt;a href=&#34;https://www.slideshare.net/bretmc/machine-learning-with-google-machine-learning-apis-puppy-or-muffin&#34;&gt;识别我们的照片中有小狗还是松饼&lt;/a&gt;，还可以编译我们的代码、部署它、配置必须的基础设施、存储我们的数据。&lt;/p&gt;
+
+&lt;p&gt;这样巨大的便利和效率提升也带来了全新的使用锁定。混合/多云配置，看上去最近吸引了很多架构师的注意，是一个考虑使用锁定时的好例子。假设你有一个应用想上云，非常容易办到。但是从架构师的角度来说，有许多选择和更多的权衡，尤其是和使用锁定有关时。&lt;/p&gt;
+
+&lt;p&gt;你可能想把应用部署到容器中。这听起来不错，但是要用 AWS 的 Elastic Container Service(ECS) 吗？毕竟，这是亚马逊云专有的。倾向于 Kubernetes？它是开源的并且可以运行在大多数环境中，包括自有环境 (on premises)。问题解决了吗？并没有完全解决 —— 你现在和 Kubernetes 绑定了 —— 想想那些至关重要的 YAML 文件吧！所以你从一个使用锁定跳到了另外一个，不是吗？而且如果你使用了托管的 Kubernetes 服务，比如 Google 的 GKE 或 Amazon 的 EKS，你可能还被限制到 Kubernetes 的一个特定版本和这些云服务商的专有扩展中。&lt;/p&gt;
+
+&lt;p&gt;如果你想在自有环境中运行应用，你也可以选择 &lt;a href=&#34;https://aws.amazon.com/outposts/&#34;&gt;AWS Outposts&lt;/a&gt;，这样你就会有一些选择权。但是这说到底还是专有的。它和 VMWare 集成，这就导致你可能已经被锁定到只能使用 VMWare 了，所以这真的有什么过人之处吗？Google 最新推出的竞品 Anthos 虽然是使用开源组件构建的，但仍然是一个专有产品：你可以将应用在不同的云提供商之间迁移 —— 前提是你要一直使用 Anthos。这不就正是使用锁定的定义吗？&lt;/p&gt;
+
+&lt;p&gt;再或者，如果你将应用的运行时和自动化部署彻底地区分开，不就可以非常简单的转换底层基础设施，减少所有这些使用锁定的影响吗？甚至还有跨平台的将基础设施作为代码(infrastructure-as-code)的工具。难道所有这些不能解除使用锁定的担心吗？&lt;/p&gt;
+
+&lt;p&gt;对于存储的需求，AWS S3 怎么样？其他云服务提供商提供了和 S3 兼容的 API，所以 S3 可以被认为是跨云兼容而且没有使用锁定吗，即使它本身是专有产品？你也可以把所有的数据访问封装一层抽象，这样就可以本地化任何依赖。这是个好主意吗？&lt;/p&gt;
+
+&lt;p&gt;看上去避免使用锁定并不那么简单，而且甚至可能会把你限制在逃离使用锁定的境况。尽管如此，为了表明基于云的架构仍然是非常有趣的，我在此推荐(原文怀疑笔误，defer to -&amp;gt; refer to) &lt;a href=&#34;https://twitter.com/swardley/status/908031162668474368&#34;&gt;Simon Wardley&amp;rsquo;s take on hybrid cloud&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;灰色的使用锁定&#34;&gt;灰色的使用锁定&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;使用锁定不是一个全是/全不是的东西&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;别人只能看到黑白的地方，乘坐架构电梯（可以参考作者的另一篇文章 &lt;a href=&#34;https://architectelevator.com/&#34;&gt;Architect Elevator&lt;/a&gt;）的人可以看到不同程度的灰色。当考虑系统设计时，他们会意识到，对于像使用锁定这种公共的属性，并不是二元的选择。就像你不会被某个产品完全锁定或完全未锁定，两个系统不会简单的完全耦合或完全无关。这两种属性都有很多方面。举例来说，使用锁定可以分解为很多不同维度：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;提供商使用锁定&lt;/strong&gt;：搞 IT 的人提到「使用锁定」时，通常都是指这种。它描述了从一个提供商切换到它的竞争者时的困难。比方说，如果从 Sieble CRM 迁移到 SalesForce CRM 或从 IBM DB2 迁移到 Oracle 基本会费掉你一根胳膊和一条腿，你被「锁定」了。这种类型的使用锁定很常见，因为提供商一般（不管是否明显）会从中获利。这种使用锁定包括商业安排，比如可以为你赢得打折的长期使用许可和售后服务协议。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;产品使用锁定&lt;/strong&gt;：和上一个相关，但这次是被锁定到了某个产品。当从一个提供商的产品迁移到另一个提供商的产品时，你经常需要同时更换提供商和产品，所以这两种使用锁定很容易混淆。开源产品可能可以避免提供商锁定，但是他们不能免除产品锁定：如果你正在使用 Kubernetes 或 Cassandra，你肯定就会被限制使用特定产品的 API，配置和功能。如果你在一个专业的（尤其是企业）环境工作，你还需要商业支持，而这将会再次将你限制到某个提供商的合同中 —— 参考上一条。过多的个性化配置、集成和专有扩展是某种形式的产品使用锁定 —— 他们使你很难切换到其他产品，即使它是开源的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;版本使用锁定&lt;/strong&gt;：除了被锁定在某一个产品，你还可能被锁定到具体的某个版本。版本升级可能会非常困难，如果他们不再兼容现有的个性化配置和你构建的扩展。一些使得你必须重写应用的版本升级 —— AngularJS vs Angular。情况还有可能变得更糟，版本锁定会传播：某个产品版本可能会使用另外一个特定（经常是过时）的操作系统版本等等，这使得任何迁移的尝试变得非常困难。当提供商决定弃用或不再继续支持整个产品线时，这种类型的锁定将会使你更难过：你必须在不再享有售后服务和作一次彻底的修改之间作出决定。情况甚至还可以变得更糟，比如，当你使用的老版本中被发现安全漏洞但是不再被提供 patch。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;架构使用锁定&lt;/strong&gt;：你也可能被限制在某个特定的架构。举例来说，当你到处使用 Kubernetes 时，有很大可能你在构建暴露 API 接口的微小的服务，并且作为容器部署。如果你想迁移到 serverless 的架构，你会想要把你的服务的粒度进一步改为单个的函数，将状态管理放到外部处理。这种改变将是你应用的一次彻底重构。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;平台使用锁定&lt;/strong&gt;：对某种产品的偏好会导致平台锁定，尤其是云平台。这种平台不仅运行你的应用，它们也保存了你的用户账号和关联的访问权限、安全策略、基础设施划分和许多其他方面。它们也提供了应用级别的服务，比如存储和机器学习服务，一般都是专有的。和这些服务保持距离看上去是一个减少平台锁定的方式，但这会大大消减最开始选择上云的动机。非软件从业者把这称为两难境地（finding yourself between a rock and a hard place）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;技能使用锁定&lt;/strong&gt;：随着开发者对某种特定的产品或架构越来越熟悉，你将会遇到技能使用锁定：重新训练或招聘其他产品或技术的开发人员会耗费时间。由于在如今的 IT 商店中，技能可用性是其中一种主要的限制，这种类型的使用锁定非常真实。一些企业应用对开发人员有特别的限制，使得花费在开发上的开销增多。当产品使用的定制化语言或者，有些讽刺的，「仅需配置」/不需要代码的框架时，这种效果尤其明显。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;法规使用锁定&lt;/strong&gt;：你可能会由于法律原因而被锁定在某个特定的解决方案，比如合规要求。举例来说，如果另外一家云服务提供商的数据中心没坐落在你的国家，那么你可能无法将你的数据迁移过去。你使用的软件的许可协议可能不允许你将系统迁移至云上，即使他们可以在云上流畅运行。如果你不管这些决定就这么干，你将会违反许可协议的条款。法律法规对工程的渗透远超我们预期：你的飞行器的小发动机可能早在 1970 年就设计好了，并且非常耗费燃料：新的引擎设计面临着高昂的法规不利条件。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;智力使用锁定&lt;/strong&gt;：最不明显，但是最危险的使用锁定的类型，就是会影响你的思考方式。当使用一系列提供商和架构工作过一段时间后，你很可能会将他们的假设纳入你做的决定中，而这将会使你拒绝掉其他可选项。举例来说，你可能以低效为理由拒绝扩容底层架构，因为他们不是线性伸缩的（将硬件提升两倍并不会两倍提升性能）。虽然技术上说是准确的，但是这种考虑问题的方式忽略了可伸缩性而不是效率才是最重要的这样一个事实。或者你可能会厌恶较短的发布周期，因为你观察到频繁的更新会导致更多的缺陷。当然了，你被告知过，写代码是奢侈、耗时并易于出错的，所以你应该通过配置完成所有事情。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;开源软件不是使用锁定的魔法解药&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;总的来说，使用锁定完全不属于「是/不是」的二维范畴，所以理解这些不同的方面可以帮助你做出更明智的架构决定。这个列表也揭穿了一些常见的迷思，比如使用开源软件可以神奇地消除掉使用锁定。开源软件可以减少提供商锁定，但是大多数其他类型的使用锁定仍然存在。这并不意味着开源不好，只是它不是使用锁定的魔法解药。&lt;/p&gt;
+
+&lt;h2 id=&#34;通过使用模型做出更好的决策&#34;&gt;通过使用模型做出更好的决策&lt;/h2&gt;
+
+&lt;p&gt;经验丰富的架构师不仅可以看到更多不同的灰度，他们也会实践良好的决策原则。这非常重要，因为我们远没有一般愿意认为的那样善于做出决定 —— 如果怀疑的话，你可以看下 Kahneman 的 &lt;a href=&#34;https://amzn.to/2Xnx7od&#34;&gt;「思考，快与慢」&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;改善决策最有效的一种方式是使用模型。甚至，或者说尤其是，简单的模型可以令人称奇地提改善决策制定。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;简单却容易记忆的模型是伟大的科学家的签名，而过于详尽参数过多的模型则是平庸的标志&lt;/p&gt;
+
+&lt;p&gt;—— &lt;a href=&#34;https://en.wikipedia.org/wiki/All_models_are_wrong#Quotations_of_George_Box&#34;&gt;George Box&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这就是你不应该嘲笑管理顾问钟爱的非常闻名的 2x2 矩形的原因。它是最简单也因此最有效的模型之一，我们不久将会看到。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;环境越是不确定，越是结构化的模型将帮助你做出更好的决定。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;关于模型第二重要的点：一种常见的观点是，当面对不确定时，你非常可能不得不随意做决定（shoot from the hip）—— 反正一切都在变动中。对立面其实才是真实的：我们本来就很差的做决定的能力，在需要处理许多相互依赖、高度不确定性和很小的概率时，只会变得更加糟糕。因此，在我们做决定时，模型会带来所需的结构和原则，派上大用场。决定是否接受使用锁定以及接受到什么程度非常完美地契合到这种做决定的类型，所以让我们用一些模型。&lt;/p&gt;
+
+&lt;h2 id=&#34;使用锁定作为一个-2x2-的矩阵&#34;&gt;使用锁定作为一个 2x2 的矩阵&lt;/h2&gt;
+
+&lt;p&gt;一个简单的模型可以帮助我们跨过「使用锁定=坏」的境地。首先，我们需要意识到，想要完全免除使用锁定是非常困难的，所以适量的使用锁定是不可避免的。其次，如果得到相应的好处，比如，竞品不提供的独特的功能或者使用便利，我们也可以很愉快地接受一定程度的使用锁定。&lt;/p&gt;
+
+&lt;p&gt;让我们用一个非常简单的模型来表示这些因素 —— 一个 2x2 的矩阵&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/lockin/lockin_matrix.png&#34; alt=&#34;lockin_matrix&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这个矩阵通过 2 个轴来表示我们的选择：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;切换代价（也就是「使用锁定」）：当我们想切换到其他方案时将会有多困难？&lt;/li&gt;
+&lt;li&gt;独特的功能：与其他可选方案相比，我们可以从当前方案可以多获得多少？&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;现在我们可以对四个象限做比较了：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;方便替换（Disposable）&lt;/strong&gt;：没有独特功能也可以简单替换的组件，可能是最不需要我们担心的。我们可以让它们保持原样，或者如果我们遇到问题了，可以简单地替换它们。Not a bad place to be for run-of-the-mill stuff. 比如，大多数开发 IDE（EMACS 可能是个引人注目的例外！）就属于这个分类：可以根据你的喜好混合使用，而且不会过于依赖它们。存放了你的照片和其他个人数据的云端存储使得你的智能手机也被划分到这个分类，后面还会详细讨论。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可接受的使用锁定（Acceptted Lock-in）&lt;/strong&gt;：对角线上，会使得你被锁定到某个产品或提供商，但是同时给你提供了独特的功能作为回报。虽然一般我们倾向于更少的使用锁定，但是这种折中也是可以接受的。你可能使用了像 Google Cloud BigQuery 或 AWS 裸金属这样的产品，非常清楚地知道被锁定了，这就是基于你所能得到的好处做了一个很清醒的决定。对于较小的应用，你也可能愉快的使用原生 AWS 服务，因为不太可能做迁移，而在开发和运维中节省的力气则是很受欢迎的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;警告（Caution）&lt;/strong&gt;：最不受欢迎的，既锁定了你，但又没有提供什么独特的功能。传统的关系型数据库可能属于这一类 —— 使用专有数据库可以提升你的年报吗？并不见得。然而，想要迁移走却是非常困难的，所以你最好能确保你不需要那样做。如果你为嵌入式系统选择了一个特别的硬件，然后要把这个系统发射到外太空，这样是可以的 —— 需要迁移的可能性足够低了。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;理想情况（Ideal）&lt;/strong&gt;：最棒的产品，提供了独特的功能，同时又可以非常方便地被替换。虽然听上去是要努力达到的理想状况，但是你需要知道这是有点矛盾的：如果一个方案提供了独特的功能，根据定义来说，竞品是不会提供的，这就会使得迁移变困难。S3 可能是这个分类的一个合适的例子 —— 多个云提供商采用了相同的 API，使得迁移，比如迁移到 GCP，相对简单。然而，每个实现都有一些不同的优势，比如地区、性能等。为了保护这种不同产品间的可迁移性，&lt;a href=&#34;https://en.wikipedia.org/wiki/Oracle_America,_Inc._v._Google,_Inc.&#34;&gt;不允许 API 被注册为专利&lt;/a&gt;是非常重要的。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;虽然模型确实很简单，将你的软件（可能还有硬件）组件放到这个矩阵中则值得实践。不仅可以可视化你暴露的东西，而且还可以将你的决定和不同的股东更好的交流。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/lockin/lockin_example.jpg&#34; alt=&#34;lockin_example&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;举一个每天都会用到的四象限的例子，你可能决定使用下面这些东西，它们给你带来了不同程度的使用锁定和便利（从右上角开始逆时针说）：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;你钟爱的 &lt;strong&gt;iPhone&lt;/strong&gt; 将你锁定在一个提供商的生态中，但是它也提供了独特的功能，所以你可能觉得&lt;strong&gt;接受这样的锁定是 OK 的（Accepted Lock-in）&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;你的&lt;strong&gt;移动数据提供商合同&lt;/strong&gt;将你锁定在单一的网络中，但是相对其他网络并没有真正提供多少便利。最好将它放入&lt;strong&gt;警告（Caution）&lt;/strong&gt;中&lt;/li&gt;
+&lt;li&gt;你的&lt;strong&gt;手机充电器&lt;/strong&gt;有标准接口。可惜很多 iPhone 没有，但是幸运的是转接线仍旧使得这种零件&lt;strong&gt;方便替换（Disposable）&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;很多 &lt;strong&gt;应用，比如短信&lt;/strong&gt;，提供了独特的功能，比如联络朋友，但是它们仍然被设计为易于替换，比如使用你手机上的联系人列表。这是&lt;strong&gt;理想情况（Ideal）&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;产品的独特功能并不总是满足你的独特需求&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;关于独特功能的一条警告：每个提供商都会提供某些形式的独特功能 —— 这是他们区别于其他家的手段。然后，重要的是，这种功能是否可以满足你或你的公司的某个确切的需求。举例来说，一些云提供商可以在他们令人称赞的全球网络中运行了数十亿用户服务。这是非常让人印象深刻和独特的，然而对一般企业来说，他们只需要服务一百万客户而且可能只在一个国家提供服务，这种对大规模的支持就不那么吸引人了。有些人坚持在有限速的小州购买法拉利，所以显然不是所有的决定都是完全理智的，但是也有可能是一辆法拉利可以比云平台在更多方面提供便利。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;使用锁定真正的代价&#34;&gt;使用锁定真正的代价&lt;/h2&gt;
+
+&lt;p&gt;由于这个简单的矩阵如此好用，让我们再做另外一个。上一个矩阵将切换代价作为一个单一的元素（或维度）对待。一个好的架构师可以将它分解为两个维度：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/lockin/lockin_cost.png&#34; alt=&#34;lockin_cost&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这个矩阵将切换的代价和可能性区分开。不大可能切换并且切换代价也低的东西不应该太打扰你，然而它的对端，切换代价高并且很有可能切换的东西非常不好而且应该被解决。在另一条对角线上，你则是在边缘试探，这些东西会使得你付出代价，但是却很少出现 —— 你会想买入一些保险，比如限制改变的范围或增加维护预算。你也可能接受这份风险 —— 有多大的概率你真的需要从 Oracle 切换到 DB2，或者反之？最后，如果切换很可能发生并且很容易，那你就达成了敏捷 —— 你拥抱变化并且将系统设计的易于改变。奇怪的是，这个象限经常比左上角的到的关注更少，尽管有许许多多的小变化在很快的被加上。这是我们糟糕的决策制定在作祟：不大可能发生的 drama 会得到更多的关注，因为&lt;em&gt;万一呢！&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;当讨论使用锁定的可能性时，你会考虑各种使你想要切换方案的场景：提供商可能倒闭、提高价格，或者无法继续支持你的规模或功能需求。有趣的是，减少使用锁定的努力有时候会成为谈判的工具：当协商延续使用协议时，你可以暗示提供商，你将系统架构为可以很容易的从他们产品中迁移走。这会帮助你谈判得到一个更低的价格，因为你的备选方案很廉价。这是一种不一定真的会被用到的架构选择 —— 它是一种威慑物，有点像冷战时期的兵器储备。你也可以假装拥有而不真正的减少使用锁定，但是你最好是一个谈判好手，以防提供商揭穿了你的虚张声势，比如通过在饮水机旁和你的开发人员聊天。&lt;/p&gt;
+
+&lt;h2 id=&#34;减少使用锁定-执行价格-the-strike-price&#34;&gt;减少使用锁定：执行价格（The strike price）&lt;/h2&gt;
+
+&lt;p&gt;再次将开头的&lt;a href=&#34;https://architectelevator.com/architecture/architecture-options/&#34;&gt;可选项比喻&lt;/a&gt;纳入考虑，如果避免使用锁定为你提供了更多的选择，那么从这些选择种进行切换时所付出的代价就是这些选择的执行价格了：它是你执行这个选项时真正的花费。如果你想达到越低的切换代价，这个选项的价值就会越高因此价格也会越高。虽然我们梦想所有系统都在「绿盒子」中，切换代价都最小，但是和投资相比可能会得不偿失。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;将切换代价降至最低可能不是最经济的选择。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;举例来说，很多架构师倾向于不被一家数据库提供商或云提供商锁定。然而，切换的可能性有多高呢？可能 5%，甚至更低？而你将切换代价从假如说五万刀（半手动迁移）降到接近零又需要花费多少？很可能要比两千五百刀（$50000x5%）多很多。因此，降低切换代价不是唯一的目标，而且很可能导致过度投资。这有点类似于超额投保：花费巨额溢价将免赔额降至零可能会让你感觉安心，但是一般来说并不是最经济，也即理智，的决定。&lt;/p&gt;
+
+&lt;p&gt;最终的模型（这次终于不是矩阵了）可以帮助你决定应当为减少切换代价做多少投资。下面的图像展示了你的责任，定义为产品的切换代价乘以与前期投资相关的切换的可能性（蓝色线条）。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/lockin/option_switching_cost.png&#34; alt=&#34;option_switching_cost&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;通过对可选项的投资，不管是降低切换的可能性，还是减少执行时的代价，当然可以减少责任。举例来说，使用一个像 Hibernate 这样的 ORM(Object-relational Mapping) 框架，就是一种减少数据库提供商锁定的小额投资。你也可以创建一种可以翻译为不同数据库提供商原生存储过程语法的元语言。它将使得你可以在不依赖数据库的前提下仍然能够充分发挥数据库的性能，但是它将会需要非常多的前期努力，只是为了一个相对不常见的场景。&lt;/p&gt;
+
+&lt;p&gt;因此比较有趣的部分是红色线条，它将前期投资和潜在责任做了加和。这是你总共的代价以及你应当追求最小化的东西。在大多数场景中，随着前期投资升高，你将会朝最优范围迈进。为了减少使用锁定的额外投资其实会导致更高的总代价。原因很简单：投资的回报消失了，尤其是对于基本不可能发生的切换。如果我们将架构做得过于灵活，我们很可能就会困在过度投资的区域了。信奉 &lt;a href=&#34;https://martinfowler.com/bliki/Yagni.html&#34;&gt;Yagni（你不会用到这个功能的）&lt;/a&gt; 的家伙们则在光谱的另一端 —— 老生常谈了，诀窍是找到合理的中间地带。&lt;/p&gt;
+
+&lt;h2 id=&#34;避免使用锁定所需的总代价&#34;&gt;避免使用锁定所需的总代价&lt;/h2&gt;
+
+&lt;p&gt;既然现在我们有一个评价使用锁定的代价和潜在好处的不错的工具，让我们仔细研究下避免使用锁定的总代价。在前面的模型中，我们假设避免使用锁定是简单的一种代价。然而现实中，这种代价可以分解为几种组成部分&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;复杂度可能会是减少使用锁定时最大的拦路虎。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;功夫（Effort）&lt;/strong&gt;：这是在人工时间方面需要的额外工作。如果我们选择在 kubernetes 集群中部署容器的方式来减少云提供商使用锁定，这一类将会包括学习新工具、编写 Docker 文件、配置 Kubernetes 等的功夫。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;花费（Expense）&lt;/strong&gt;：这是额外的现金花费，比如，产品使用许可证，招聘外面的提供商，或者是参加 KubeCon。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;利用不足（Underutilization）&lt;/strong&gt;：出现这种间接代价是由于避免使用锁定经常使得你无法使用提供商提供的特定功能。结果是，你无法从所使用的软件中得到所有便利。接下来就会导致为了完成缺失的功能而付出更多的努力或者导致你产品中存在弱点。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;复杂度（Complexity）&lt;/strong&gt;：复杂度是等式中的核心元素，而又太经常被忽略。许多为了减少使用锁定的努力会引入一层额外的抽象层：JDBC，容器，公用 APIs。虽然这些都是有用的工具，额外的一层就会增加另一个活动部件，都会给整个系统增加复杂度。这就会增加团队新成员学习难度和出现系统级错误的概率。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;新的使用锁定（New Lock-ins）&lt;/strong&gt;：避免一个使用锁定经常导致另外一个使用锁定。举例来说，你可能不用 AWS CloudFormation 而选择 Hashicorp 的 Terraform 或 Pulumi，这些都提供支持跨云支持。然而，现在你被锁定在其他提供商的另外的产品中了，你需要考虑这对你是否 OK。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;当计算避免使用锁定的代价时，架构师应当快速地过一遍这份列表来避免盲点。同时，请注意避免使用锁定的尝试可能会有遗漏，和 &lt;a href=&#34;https://architectelevator.com/architecture/failure-doesnt-respect-abstraction/&#34;&gt;leaky abstractions&lt;/a&gt; 非常类似。举例来说，Terraform 是一个很不错的工具，但是它的脚本使用了许多和提供商强关联的构建。实现细节因此被渗透，使得从一个云切换到另外一个不可能是零代价。&lt;/p&gt;
+
+&lt;h2 id=&#34;综合考虑&#34;&gt;综合考虑&lt;/h2&gt;
+
+&lt;p&gt;说了这么多理论，让我们看一些具体的例子。&lt;/p&gt;
+
+&lt;h3 id=&#34;部署容器&#34;&gt;部署容器&lt;/h3&gt;
+
+&lt;p&gt;我在一家将他们大部分代码打包到 Docker 容器并部署到 AWS ECS 的公司工作。因此他们被限制在了 AWS。他们应该用开源的 Kubernetes 代替目前的容器编排吗？鉴于他们目前主要关注于功能开发速度，而且 ECS 的解决方案对他们来说很适用，我不认为迁移可以带来足够的好处。迁移到其他云提供商的可能性很低，他们目前有更重要的事情要做（bigger fish to fry）.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;建议&lt;/strong&gt;：接受使用锁定。&lt;/p&gt;
+
+&lt;h3 id=&#34;关系型数据库访问&#34;&gt;关系型数据库访问&lt;/h3&gt;
+
+&lt;p&gt;许多应用都在使用关系型数据库，许多提供商和开源选择都提供数据库支持。然而，SQL 方言、存储过程和定制的管理控制台都可能导致数据库使用锁定。你应该为了避免使用锁定投入多少呢？对于大多数语言和运行时，公共映射框架比如 Hibernate 以较低的代价提供了一定级别的数据库中立性。如果你想进一步减少你的执行价格，你可能需要避免使用 SQL 函数和存储过程，这可能降低你的产品的性能或需要你使用更多硬件。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;建议&lt;/strong&gt;：使用低成本低机制来减少使用锁定。不要试图得到零转换代价。&lt;/p&gt;
+
+&lt;h3 id=&#34;迁移至云&#34;&gt;迁移至云&lt;/h3&gt;
+
+&lt;p&gt;相较于从一个数据库提供商切换到另一个，你可能对将应用，包括它使用的数据库，一起迁移到云端更感兴趣。除了技术方面的考虑，你还需要谨慎考虑提供商的使用许可，它可能将使迁移变得不划算。在这些情况下，选择一个开源数据库更划算。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;建议&lt;/strong&gt;：选择一个可以满足你们运营和售后支持的开源数据库，但是也要接受一定程度的使用锁定。&lt;/p&gt;
+
+&lt;h3 id=&#34;多云&#34;&gt;多云&lt;/h3&gt;
+
+&lt;p&gt;许多企业着迷于可迁移的多云部署，提出了更精细和复杂（和昂贵）的计划使得他们表面上可以避免云服务商使用锁定。然而，大部分方法和你最初想要上云的原因相违背：减少碎片和使用像存储或数据库这种托管服务的能力。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;建议&lt;/strong&gt;：实践警告。阅读我的关于多云的&lt;a href=&#34;https://architectelevator.com/cloud/hybrid-multi-cloud/&#34;&gt;文章&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;以思考的速度做架构&#34;&gt;以思考的速度做架构&lt;/h2&gt;
+
+&lt;p&gt;似乎人们可以投入大量时间考虑使用锁定的问题。一些人甚至会认为我们的讨论过于「学院派」，虽然我很难把这个词理解为贬义，因为那是我们大多数人接受教育的地方。然而，之前的非黑即白的架构方法难道不是更简单，也就是更高效吗？&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;如果你专注于并坚持简单模型的话，架构思维实际上会惊人的快&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;现实生活中，思索其实非常迅速。过一遍本文中提到的所有模型可能只需要几分钟时间，然后就可以产生记录良好的决定。除了一张纸或一块白板以为并不需要什么花哨的工具。快速的架构思维的关键只是专注的能力。&lt;/p&gt;
+
+&lt;p&gt;与之相对的是，为了提前几周就安排好，但是却几乎没有具有能够做出明智决定的实际专业经验的人参加的漫长的指导委员会会议，去准备详尽的 PPT 而付出的努力。&lt;/p&gt;
+
+&lt;p&gt;我们还是倾向于将在等待开会的时间花在思考上。&lt;/p&gt;
+
+&lt;h2 id=&#34;致谢&#34;&gt;致谢&lt;/h2&gt;
+
+&lt;p&gt;略&lt;/p&gt;
+
+&lt;h2 id=&#34;重大修订&#34;&gt;重大修订&lt;/h2&gt;
+
+&lt;p&gt;略&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;我的思考&#34;&gt;我的思考&lt;/h2&gt;
+
+&lt;p&gt;从 9 月 5 号就开始翻译，耗时将近两周，感觉文章的含金量并没有想象中高，有些老生常谈和虎头蛇尾。&lt;/p&gt;
+
+&lt;p&gt;首先，我们都知道系统设计中会充满权衡，只不过这篇文章好像把关注点放在了和企业上云相关的领域。但其实又没有很深入的去谈如何解决问题，各种会遇到的问题倒是罗列的很详尽。&lt;/p&gt;
+
+&lt;p&gt;可是这些会遇到的问题，我想大多数人心里还是有数的，即使没有作者这样逻辑清晰的一一指认出来。&lt;/p&gt;
+
+&lt;p&gt;但是更重要的是，如何解决这些问题呀！&lt;/p&gt;
+
+&lt;p&gt;模型的思考方式确实是一个新的思路，更重要的是，在真正做选择时，如何把待选项正确的套用到模型中，并给出确切的理由。这里作者也确实给了一些例子做参考，但是相较于文章开头对各种问题的吐槽，这里的分析显得薄弱好多。&lt;/p&gt;
+
+&lt;p&gt;还是要靠自己啊。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The Three Buckets</title>
+      <link>https://kyon.life/post/the-three-buckets/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/the-three-buckets/</guid>
+      <description>&lt;p&gt;翻译自 &lt;a href=&#34;https://adamnash.blog/2009/07/22/guide-to-product-planning-three-feature-buckets/&#34;&gt;Guide to Product Planning: Three Feature Buckets&lt;/a&gt;，一篇 2009 年的文章。&lt;/p&gt;
+
+&lt;p&gt;把将要开发的功能的概念分类到下面三个桶里的一个：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Metric Movers&lt;/strong&gt;: 这些功能会很大程度上改变商业目标和产品指标(These are features that will move your target business &amp;amp; product metrics significantly.)。在大多数健康的产品组织中，都会有具体的原因和策略支持对某个产品或功能的投资决定。受雇，增长，年报。一般来说，很少功能真正属于这一类。要提前知道哪些功能是，因为产品的成败很大程度上取决于指标的评估。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Customer Requests&lt;/strong&gt;: 这些功能是你的客户不断要求的。没什么好说的。倾听你的客户，弄清楚哪些是他们最想要的。你不必非要实现他们要求的所有功能，但是专业的项目管理需要谨慎的倾听直接来自客户的要求，并且十分谦虚和考虑周全，因为没有什么比把客户曾经要求的功能回滚更能激怒他们。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Customer Delight&lt;/strong&gt;: 这些功能客户没有要求过，但是使用的时候他们会很高兴。一般来说完成这些功能需要以下几点：倾听客户找到他们的痛点，了解在技术上如何可行，富有创新的设计以获得优雅而令人愉悦的操作体验。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;有些功能可能可以同时放入多个桶，但是一般不会同时可以放到所有桶里。&lt;/p&gt;
+
+&lt;p&gt;我发现，把功能从这三个桶的维度进行分类，会强迫产品团队直视他们为什么想要完成某项功能，是客户想要吗？还是公司想要（Metric Movers）？或者只是他们自己觉得很酷。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;以上算是摘抄式翻译，有两段介绍作者写这篇文章原因的文字略过，后面关于使用这种方式的好处也略过了。&lt;/p&gt;
+
+&lt;p&gt;另外，最为关键的 &lt;strong&gt;Metrics Movers&lt;/strong&gt; 这个分类，感觉吃不准，作者想表达的到底是完成这项功能以后，产品就会向着预期的目标迈进一大步，还是会大幅度改变产品原来的目标。搜了下原文的评论，似乎没人有这个困惑，可能属于 101 的内容，我这个大外行才不懂。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to Be a Great Product Manager</title>
+      <link>https://kyon.life/post/how-to-be-a-great-product-manager/</link>
+      <pubDate>Tue, 03 Sep 2019 15:05:43 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/how-to-be-a-great-product-manager/</guid>
+      <description>
+
+&lt;p&gt;翻译自 &lt;a href=&#34;https://adamnash.blog/2011/12/16/be-a-great-product-leader/&#34;&gt;Be a Great Product Leader&lt;/a&gt;，一篇 2011 年的文章。&lt;/p&gt;
+
+&lt;p&gt;了解我的人都知道，我对项目管理充满热情。我相信，项目管理可以帮助一个拥有技术和设计人员的跨功能模块的团队最好程度地完成工作。&lt;/p&gt;
+
+&lt;p&gt;不幸的是，项目管理的工作描述要不就是太模糊（你对这个产品负责），要不就是过于具体（编写产品规格说明），都不能帮助人们成为厉害的项目管理。&lt;/p&gt;
+
+&lt;p&gt;我花了很多时间来考虑项目管理的价值，怎么能够既可以和合作团队沟通清楚他们的需求，又能和项目管理新人交代明白他们的工作内容。这么多年过去了，我把这些沟通精简为三种责任：策略、优先级和实施。&lt;/p&gt;
+
+&lt;h2 id=&#34;责任-1-产品策略&#34;&gt;责任 #1: 产品策略&lt;/h2&gt;
+
+&lt;p&gt;在顶级的商务课程中有很多探讨策略的内容，然而，我怀疑，其中并没有任何一个探讨产品的策略。&lt;/p&gt;
+
+&lt;p&gt;非常简单，产品管理的任务是把两件事情说清楚：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;我们参与的竞争是什么&lt;/li&gt;
+&lt;li&gt;我们如何赢得分数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;把这两件事情理清楚以后，忽然间，会有很多非常聪明的人一起来为这个产品贡献自己的力量，比如开发、运营、市场、质量保证、设计等。如果没有搞明白这两件事情，再好的优先级制定和实施也挽救不了你。架构杰出的软件需要各种个样的人才，原创性的理念可能来自各种地方，把我们参加的竞争和如何衡量是否成功说明白，可以帮助团队自主决定哪个主意更有完成的价值。&lt;/p&gt;
+
+&lt;p&gt;清楚地定义参与的竞争是什么，包括对这个产品的愿景，给消费者提供的价值，以及和竟争对手的差异。但是，更重要的是，清楚地表达出为什么我们的产品可以在市场竞争中获胜。如果你选取了适当的衡量成败的指标，团队里的每个人都应该知道如何取胜。&lt;/p&gt;
+
+&lt;p&gt;询问任何一个在职超过两周的项目管理这两个问题，你都应该得到一个坚实的答案。&lt;/p&gt;
+
+&lt;p&gt;达成成就：步调一致的努力，更好的积极性，原创性的主意，获得反馈(product that moves a needle)。&lt;/p&gt;
+
+&lt;h2 id=&#34;责任-2-优先级&#34;&gt;责任 #2: 优先级&lt;/h2&gt;
+
+&lt;p&gt;一旦团队成员了解了目标和如何达成，制定优先级就变得简单了。这是项目管理的第二种责任——确保最初的策略贯彻到项目实施阶段。&lt;/p&gt;
+
+&lt;p&gt;在拥有聪明人士的公司里，总是会有更多的好主意。随着公司规模的增大，这种状况并不会变好，因为更多的人总是会有不同的主意，关于什么可以做什么不能。最终，不留情面的制定优先级是必须面对的现实。&lt;/p&gt;
+
+&lt;p&gt;团队接下来需要执行并完成的三个主意才是值得关注的，而不是在好主意清单中哪些是最棒的。&lt;/p&gt;
+
+&lt;p&gt;目前所处的阶段是任何企业事业中最关键的部分，大多数产品的失败不是由于缺少好主意，而是错误地评估了哪些主意是目前急需实现的，哪些可以再等等。&lt;/p&gt;
+
+&lt;p&gt;就个人来说，我认为线性的优先级在长远来看是低效的。在另一篇文章 &lt;a href=&#34;https://kyon.life/post/the-three-buckets/&#34;&gt;The Three Buckets&lt;/a&gt;里详细解释了我赞成的划分优先级的流程。&lt;/p&gt;
+
+&lt;p&gt;询问任何一个在职超过两周的项目经理，他们的团队目前开发产品的优先级列表，而且这个列表有着自己清晰的逻辑，团队里每个人都了解并支持。&lt;/p&gt;
+
+&lt;h2 id=&#34;责任-3-实施&#34;&gt;责任 #3: 实施&lt;/h2&gt;
+
+&lt;p&gt;项目管理其实会做非常多的杂事。&lt;/p&gt;
+
+&lt;p&gt;最终来看，项目管理会发布产品。这意味着，项目管理需要处理产品发布过程中的任何问题。有时需要完善内容，有时需要补设计，有时需要做 QA，有时又需要做 PR。总之是在人类能力所及范围内，去完成所有成功发布产品所需要的事情。&lt;/p&gt;
+
+&lt;p&gt;然而，这其中有些事情对团队来说尤为重要，否则效率会变得相当低下。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;产品规格文档：需要清晰地指示团队在构建的东西&lt;/li&gt;
+&lt;li&gt;边缘场景取舍：意料外地复杂边缘场景经常会出现。一般来说，这是项目管理的责任，把这些边缘场景可能会造成的后果分散到产品的其他部分中去。（ Typically, the product manager is on the line to quickly triage those decisions for potentially ramifications to other parts of the product.）&lt;/li&gt;
+&lt;li&gt;项目管理：任何功能都会伴随着开发时间与完成度的互相妥协，大多数功能都被强制限定在一个产品开发周期里，项目管理必须领先于可能的问题，平衡产品开发时间和完成度以确保可以上市并取得成功&lt;/li&gt;
+&lt;li&gt;分析：最后，团队依靠产品管理分析数据，找出哪些地方是完成功能要达成的目标所需关注的。同时，他们也期望项目管理可以理解当前功能的性能，以及竞争对手完成的功能的性能。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;make-things-happen&#34;&gt;Make things happen&lt;/h2&gt;
+
+&lt;p&gt;厉害的项目管理让事情发生。你可以准确无误地判断新来的产品管理是好是坏。因为事情会很快的发生，问题修复和功能发布，数据分析，项目优先级重新规划，关键数据开始移动。&lt;/p&gt;
+
+&lt;p&gt;请成为一名厉害的项目管理。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>《架构整洁之道》读后</title>
+      <link>https://kyon.life/post/clean-architecture/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/clean-architecture/</guid>
+      <description>&lt;p&gt;&lt;sup&gt;4&lt;/sup&gt;&amp;frasl;&lt;sub&gt;5&lt;/sub&gt; 星推荐&lt;/p&gt;
+
+&lt;p&gt;用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完合住书的情况下按照回忆来写的，写着写着就断掉了，苦不堪言，还是要时不时的回去看书啊。&lt;/p&gt;
+
+&lt;p&gt;相对于硬件，软件应当「柔软」，不与运行平台绑定，对新需求友好。&lt;/p&gt;
+
+&lt;p&gt;编程范式有三种，面向过程编程，面向对象编程，函数式编程。这三种范式都是通过约束程序员的能力，换取程序的健壮性。面向过程编程约束了 goto 语句，不允许程序执行流程随意跳转，将函数的控制语句限制在 &lt;code&gt;if...else..&lt;/code&gt;, &lt;code&gt;for..loop&lt;/code&gt; 这几种，保证了程序的可推导性；面向对象编程约束了函数指针的使用，多态取而代之，使得依赖反转以及插件式设计更加容易；函数式编程约束了变量的可变性，即在函数式编程思想中，变量一旦赋值是不可更改的，从而在根源上避免了各种多线程并发问题。&lt;/p&gt;
+
+&lt;p&gt;编程范式在源码层面保证了整洁，而架构设计也需要整洁。&lt;/p&gt;
+
+&lt;p&gt;开发系统时，划分组件应当遵循的 SOLID 原则：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;SRP 单一职责原则，同一个组件的代码实现的功能应当同属一个职责，同时也应当兼顾变更速度，否则会导致一个小的改动引起其他功能的错误或者至少是更多的回归测试&lt;/li&gt;
+&lt;li&gt;OCP 开闭原则，对扩展友好，对修改拒绝。开发组件时应当考虑如何设计才能够使得以后引入新功能时，可以通过扩展实现，而尽量降低修改对原有代码的影响。一种模式是支持插件式设计。另外的考虑是，对依赖方向的控制。一般来说频繁的需求变更都不会影响核心业务逻辑，因此将核心业务逻辑放在依赖方向的最上层，依赖只会从下往上，以此下推，新需求只会影响下层的模块，而不需要大规模修改核心逻辑部分。&lt;/li&gt;
+&lt;li&gt;LSP 里氏替换原则，继承实现的指导原则，在可以使用父类的地方，使用子类替换后，行为不能异常。&lt;/li&gt;
+&lt;li&gt;ISP 接口隔离原则，通过接口隔离依赖，可以减少很多不必要的麻烦。&lt;/li&gt;
+&lt;li&gt;DIP 依赖反转原则，控制流的依赖应当遵循依赖守则：单向的、由下层指向上层。而源码依赖和控制流依赖的方向通常是相反的。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;划分组件时，我们一般会想到 MVC，model、view、controller，这是按照流程功能来做的归类，与特定系统处理的领域无关，即不管是哪个领域的软件系统，都可以按照这个模式划分为三块。但是这样却不够合理，一个系统的组件划分应该有自己鲜明的特征，就像建筑图纸，如果你看到了客厅、厨房、卧室，那这无疑是家的设计，而如果看到的是借阅室、还书区、公共阅读室那这肯定是图书馆。&lt;/p&gt;
+
+&lt;p&gt;类似的，系统的组件划分&lt;strong&gt;应当&lt;/strong&gt;是和它的领域相关的，一个新来的同事，应该可以很快的发现这个系统要做的事情。因此划分系统组件时，应当是用例主导的，并且不同用例的功能应当遵循单一职责原则进行隔离。识别出核心业务逻辑，所谓核心，就是这个业务中与赚钱最为相关的一部分逻辑。梳理依赖关系时，核心逻辑应当处于最顶层/或者是同心圆的最里层，其他模块依赖它，而它不会依赖下层的模块，下/外面一层是用例的处理逻辑，再外一层是展现/存储的转换层（presenter），最下/外一层是真正的展现/存储。&lt;/p&gt;
+
+&lt;p&gt;引入转换层，是因为 GUI 是难于测试的，而测试应当是系统的一部分（是的，系统不只包括开发功能的代码），为了避免出现系统无法测试的情况，展现部分应当没有任何处理逻辑，这些逻辑应当放在转换层，从而将系统从转换层这里划分为可测试部分和不可测试部分。而测试在系统中所处位置，是属于最底层/外层，它依赖于所需测试的模块，而没有模块依赖于它。但是测试不应当与功能模块耦和，避免出现功能模块一个小的改动，导致测试模块成千的失败。另外，必要时，应当为测试编写专门的 API，以便跳过各种安全、权限检查。&lt;/p&gt;
+
+&lt;p&gt;GUI 只是一种展现方式，而 Web 只是一种 GUI方式，因此设计系统时，这部分属于实现细节，决策应当向后推迟，以便支持更多的展现方式，或者说遵循 OCP 原则，在后续有新的展现需求时可以更容易扩展。另外的展现方式还有 CLI 。&lt;/p&gt;
+
+&lt;p&gt;数据库也只是一种实现细节，数据库的表/行结构如此流行，只不过是因为内存不够大/硬盘不够快，如果没有这样的限制，应当尽可能选择利于程序使用的结构，比如栈、堆、数组、哈希表等。另外的存储方式包括文件、缓存等。因此关于存储的决策也应当尽可能延迟。&lt;/p&gt;
+
+&lt;p&gt;不要迷信框架，对框架的使用程度，可以使用框架便利开发，但是不应当在业务逻辑中出现对框架的依赖，即保持框架可以方便地被去除/替换。&lt;/p&gt;
+
+&lt;p&gt;架构的价值在于，使得系统开发的成本尽量降低。&lt;/p&gt;
+
+&lt;p&gt;在系统全周期（开发、部署、运行、维护）中，好的架构都发挥着作用。开发时，系统架构应当和开发团队相匹配，方便系统开发；部署时，保持不同组件的独立性，修改其中一个不需要全部重新部署；运行时，好的架构应该可以起到解释系统运行过程的作用；维护包括系统的捉虫以及新需求的 patch，是整个周期中成本最高的，好的架构通过遵循开闭原则以及接口隔离原则，使得 debug 可以尽量少的影响原来代码，并方便扩展新加功能。&lt;/p&gt;
+
+&lt;p&gt;好的架构应当使得系统的可选项尽可能久的尽可能多。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>「常识」摘抄</title>
+      <link>https://kyon.life/post/common-sense/</link>
+      <pubDate>Mon, 17 Dec 2018 15:17:22 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/common-sense/</guid>
+      <description>&lt;p&gt;摘抄自梁文道的书 &lt;a href=&#34;https://book.douban.com/subject/3344676/&#34;&gt;《常识》&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;在这里，语言文字与真实世界“隔离”何其严重。前人花了一万多年努力去命名世间的每一样事物，例如一头山林中的走兽，一座架设在河道上的工具，一种暧昧的情绪，甚至是风暴的形态。到了现在，这一切名字却像黏力消失的小纸片，从它们所在的东西上逐一剥落，逐一飞散。所以我们开始习惯不再相信言词。&lt;/p&gt;
+
+&lt;p&gt;如果每个人都以类似的态度对待言词与事实的隔离，那么他们一定不会再轻信任何言词以及那些用言词表达的所有美好价值。而这个社会将不只是个信任匮乏的社会，它还必将滋生出一种犬儒的冷漠。&lt;/p&gt;
+
+&lt;p&gt;我依然相信语言与事物的神奇对应，相信承诺必将履行，理念必得实现。这不是幼稚，而是公民存在的基本条件；不只是“我相信”，更是“我要相信”。&lt;/p&gt;
+
+&lt;p&gt;—— 空话/言语脱离现实之后的信任问题&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;“必须从一开始就对文本的异己性保持敏感。但这种敏感既不涉及所谓的‘中立’，也不意味泯除自我；而是为自己的现存之见与固有理解让出一块空地。对自己偏见的觉察是件重要的事，因为这样，文本才能呈现出它所有的他性，以及它那相对于读者固有理解的真理。”&lt;/p&gt;
+
+&lt;p&gt;浮躁/这个时代的集体病症&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;政府若要施行有效的统治，要百姓心悦诚服地遵从法律政令，要纳税人心甘情愿地缴税，靠的不能只是暴力，还要靠对统治者的同意与信服，这是现代政治文明的常识；人民是国家的主人，人民必须同意政府的统治，政府才能有效地管治。
+然而，不客气地说，一个永远正确永不犯错的政权，这是在传统社会里才行得通的神话。改革开放三十年来的历程恰恰说明了，政权的合法性绝对不能只开一个不容动摇的神话史观，还要依靠凭绩效而来的良治经验。…… 由此看来，再去重复神话史观的力量不只是不合时宜，简直就是开倒车了。&lt;/p&gt;
+
+&lt;p&gt;——创世神话/新中国的历史问题&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;我们时常歌颂知识分子的独立人格，但很少去谈学术界文化界的“界格”。“界格”说白了，就是学术文化相对的独立地位；正因其独立，一个学者的话才有了分量。我们愿意相信他的发言他的研究，信服的是学术本身的逻辑，以真理的追求为目标，而非大量以取悦政治人物的喜好为原点。毕竟政治的逻辑和学术的逻辑是两套不同的逻辑。政治、经济、学术和文化等领域的分化发展是现代性的标志成就，显然它们彼此相关，但没有任何一个领域可以完全吞没另一个领域，也没有任何一个领域的逻辑可以完全取代另一套逻辑，更不可能让一套逻辑的目标成为所有领域活动的目标。&lt;/p&gt;
+
+&lt;p&gt;—— 大学校长/校长的地位堪比国家元首&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;不假思索地将“极少数”和“坏分子”联结起来，会起到使大脑迟钝、令焦点模糊的作用。&lt;/p&gt;
+
+&lt;p&gt;二战之后的德国兴起纳粹语言学的研究，就是要分析政治语言的语法和词条，看看空洞的语言如何造成了思想的贫乏和虚无的热情。今天的中国已经正式告别过去的阶级斗争，迈向建设和发展之路，我们也需要相应的语言反省和重建。以“极少数”为例的老式术语虽不是“文革”的产物，却是可以总结那个年代的“斗争语言”代表，小心清理它过多的价值意蕴既合时宜且有益，否则说不定会闹出一些笑话。&lt;/p&gt;
+
+&lt;p&gt;—— 极少数/ 只限于坏人的一种量词&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>集合基数统计</title>
+      <link>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
+      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;集合基数&lt;/strong&gt;：对于非无限集合，基数是指集合中元素的个数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：将两个集合合并后，如何求新集合的基数。&lt;/p&gt;
+
+&lt;p&gt;Bitmap &amp;ndash;&amp;gt; Linear Count &amp;ndash;&amp;gt; LogLog Count &amp;ndash;&amp;gt; Adaptive Count &amp;ndash;&amp;gt; HyperLogLog Count&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;假设集合的基数为 n&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;bitmap&#34;&gt;Bitmap&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;原理&lt;/strong&gt;：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;内存占用&lt;/strong&gt;：需要 n bit，空间复杂度 O(n)&lt;/p&gt;
+
+&lt;h2 id=&#34;linear-count&#34;&gt;Linear Count&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;原理&lt;/strong&gt;：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。
+&lt;img src=&#34;https://kyon.life/media/15436750409657/15436750409657.jpg&#34; alt=&#34;LC 将集合元素存入 bitmap 示意图&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：和 bitmap 相同&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;内存占用&lt;/strong&gt;：由于当桶满的情况（即所有 bit 都为 1）下，u=0，公式得到的值趋近无穷，不再生效，因此需要控制满桶出现的概率足够小，并且需要控制误差在可接受范围内，经过一系列计算，可以得出 m 和 n 的一个表格，表示不同集合基数 n 时，需要控制满桶概率的 m 的值，可以总结出一个规律，m 大约为 n/10，即只需要 bitmap 方式占用空间的十分之一。但是从渐进复杂性的角度看，空间复杂度仍为 O(n)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;误差&lt;/strong&gt;：由 n 的量级和 m 的量级共同决定，当可以容忍的误差为 ∆ 则可以推导得到  $m &amp;gt; \frac {e^t-t-1}{(∆t)^2}$ 其中 t = n/m&lt;/p&gt;
+
+&lt;h2 id=&#34;loglog-count&#34;&gt;LogLog Count&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;前置要求&lt;/strong&gt;：
+1. 哈希的结果分布近似均匀
+2. 哈希结果碰撞的概率足够小
+3. 哈希的结果表示为二进制后长度固定&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;原理&lt;/strong&gt;：
+将集合中一个元素进行哈希后，表示为 m 位二进制存入 bitmap，存入时与原 bitmap 中的值做 或(or) 操作，由前置要求的第 x 条可知，每一 bit 为 0 或为 1 是互相独立的，各有 &lt;sup&gt;1&lt;/sup&gt;&amp;frasl;&lt;sub&gt;2&lt;/sub&gt; 的概率，因此将集合中所有元素全部存入 bitmap 的过程可以看作是 &lt;code&gt;伯努利过程&lt;/code&gt;，那么第 k 位第一次出现 1 的概率为 $P_n(x=k) = \frac {1}{2^k}$。接下来用反证法证明，集合的基数 $n ≈ 2^k$&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;bitmap 中 1 第一次出现在 k 位之前的概率 $P_n(x≤k) = (1-P_n(x=k))^n = (1 - \frac {1}{2^k})^n$&lt;/li&gt;
+&lt;li&gt;那么 bitmap 中 1 第一次出现在 k 之后的概率 $P_n(x&amp;gt;k) = (1 - P_n(x≤k)) = (1 - (1 - \frac {1}{2^k})^n)$&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;首先，假设 $n » 2^k$ 那么 $P_n(x&amp;gt;k)$ 趋近于 0，而当 $n « 2^k$ 时，$P_n(x≤k)$ 则趋近于 0，于是 n 可以近似由  $2^k$ 求得。&lt;/p&gt;
+
+&lt;p&gt;此时已经可以得到集合的基数为 $$n ≈ 2^k$$ 其中 k 为 bitmap 中从高位数起，1 第一次出现的位数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;桶平均&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;接下来，为了抵消一些偶然因素，LLC 引入了桶分组，类似于物理实验中的多次实验求平均值。&lt;/p&gt;
+
+&lt;p&gt;将元素哈希后的 m 位二进制表示，拆分为两部分，前 p 位表示桶序号，后面的 m-p 位作为真正用于估计基数的比特串。桶序号相同的元素被分配到同一个桶，估计基数时，首先计算桶内比特串 1 第一次出现的位置，记为 P[i]，然后对 p 个桶加和取平均后再进行估算，此时 n 的估计值变为
+$$n ≈ 2^{\frac {∑P[i]}{p}}$$&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;合并&lt;/strong&gt;：以桶为合并的最小单位，桶序号相同的比特串进行 bitmap 的合并
+&lt;strong&gt;内存占用&lt;/strong&gt;：内存使用与分桶数及哈希后的二进制位长度相关，假设哈希后数值表示为二进制为 32 位，则每个桶需要 5bit 内存来存当前桶第一个 1 出现的位置，内存占用即为 $$\frac {5*p}8 byte$$
+&lt;strong&gt;误差&lt;/strong&gt;：误差主要由分桶的数目决定，如果要将误差控制在 ∆ 之内，则分桶数 p 的取值为 $$p &amp;gt; (\frac {1.30}{∆})^2$$&lt;/p&gt;
+
+&lt;p&gt;假设基数为一亿的集合（约为 $2^27$），分桶数为 p=1024，那么需要占用的内存为 5*&lt;sup&gt;1024&lt;/sup&gt;&amp;frasl;&lt;sub&gt;8&lt;/sub&gt;=640 字节，误差由 $1024 &amp;gt; (\frac {1.30}∆)^2$ 可算得 $∆ &amp;lt; 0.040625$ 即小于 4%&lt;/p&gt;
+
+&lt;h2 id=&#34;adaptive-count&#34;&gt;Adaptive Count&lt;/h2&gt;
+
+&lt;p&gt;基数比较小时，用 LC，比较大时用 LLC&lt;/p&gt;
+
+&lt;h2 id=&#34;hyperloglog-count&#34;&gt;HyperLogLog Count&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;注意，这里的分桶数，使用 m 来表示，而不是 p&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;将 LLC 中桶分组的几何平均替换为调和平均，使用调和平均数代替几何平均数后，估计公式变为如下&lt;/p&gt;
+
+&lt;p&gt;$$\hat{n}=\frac{\alpha_m m^2}{\sum{2^{-M}}}$$&lt;/p&gt;
+
+&lt;p&gt;其中&lt;/p&gt;
+
+&lt;p&gt;$$\alpha_m=(m\int _0^\infty (log_2(\frac{2+u}{1+u}))^m du)^{-1}$$
+替换求平均方式的原因是，几何平均对离群值非常敏感，导致有空桶出现时，估计结果有较大扰动&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;参考：&lt;/p&gt;
+
+&lt;p&gt;[1]. &lt;a href=&#34;http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-ii.html&#34;&gt;解读Cardinality Estimation算法（第二部分：Linear Counting）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[2]. &lt;a href=&#34;http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-iii.html&#34;&gt;解读Cardinality Estimation算法（第三部分：LogLog Counting）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[3]. &lt;a href=&#34;http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-iv.html&#34;&gt;解读Cardinality Estimation算法（第四部分：HyperLogLog Counting及Adaptive Counting）&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[4]. &lt;a href=&#34;https://djhworld.github.io/hyperloglog/&#34;&gt;HyperLogLog&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[5]. &lt;a href=&#34;https://www.soasme.com/techshack.weekly/verses/a4335a0c-7b1f-4b0e-9f79-15201ed79998.html&#34;&gt;Hyperloglog 算法简介&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch 学习记录</title>
+      <link>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
+      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
+      <description>
+
+&lt;h2 id=&#34;es-的基本概念&#34;&gt;ES 的基本概念&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用 lucene 作为核心搜索库，倒排索引&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;index&lt;/code&gt; 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;document&lt;/code&gt; 文档，类似于 sql 表中的一条数据，含有多个 field&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;field&lt;/code&gt; 类似于 sql 表中的一列，属性及其值&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;node/cluster&lt;/code&gt; es 可以在不同的机器（node）上运行不同的线程，组成 cluster 的形式提供服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;shard&lt;/code&gt; 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;es-的分布式架构&#34;&gt;ES 的分布式架构&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/es/ES-architecture.png&#34; alt=&#34;01_elasticsearch分布式架构原理&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分&lt;/li&gt;
+&lt;li&gt;一个 shard 的 primary/replica 会在不同机器上，当一台机器挂掉后，可以从另一台机器的 shard 中读取/恢复数据&lt;/li&gt;
+&lt;li&gt;写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端&lt;/li&gt;
+&lt;li&gt;读 es 时，可以从 primary shard 读，也可以从 replica 读&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://kyon.life/media/es/ES-write.png&#34; alt=&#34;01_es读写底层原理剖析&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;es-的写过程&#34;&gt;ES 的写过程&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用&lt;/li&gt;
+&lt;li&gt;协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点&lt;/li&gt;
+&lt;li&gt;shard A 接收到数据后，进行存储，并同步到 replica shard&lt;/li&gt;
+&lt;li&gt;协调节点等待 shard A 的写入和同步都完成后，向客户端发送写入成功回执&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;shard-a-写数据过程详细&#34;&gt;shard A 写数据过程详细&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;shard A 收到数据后，会先缓存到内存 buffer 中，并写入一份到 translog&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:translaog&#34;&gt;&lt;a href=&#34;#fn:translaog&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; 文件的系统缓存（os cache），此时，该条数据虽然写入完成，但是没有经过进一步处理，客户端进行查询的话，是查询不到的&lt;/li&gt;
+&lt;li&gt;buffer 写满/每隔一段时间（默认 1s），es 将 buffer 中的数据 &lt;em&gt;refresh&lt;/em&gt; 到 segment file 的 os cache 中，数据写入 segment file 之后，同时就会建立好倒排索引，若 buffer 中没有数据则跳过&lt;/li&gt;
+&lt;li&gt;由于 os cache 虽然不是 es 在管理，但也是内存，如果机器挂掉数据同样会丢失，所以 os cache 超过一定容量/每隔一段时间（默认 30min）会 &lt;em&gt;flush&lt;/em&gt; 到磁盘，此时将会生成多个 segment file（上次 flush 到这次之间 refresh 个数的）&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;translog 同样需要持久化，达到一定阈值/每隔一段时间（默认 5s）进行一次 &lt;em&gt;commit&lt;/em&gt; 操作&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;将 buffer 中的数据 refresh 到 os cache 中，清空 buffer&lt;/li&gt;
+&lt;li&gt;将一个 commit point 写入磁盘文件，里面标识着这个 commit point 之前的所有 segment file&lt;/li&gt;
+&lt;li&gt;将 os cache 中的所有数据强制 fsync 到磁盘&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;由于每次 refresh 操作，都会生成一个 segment file，所以数量会急剧增多，到达一定阈值后，会触发 &lt;em&gt;merge&lt;/em&gt; 操作，合并为一个大的 segment file，并将原来的小文件删除&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;es 删除数据是标记删除，即删除请求到达后，会记录一个 &lt;em&gt;.del&lt;/em&gt; 的磁盘文件，当搜索某条数据时，一旦发现在 .del 文件中被标记为删除，则不会返回；在 merge 被触发后，过程中检查 segment file 中的记录是否已经被标记删除，若是，则不会进入大的 segment file，以此达到删除的目的&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;es-的读过程&#34;&gt;ES 的读过程&lt;/h2&gt;
+
+&lt;p&gt;es 读数据分为两种&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;根据 doc id 进行 get 查询&lt;/li&gt;
+&lt;li&gt;搜索&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;查询&#34;&gt;查询&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端向协调节点发起查询请求&lt;/li&gt;
+&lt;li&gt;协调节点根据 doc id 进行哈希，获得该条数据所在 shard 及其 node&lt;/li&gt;
+&lt;li&gt;由于查询既可以向 primary 也可以向 replica 发起，因此这里选取路由时有一个 lb，从中选取一个 shard 及其 node 即可&lt;/li&gt;
+&lt;li&gt;shard 将数据返回给协调节点，协调节点将数据返回客户端&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;搜索&#34;&gt;搜索&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;客户端向协调节点发起搜索请求&lt;/li&gt;
+&lt;li&gt;协调节点将关键词发给所有 shard（primary/replica 任选其一）&lt;/li&gt;
+&lt;li&gt;各个 shard 根据关键词进行搜索，并返回匹配度较高的几条 doc 的 id 给协调节点&lt;/li&gt;
+&lt;li&gt;协调节点接收到所有 shard 的返回后，根据匹配度进行排序，获取最优的几条，并根据 doc id 向 shard 查询对应的 document，返回给客户端&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Ps.&lt;/strong&gt; ES 是准实时的，因为在 buffer 中的内容 refresh 到 segment file 之前是搜索不到的，大概会有 1s 的时间差&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ps.s.&lt;/strong&gt; ES 有可能会丢数据，在 buffer、translog 中有数据未落盘时机器宕机&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ps.s.s.&lt;/strong&gt; refresh、flush、commit 操作都可以通过 rest API/Java API 手动触发&lt;/p&gt;
+
+&lt;p&gt;参考资料：&lt;/p&gt;
+
+&lt;p&gt;中华石杉码农，视频资料&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+
+&lt;hr /&gt;
+
+&lt;ol&gt;
+&lt;li id=&#34;fn:translaog&#34;&gt;translog 的作用：机器宕机重启时，会读取 translog 中的信息，并恢复到内存 buffer 和 os cache 中，减少数据丢失。
+ &lt;a class=&#34;footnote-return&#34; href=&#34;#fnref:translaog&#34;&gt;&lt;sup&gt;[return]&lt;/sup&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
     </item>
     
   </channel>

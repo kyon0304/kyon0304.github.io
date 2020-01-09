@@ -23,7 +23,7 @@
 <meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
 
 
-<meta name="generator" content="Hugo 0.61.0 with theme even" />
+<meta name="generator" content="Hugo 0.57.2 with theme even" />
 
 
 <link rel="canonical" href="https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/" />
@@ -53,7 +53,8 @@
 
 
 
-<meta itemprop="keywords" content="elasticsearch,工具,学习笔记," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="elasticsearch,工具,学习笔记," />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="ElasticSearch 学习记录"/>
 <meta name="twitter:description" content="ES 的基本概念 使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个"/>
 
@@ -133,21 +134,22 @@
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-  <ul>
-    <li><a href="#es-">ES 的基本概念</a></li>
-    <li><a href="#es--1">ES 的分布式架构</a></li>
-    <li><a href="#es--2">ES 的写过程</a>
-      <ul>
-        <li><a href="#shard-a-">shard A 写数据过程详细</a></li>
-      </ul>
-    </li>
-    <li><a href="#es--3">ES 的读过程</a>
-      <ul>
-        <li><a href="#heading">查询</a></li>
-        <li><a href="#heading-1">搜索</a></li>
-      </ul>
-    </li>
-  </ul>
+<ul>
+<li>
+<ul>
+<li><a href="#es-的基本概念">ES 的基本概念</a></li>
+<li><a href="#es-的分布式架构">ES 的分布式架构</a></li>
+<li><a href="#es-的写过程">ES 的写过程</a>
+<ul>
+<li><a href="#shard-a-写数据过程详细">shard A 写数据过程详细</a></li>
+</ul></li>
+<li><a href="#es-的读过程">ES 的读过程</a>
+<ul>
+<li><a href="#查询">查询</a></li>
+<li><a href="#搜索">搜索</a></li>
+</ul></li>
+</ul></li>
+</ul>
 </nav>
   </div>
 </div>
@@ -161,16 +163,22 @@
 <li><code>node/cluster</code> es 可以在不同的机器（node）上运行不同的线程，组成 cluster 的形式提供服务</li>
 <li><code>shard</code> 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard</li>
 </ul>
-<h2 id="es--1">ES 的分布式架构</h2>
-<p><img src="/media/es/ES-architecture.png" alt="01_elasticsearch分布式架构原理"></p>
+
+<h2 id="es-的分布式架构">ES 的分布式架构</h2>
+
+<p><img src="/media/es/ES-architecture.png" alt="01_elasticsearch分布式架构原理" /></p>
+
 <ul>
 <li>不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分</li>
 <li>一个 shard 的 primary/replica 会在不同机器上，当一台机器挂掉后，可以从另一台机器的 shard 中读取/恢复数据</li>
 <li>写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端</li>
 <li>读 es 时，可以从 primary shard 读，也可以从 replica 读</li>
 </ul>
-<p><img src="/media/es/ES-write.png" alt="01_es读写底层原理剖析"></p>
-<h2 id="es--2">ES 的写过程</h2>
+
+<p><img src="/media/es/ES-write.png" alt="01_es读写底层原理剖析" /></p>
+
+<h2 id="es-的写过程">ES 的写过程</h2>
+
 <ol>
 <li>客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用</li>
 <li>协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点</li>
@@ -203,13 +211,18 @@
 <p>es 删除数据是标记删除，即删除请求到达后，会记录一个 <em>.del</em> 的磁盘文件，当搜索某条数据时，一旦发现在 .del 文件中被标记为删除，则不会返回；在 merge 被触发后，过程中检查 segment file 中的记录是否已经被标记删除，若是，则不会进入大的 segment file，以此达到删除的目的</p>
 </li>
 </ul>
-<h2 id="es--3">ES 的读过程</h2>
+
+<h2 id="es-的读过程">ES 的读过程</h2>
+
 <p>es 读数据分为两种</p>
+
 <ul>
 <li>根据 doc id 进行 get 查询</li>
 <li>搜索</li>
 </ul>
-<h3 id="heading">查询</h3>
+
+<h3 id="查询">查询</h3>
+
 <ol>
 <li>客户端向协调节点发起查询请求</li>
 <li>协调节点根据 doc id 进行哈希，获得该条数据所在 shard 及其 node</li>
@@ -228,9 +241,12 @@
 <p><strong>Ps.s.</strong> ES 有可能会丢数据，在 buffer、translog 中有数据未落盘时机器宕机</p>
 <p><strong>Ps.s.s.</strong> refresh、flush、commit 操作都可以通过 rest API/Java API 手动触发</p>
 <p>参考资料：</p>
+
 <p>中华石杉码农，视频资料</p>
-<section class="footnotes" role="doc-endnotes">
-<hr>
+<div class="footnotes">
+
+<hr />
+
 <ol>
 <li id="fn:1" role="doc-endnote">
 <p>translog 的作用：机器宕机重启时，会读取 translog 中的信息，并恢复到内存 buffer 和 os cache 中，减少数据丢失。 <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
@@ -298,6 +314,10 @@
   </article>
         </div>
         
+
+  
+
+  
 
   
 
