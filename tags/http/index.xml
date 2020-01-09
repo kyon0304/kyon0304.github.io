@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>http on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/http/</link>
+    <description>Recent content in http on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 06 Jan 2020 10:13:03 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/http/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>HTTP/3 的过去、现在及将来</title>
+      <link>https://kyon.life/post/http3/</link>
+      <pubDate>Mon, 06 Jan 2020 10:13:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/http3/</guid>
+      <description>看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。 以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。 http/1 每</description>
+    </item>
+    
+  </channel>
+</rss>

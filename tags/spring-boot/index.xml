@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>spring-boot on kyon&#39;s wonderland with ❤️</title>
@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>基于 spring boot &#43; disconf 的配置中心</title>
+      <title>基于 Spring Boot &#43; Disconf 的配置中心</title>
       <link>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</link>
       <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       

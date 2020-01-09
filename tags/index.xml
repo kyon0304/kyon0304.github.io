@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on kyon&#39;s wonderland with ❤️</title>
@@ -6,79 +6,80 @@
     <description>Recent content in Tags on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <lastBuildDate>Mon, 06 Jan 2020 10:13:03 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>architecture</title>
-      <link>https://kyon.life/tags/architecture/</link>
-      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      <title>http</title>
+      <link>https://kyon.life/tags/http/</link>
+      <pubDate>Mon, 06 Jan 2020 10:13:03 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/architecture/</guid>
+      <guid>https://kyon.life/tags/http/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>elasticsearch</title>
-      <link>https://kyon.life/tags/elasticsearch/</link>
-      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      <title>学习笔记</title>
+      <link>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Mon, 06 Jan 2020 10:13:03 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/elasticsearch/</guid>
+      <guid>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>es</title>
-      <link>https://kyon.life/tags/es/</link>
-      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      <title>java</title>
+      <link>https://kyon.life/tags/java/</link>
+      <pubDate>Sun, 22 Dec 2019 18:24:10 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/es/</guid>
+      <guid>https://kyon.life/tags/java/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>howto</title>
-      <link>https://kyon.life/tags/howto/</link>
-      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      <title>disconf</title>
+      <link>https://kyon.life/tags/disconf/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/howto/</guid>
+      <guid>https://kyon.life/tags/disconf/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>notes</title>
-      <link>https://kyon.life/tags/notes/</link>
-      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      <title>spring-boot</title>
+      <link>https://kyon.life/tags/spring-boot/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/notes/</guid>
+      <guid>https://kyon.life/tags/spring-boot/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>product</title>
-      <link>https://kyon.life/tags/product/</link>
-      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      <title>实操</title>
+      <link>https://kyon.life/tags/%E5%AE%9E%E6%93%8D/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/product/</guid>
+      <guid>https://kyon.life/tags/%E5%AE%9E%E6%93%8D/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>reading</title>
-      <link>https://kyon.life/tags/reading/</link>
-      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      <title>工具</title>
+      <link>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/reading/</guid>
+      <guid>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>translation</title>
-      <link>https://kyon.life/tags/translation/</link>
-      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      <title>配置中心</title>
+      <link>https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/translation/</guid>
+      <guid>https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/</guid>
       <description></description>
     </item>
     
@@ -92,29 +93,65 @@
     </item>
     
     <item>
-      <title>基数统计</title>
-      <link>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link>
-      <pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>工具</title>
-      <link>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</link>
-      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>架构</title>
       <link>https://kyon.life/tags/%E6%9E%B6%E6%9E%84/</link>
       <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
       
       <guid>https://kyon.life/tags/%E6%9E%B6%E6%9E%84/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>翻译</title>
+      <link>https://kyon.life/tags/%E7%BF%BB%E8%AF%91/</link>
+      <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E7%BF%BB%E8%AF%91/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>howto</title>
+      <link>https://kyon.life/tags/howto/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/howto/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>产品</title>
+      <link>https://kyon.life/tags/%E4%BA%A7%E5%93%81/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E4%BA%A7%E5%93%81/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>architecture</title>
+      <link>https://kyon.life/tags/architecture/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/architecture/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>读过</title>
+      <link>https://kyon.life/tags/%E8%AF%BB%E8%BF%87/</link>
+      <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E8%AF%BB%E8%BF%87/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>朝花夕拾</title>
+      <link>https://kyon.life/tags/%E6%9C%9D%E8%8A%B1%E5%A4%95%E6%8B%BE/</link>
+      <pubDate>Mon, 17 Dec 2018 15:17:22 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E6%9C%9D%E8%8A%B1%E5%A4%95%E6%8B%BE/</guid>
       <description></description>
     </item>
     
@@ -128,11 +165,11 @@
     </item>
     
     <item>
-      <title>翻译</title>
-      <link>https://kyon.life/tags/%E7%BF%BB%E8%AF%91/</link>
-      <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
+      <title>elasticsearch</title>
+      <link>https://kyon.life/tags/elasticsearch/</link>
+      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
       
-      <guid>https://kyon.life/tags/%E7%BF%BB%E8%AF%91/</guid>
+      <guid>https://kyon.life/tags/elasticsearch/</guid>
       <description></description>
     </item>
     

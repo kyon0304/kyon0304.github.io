@@ -23,7 +23,7 @@
 <meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
 
 
-<meta name="generator" content="Hugo 0.54.0 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.61.0 with theme even" />
 
 
 <link rel="canonical" href="https://kyon.life/post/threadlocal/" />
@@ -33,8 +33,8 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
-
-<link href="/dist/even.93844dae.min.css" rel="stylesheet">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/share.min.css">
 
@@ -43,21 +43,17 @@
 <meta property="og:description" content="使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/threadlocal/" />
-<meta property="article:published_time" content="2019-12-22T18:24:10&#43;08:00"/>
-<meta property="article:modified_time" content="2019-12-22T18:24:10&#43;08:00"/>
-
+<meta property="article:published_time" content="2019-12-22T18:24:10+08:00" />
+<meta property="article:modified_time" content="2020-01-06T00:00:00+00:00" />
 <meta itemprop="name" content="Threadlocal 梳理">
 <meta itemprop="description" content="使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见">
-
-
 <meta itemprop="datePublished" content="2019-12-22T18:24:10&#43;08:00" />
-<meta itemprop="dateModified" content="2019-12-22T18:24:10&#43;08:00" />
-<meta itemprop="wordCount" content="1926">
+<meta itemprop="dateModified" content="2020-01-06T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2596">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="java,学习笔记," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Threadlocal 梳理"/>
 <meta name="twitter:description" content="使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见"/>
 
@@ -127,9 +123,9 @@
       <div class="post-meta">
         <span class="post-time"> 2019-12-22 </span>
         
-          <span class="more-meta"> 约 1926 字 </span>
-          <span class="more-meta"> 预计阅读 4 分钟 </span>
-        
+          <span class="more-meta"> 约 2596 字 </span>
+          <span class="more-meta"> 预计阅读 6 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
     </header>
 
@@ -137,35 +133,38 @@
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#使用场景">使用场景</a></li>
-<li><a href="#实现">实现</a></li>
-<li><a href="#垃圾回收">垃圾回收</a></li>
-<li><a href="#一种使用方式">一种使用方式</a></li>
-<li><a href="#其他">其他</a></li>
-<li><a href="#参考">参考</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#heading">使用场景</a></li>
+    <li><a href="#heading-1">实现</a>
+      <ul>
+        <li><a href="#heading-2">如何存储</a></li>
+        <li><a href="#heading-3">获取过程</a></li>
+        <li><a href="#heading-4">创建过程</a></li>
+        <li><a href="#heading-5">总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#heading-6">垃圾回收</a></li>
+    <li><a href="#heading-7">一种使用方式</a></li>
+    <li><a href="#heading-8">其他</a></li>
+    <li><a href="#heading-9">参考</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      
-
-<h2 id="使用场景">使用场景</h2>
-
+      <h2 id="heading">使用场景</h2>
 <p>用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见的使用场景，比如存储登录用户信息，同一个 request 的 trace id 等。</p>
-
-<h2 id="实现">实现</h2>
-
-<p>ThreadLocal 包含两个静态内部类，ThreadLocalMap 和 Entry，如下所示，其中 Entry 是弱引用的子类，referent 是 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。</p>
-
-<p>内部类 ThreadLocalMap 名字中虽然包含 Map，但与一般的 hashmap 并没有什么关系，其实是内部维护了一个 Entry[] 类型的数组，索引自己的内部类 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。</p>
+<h2 id="heading-1">实现</h2>
+<p>ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。</p>
+<h3 id="heading-2">如何存储</h3>
+<p>首先，用一张图来表示一下 threadlocal 是如何存储数据的：</p>
+<p><img src="/media/threadlocal/threadlocal.png" alt="threadlocal.png"></p>
+<p>可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 <code>table</code>，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。</p>
+<p>ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 <code>table</code>，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。</p>
+<p>ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -182,25 +181,24 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ThreadLocal</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>    
     <span class="kd">static</span> <span class="kd">class</span> <span class="nc">ThreadLocalMap</span> <span class="o">{</span>
-        <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Entry</span> <span class="kd">extends</span> <span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;&gt;</span> <span class="o">{</span>
+        <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Entry</span> <span class="kd">extends</span> <span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="o">{</span>
             <span class="cm">/** The value associated with this ThreadLocal. */</span>
             <span class="n">Object</span> <span class="n">value</span><span class="o">;</span>
 
-            <span class="n">Entry</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">k</span><span class="o">,</span> <span class="n">Object</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
-                <span class="kd">super</span><span class="o">(</span><span class="n">k</span><span class="o">);</span>
+            <span class="n">Entry</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">k</span><span class="o">,</span> <span class="n">Object</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
+                <span class="kd">super</span><span class="o">(</span><span class="n">k</span><span class="o">)</span><span class="o">;</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">v</span><span class="o">;</span>
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>使用 ThreadLocal 时，代码调用逻辑。</p>
-
-<p>调用以下代码时 ThreadLocal 的执行逻辑</p>
+</div><h3 id="heading-3">获取过程</h3>
+<p>上面说明了 ThreadLocal 数据是如何存储的，那么当使用 ThreadLocal 时，是如何创建和获取数据的呢？一个简单的使用 ThreadLocal 的代码片段如下所示：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -209,19 +207,19 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">threadLocal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">threadLocal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
     <span class="nd">@Override</span>
-    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">initValue</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">initValue</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">5</span><span class="o">;</span>
     <span class="o">}</span>
-<span class="o">};</span>
-<span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">();</span></code></pre></td></tr></table>
+<span class="o">}</span><span class="o">;</span>
+<span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>ThreadLocal 的构造函数是一个空函数，所以 <code>new</code> 的时候没有什么特殊操作，接下来看下 <code>get</code> 函数都做了哪些事情：</p>
+</div><p>相较于创建，我们先来看下 ThreadLocal 更高频使用的 <code>get()</code> 方法：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -240,52 +238,125 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">T</span> <span class="nf">get</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
-    <span class="n">ThreadLocalMap</span> <span class="n">map</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">map</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">getEntry</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">T</span> <span class="nf">get</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ThreadLocalMap</span> <span class="n">map</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">map</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">getEntry</span><span class="o">(</span><span class="k">this</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
             <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
             <span class="n">T</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
             <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="n">setInitialValue</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">setInitialValue</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="n">ThreadLocalMap</span> <span class="nf">getMap</span><span class="o">(</span><span class="n">Thread</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="na">threadLocals</span><span class="o">;</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>首先获取当前线程，然后获取当前线程持有的 ThreadLocalMap 对象，这个对象是 Thread 对象持有的成员变量，具体管理则由 ThreadLocal 类实现。</p>
+</div><p>可以看到，在这个方法中会去获取当前线程<code>t</code>，然后使用 <code>t</code> 获取当前线程持有的 ThreadLocalMap 实例变量 <code>map</code>，然后根据 <code>map</code> 和 <code>this</code> 得到对应的 Entry 实例 <code>e</code>，最终获取用户数据 <code>e.value</code>。如果获取不到，则调用 <code>setInitialValue()</code> 进行初始化。</p>
+<p>获取当前线程 <code>t</code> 和获取 <code>map</code> 都是比较直白的过程，直接略过，先看下 <code>ThreadLocalMap.Entry e = map.getEntry(this)</code> 是如何获取 Entry <code>e</code> 的：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">Entry</span> <span class="nf">getEntry</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">table</span><span class="o">.</span><span class="na">length</span> <span class="o">-</span> <span class="n">1</span><span class="o">);</span>
-    <span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">table</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="n">key</span><span class="o">)</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="cm">/**
+</span><span class="cm"> * Get the entry associated with key.  This method
+</span><span class="cm"> * itself handles only the fast path: a direct hit of existing
+</span><span class="cm"> * key. It otherwise relays to getEntryAfterMiss.  This is
+</span><span class="cm"> * designed to maximize performance for direct hits, in part
+</span><span class="cm"> * by making this method readily inlinable.
+</span><span class="cm"> *
+</span><span class="cm"> * @param  key the thread local object
+</span><span class="cm"> * @return the entry associated with key, or null if no such
+</span><span class="cm"> */</span>
+<span class="kd">private</span> <span class="n">Entry</span> <span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">getEntry</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">table</span><span class="o">.</span><span class="na">length</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">table</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">key</span><span class="o">)</span>
         <span class="k">return</span> <span class="n">e</span><span class="o">;</span>
     <span class="k">else</span>
-        <span class="k">return</span> <span class="n">getEntryAfterMiss</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
-<span class="o">}</span></code></pre></td></tr></table>
+        <span class="k">return</span> <span class="n">getEntryAfterMiss</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="cm">/**
+</span><span class="cm"> * Version of getEntry method for use when key is not found in
+</span><span class="cm"> * its direct hash slot.
+</span><span class="cm"> *
+</span><span class="cm"> * @param  key the thread local object
+</span><span class="cm"> * @param  i the table index for key&#39;s hash code
+</span><span class="cm"> * @param  e the entry at table[i]
+</span><span class="cm"> * @return the entry associated with key, or null if no such
+</span><span class="cm"> */</span>
+<span class="kd">private</span> <span class="n">Entry</span> <span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">getEntryAfterMiss</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">key</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="n">Entry</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">[</span><span class="o">]</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="n">e</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">=</span><span class="o">=</span> <span class="n">key</span><span class="o">)</span>
+            <span class="k">return</span> <span class="n">e</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">expungeStaleEntry</span><span class="o">(</span><span class="n">i</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">else</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>得到 ThreadLocalMap 对象后，再使用当前 threadLocal 对象获取 Entry 对象。如果可以获取到，则返回 Entry 中存储的 value 值，如果获取不到，则进行初始化。</p>
+</div><p><code>this</code> 是当前 ThreadLocal 对象实例，使用它作为 key，在 ThreadLocalMap 持有的 <code>Entry[] table</code> 中索引相应的 Entry <code>e</code>，可以看到，这里便是上面说到的索引 Entry 的两种方式：首先根据 hashcode 快速索引，如果找不到，则调用 <code>getEntryAfterMiss()</code> 方法，将当前 ThreadLocal 对象实例 <code>this</code> 作为 key，与 Entry 的 referant 作比对，获取相应的 entry。</p>
+<h3 id="heading-4">创建过程</h3>
+<p>接下来看下如果获取不到 Entry，ThreadLocal 如何通过 <code>setInitialValue()</code> 进行初始化：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -336,99 +407,92 @@
 </span><span class="lnt">49
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">T</span> <span class="nf">setInitialValue</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">T</span> <span class="n">value</span> <span class="o">=</span> <span class="n">initialValue</span><span class="o">();</span>
-    <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
-    <span class="n">ThreadLocalMap</span> <span class="n">map</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">map</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
-        <span class="n">map</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">T</span> <span class="nf">setInitialValue</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">T</span> <span class="n">value</span> <span class="o">=</span> <span class="n">initialValue</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ThreadLocalMap</span> <span class="n">map</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">map</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">value</span><span class="o">)</span><span class="o">;</span>
     <span class="k">else</span>
-        <span class="n">createMap</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+        <span class="n">createMap</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">value</span><span class="o">)</span><span class="o">;</span>
     <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
 <span class="o">}</span>
 
-<span class="kd">private</span> <span class="kt">void</span> <span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">Entry</span><span class="o">[]</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">[</span><span class="o">]</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">len</span><span class="o">-</span><span class="n">1</span><span class="o">);</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">len</span><span class="o">-</span><span class="n">1</span><span class="o">)</span><span class="o">;</span>
 
-    <span class="k">for</span> <span class="o">(</span><span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
-            <span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
-            <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">len</span><span class="o">)])</span> <span class="o">{</span>
-        <span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="o">;</span>
+            <span class="n">e</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">]</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
 
-        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">=</span><span class="o">=</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
             <span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
             <span class="k">return</span><span class="o">;</span>
         <span class="o">}</span>
 
-        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">replaceStaleEntry</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">replaceStaleEntry</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">i</span><span class="o">)</span><span class="o">;</span>
             <span class="k">return</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
 
-    <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
-    <span class="kt">int</span> <span class="n">sz</span> <span class="o">=</span> <span class="o">++</span><span class="n">size</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(!</span><span class="n">cleanSomeSlots</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">sz</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">sz</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">)</span>
-        <span class="n">rehash</span><span class="o">();</span>
+    <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">sz</span> <span class="o">=</span> <span class="o">+</span><span class="o">+</span><span class="n">size</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">cleanSomeSlots</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">sz</span><span class="o">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">sz</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">threshold</span><span class="o">)</span>
+        <span class="n">rehash</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="kt">void</span> <span class="nf">createMap</span><span class="o">(</span><span class="n">Thread</span> <span class="n">t</span><span class="o">,</span> <span class="n">T</span> <span class="n">firstValue</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">t</span><span class="o">.</span><span class="na">threadLocals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocalMap</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">firstValue</span><span class="o">);</span>
+    <span class="n">t</span><span class="o">.</span><span class="na">threadLocals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocalMap</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">firstValue</span><span class="o">)</span><span class="o">;</span>
 <span class="o">}</span>
 
-<span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">ThreadLocalMap</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">firstKey</span><span class="o">,</span> <span class="n">Object</span> <span class="n">firstValue</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">table</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">[</span><span class="n">INITIAL_CAPACITY</span><span class="o">];</span>
-    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstKey</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">INITIAL_CAPACITY</span> <span class="o">-</span> <span class="n">1</span><span class="o">);</span>
-    <span class="n">table</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">(</span><span class="n">firstKey</span><span class="o">,</span> <span class="n">firstValue</span><span class="o">);</span>
+<span class="n">ThreadLocalMap</span><span class="o">.</span><span class="na">ThreadLocalMap</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">firstKey</span><span class="o">,</span> <span class="n">Object</span> <span class="n">firstValue</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">[</span><span class="n">INITIAL_CAPACITY</span><span class="o">]</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstKey</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">INITIAL_CAPACITY</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">table</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">(</span><span class="n">firstKey</span><span class="o">,</span> <span class="n">firstValue</span><span class="o">)</span><span class="o">;</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">1</span><span class="o">;</span>
-    <span class="n">setThreshold</span><span class="o">(</span><span class="n">INITIAL_CAPACITY</span><span class="o">);</span>
-<span class="o">}</span></code></pre></td></tr></table>
+    <span class="n">setThreshold</span><span class="o">(</span><span class="n">INITIAL_CAPACITY</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>初始化的流程，首先调用 <code>initialValue()</code> 获取初始值，我们创建 threadLocal 对象时 override 了这个方法，因此会返回 5，获取值后，再使用当前线程获取 threadLocals 即这里的变量 map，如果 map 存在，则将值放入对应的 entry，不存在则创建。从这里可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。</p>
-
-<p>最后，用一张图来表示一下</p>
-
-<p><img src="/media/threadlocal/threadlocal.png" alt="threadlocal.png" /></p>
-
-<p>总结：每个线程通过持有 ThreadLocal.ThreadLocalMap 实例，来访问到真正需要的数据：存储在 Entry 实例中的成员变量 value。而不同的线程 thread-1, thread-2 即使访问相同的 ThreadLocal 实例，也会为它们创建各自线程独享的成员变量，ThreadLocalMap，从而持有线程独享的本地变量。threadlocal 实例的 get 方法，只是将这个流程包装了一下。</p>
-
-<h2 id="垃圾回收">垃圾回收</h2>
-
+</div><p>首先，调用 <code>initialValue()</code> 拿到用户需要存储的值。我们创建 ThreadLocal 对象时可以 override <code>initialValue()</code> 方法，并返回需要存储的数据。</p>
+<p>获取值后，再通过 <code>getMap(t)</code> 获取当前线程所持有的 ThreadLocalMap 实例即这里的变量 <code>map</code>，如果 <code>map</code> 不为空，则调用 <code>set(ThreadLocal&lt;?&gt; key, Object value)</code>将用户数据放入 referant 与当前 threadlocal 实例对象对应的 entry，为空则调用 <code>createMap(Thread t, T firstValue)</code> 进行创建，并赋值。</p>
+<p>从这里也可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。</p>
+<h3 id="heading-5">总结</h3>
+<p>同一个线程中，不同的 ThreadLocal 实例，都会存储在线程成员变量 <code>ThreadLocal.ThreadLocalMap threadlocals</code> 的 <code>Entry[] table</code> 数组中，不同的 ThreadLocal 实例，通过 ThreadLocal 实例的 hashcode/ Entry 变量的弱引用 referant 进行区分。</p>
+<p>同一个 ThreadLocal 类型变量的定义，不同线程去执行时，会在自己的线程中单独创建、获取，从而持有线程独享的本地变量。</p>
+<h2 id="heading-6">垃圾回收</h2>
 <p>ThreadLocal 中的 Entry 类是弱引用的子类，弱引用的使用方式是，如果弱引用对象指向的对象，只有弱引用这一条路径，则该对象会在下一次 YGC 中被回收。Entry 的 referant 是 threadlocal 对象，也即，当只有 Entry 指向这个 threadlocal 实例时，不会劫持对象，影响垃圾回收。另一方面来讲，当 Entry 实例检测到 referant 指向为 null 时，会将成员变量 value 也设置为 null，方便垃圾回收。</p>
-
 <p>但是为了方便使用，threadlocal 对象都是声明为静态的，这就是说，它不会随着线程结束而销毁，这就意味着两个问题</p>
-
 <ol>
 <li>内存泄漏，因为类变量不会随着线程终止而销毁</li>
 <li>更严重的是，当使用线程池时，threadlocal 中的值可能会被重复使用，导致错误的赋值</li>
 </ol>
-
 <p>解决这个问题的办法是线程结束前，调用 ThreadLocal 实例的 remove 方法</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">ThreadLocalMap</span> <span class="n">m</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">());</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">m</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
-        <span class="n">m</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">ThreadLocalMap</span> <span class="n">m</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">m</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="k">this</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="一种使用方式">一种使用方式</h2>
-
-<p>一种便利函数，将 threadlocal 存储的本地变量设置为 map，这样需要用到时可以随时 put/get，而不需要为每个要使用的全局变量都单独创建一个 threadlocal 实例。</p>
+</div><h2 id="heading-7">一种使用方式</h2>
+<p>一种便利函数，相比于不同变量分别去创建 ThreadLocal 类型的变量，在 Entry 中通过 referant 去区分，不如直接自己创建一个 HashMap 放到同一个 ThreadLocal 实例中（即只使用一个 Entry），在业务逻辑层面直接对不同变量通过名字进行映射，这样需要用到时可以随时 <code>put()</code>/<code>get()</code>，而不需要为每个要使用的全局变量都单独创建一个 ThreadLocal 实例。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -513,53 +577,53 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ThreadLocalUtil</span> <span class="o">{</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">ThreadLocalUtil</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">ThreadLocalUtil</span><span class="o">.</span><span class="na">class</span><span class="o">)</span><span class="o">;</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">ThreadContext</span><span class="o">&gt;</span> <span class="n">threadLocal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;&gt;();</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">ThreadContext</span><span class="o">&gt;</span> <span class="n">threadLocal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;===== put key: [{}] value: [{}] in threadLocal =====&#34;</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">SerializeUtil</span><span class="o">.</span><span class="na">toJsonString</span><span class="o">(</span><span class="n">value</span><span class="o">));</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;===== put key: [{}] value: [{}] in threadLocal =====&#34;</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">SerializeUtil</span><span class="o">.</span><span class="na">toJsonString</span><span class="o">(</span><span class="n">value</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
 
-        <span class="n">ThreadContext</span> <span class="n">threadContext</span> <span class="o">=</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">threadContext</span><span class="o">))</span> <span class="o">{</span>
-            <span class="n">threadContext</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadContext</span><span class="o">();</span>
-            <span class="n">threadLocal</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">threadContext</span><span class="o">);</span>
+        <span class="n">ThreadContext</span> <span class="n">threadContext</span> <span class="o">=</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">threadContext</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">threadContext</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadContext</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">threadLocal</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">threadContext</span><span class="o">)</span><span class="o">;</span>
         <span class="o">}</span>
-        <span class="n">threadContext</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+        <span class="n">threadContext</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="n">Object</span> <span class="nf">get</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;===== get value of key: [{}] from threadLocal =====&#34;</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;===== get value of key: [{}] from threadLocal =====&#34;</span><span class="o">,</span> <span class="n">key</span><span class="o">)</span><span class="o">;</span>
 
-        <span class="n">ThreadContext</span> <span class="n">context</span> <span class="o">=</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">context</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">ThreadContext</span> <span class="n">context</span> <span class="o">=</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">context</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
 
-        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">get</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">clazz</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;===== get value of key: [{}] class: [{}] from threadLocal =====&#34;</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;===== get value of key: [{}] class: [{}] from threadLocal =====&#34;</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getName</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
 
-        <span class="n">ThreadContext</span> <span class="n">context</span> <span class="o">=</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">context</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">ThreadContext</span> <span class="n">context</span> <span class="o">=</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">context</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
 
-        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">clazz</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">clazz</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">clear</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;====== clear threadLocal =====&#34;</span><span class="o">);</span>
-        <span class="n">threadLocal</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">clear</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;====== clear threadLocal =====&#34;</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">threadLocal</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">setThreadLocal</span><span class="o">(</span><span class="n">ThreadContext</span> <span class="n">threadLocal</span><span class="o">)</span> <span class="o">{</span>
 
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">ThreadContext</span><span class="o">&gt;</span> <span class="nf">getThreadLocal</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">ThreadContext</span><span class="o">&gt;</span> <span class="nf">getThreadLocal</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">threadLocal</span><span class="o">;</span>
     <span class="o">}</span>
 <span class="o">}</span>
@@ -568,38 +632,35 @@
 
     <span class="kd">private</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">contextMap</span><span class="o">;</span>
 
-    <span class="kd">public</span> <span class="nf">ThreadContext</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">contextMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="kd">public</span> <span class="nf">ThreadContext</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">contextMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">get</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">clazz</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">clazz</span><span class="o">.</span><span class="na">cast</span><span class="o">(</span><span class="n">contextMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">));</span>
+        <span class="k">return</span> <span class="n">clazz</span><span class="o">.</span><span class="na">cast</span><span class="o">(</span><span class="n">contextMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="n">Object</span> <span class="nf">get</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">contextMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">contextMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">contextMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+        <span class="n">contextMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">)</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="nf">getContextMap</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="nf">getContextMap</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">contextMap</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setContextMap</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">contextMap</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">this</span><span class="o">.</span><span class="na">contextMap</span> <span class="o">=</span> <span class="n">contextMap</span><span class="o">;</span>
     <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="其他">其他</h2>
-
+</div><h2 id="heading-8">其他</h2>
 <p>因为目前还没有用到，这里先备注一下，以后要用到的话，可以搜一下用法：ThreadLocal 是支持子线程继承的，即将父线程的本地变量拷贝到子线程中使用。</p>
-
-<h2 id="参考">参考</h2>
-
+<h2 id="heading-9">参考</h2>
 <ul>
 <li><a href="https://book.douban.com/subject/30333948/">码出高效：Java开发手册</a></li>
 <li>Java ThreadLocal 实现源码</li>
@@ -614,7 +675,10 @@
   </p>
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
-    <span class="item-content">2019-12-22</span>
+    <span class="item-content">
+        2020-01-06
+        
+    </span>
   </p>
   
   <p class="copyright-item">
@@ -622,6 +686,7 @@
     <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
   </p>
 </div>
+
     <div class="social-share" data-initialized="true" data-wechat-qrcode-title="扫描分享">
     <center>
         <span style="font-size:16px;color:#c05b4d;">分享到：</span>
@@ -637,32 +702,37 @@
 
 
     <footer class="post-footer">
-      
+      <div class="post-tags">
+          <a href="/tags/java/">java</a>
+          <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+          </div>
       <nav class="post-nav">
-        
-        <a class="next" href="/post/dont-get-locked-up-into-avoiding-lock-in/">
-            <span class="next-text nav-default">不要为了避免使用锁定而被限制</span>
+        <a class="prev" href="/post/http3/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">HTTP/3 的过去、现在及将来</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/config-server-with-spring-boot-and-disconf/">
+            <span class="next-text nav-default">基于 Spring Boot &#43; Disconf 的配置中心</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
       </nav>
     </footer>
+    <script src="https://utteranc.es/client.js"
+      repo="kyon0304/kyon0304.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
   </article>
         </div>
-        <div id="disqus_thread"></div>
-    <script type="text/javascript">
-    (function() {
-      
-      
-      if (window.location.hostname === 'localhost') return;
+        
 
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      var disqus_shortname = 'yabsk';
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+
+  
 
       </div>
     </main>
@@ -685,12 +755,16 @@
     <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
   </span>
 
-  
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
 
   <span class="copyright-year">
     &copy; 
     2018 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
@@ -714,7 +788,7 @@
     timeago().render(document.querySelectorAll('.timeago'), languageCode);
     timeago.cancel();  
   </script>
-<script type="text/javascript" src="/dist/even.ece58db6.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
   <script type="text/javascript">
     window.MathJax = {
       tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
