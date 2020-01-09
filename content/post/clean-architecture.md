@@ -1,7 +1,7 @@
 ---
 title: "《架构整洁之道》读后"
 date: 2019-01-13T15:29:17+08:00
-draft: false
+toc: false
 tags: ["读过", "学习笔记", "architecture"]
 ---
 
