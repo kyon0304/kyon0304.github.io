@@ -2,7 +2,7 @@
 title: "How to Be a Great Product Manager"
 date: 2019-09-03T15:05:43+08:00
 draft: false
-tags: ["翻译", "howto", "产品"]
+tags: ["鹦鹉学舌", "howto", "产品"]
 ---
 
 翻译自 [Be a Great Product Leader](https://adamnash.blog/2011/12/16/be-a-great-product-leader/)，一篇 2011 年的文章。
