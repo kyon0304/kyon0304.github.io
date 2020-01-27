@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>学习笔记 on kyon&#39;s wonderland with ❤️</title>
@@ -6,10 +6,19 @@
     <description>Recent content in 学习笔记 on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 06 Jan 2020 10:13:03 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jan 2020 16:37:33 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Philosophy of Software Design - 第七章 不同层，不同抽象</title>
+      <link>https://kyon.life/post/philosophy-of-software-design/</link>
+      <pubDate>Thu, 23 Jan 2020 16:37:33 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design/</guid>
+      <description>软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不</description>
+    </item>
     
     <item>
       <title>HTTP/3 的过去、现在及将来</title>
@@ -35,7 +44,7 @@
       <pubDate>Sun, 13 Jan 2019 15:29:17 +0800</pubDate>
       
       <guid>https://kyon.life/post/clean-architecture/</guid>
-      <description>4&amp;frasl;5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完</description>
+      <description>4/5 星推荐 用了大概一周多的时间看完了，一本简明的工具书，从不同的编程范式说起，指出了构建软件时应当遵循的规则，以及为什么应当遵循。这篇是在看完</description>
     </item>
     
     <item>
