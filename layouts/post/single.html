@@ -38,6 +38,8 @@
     <!-- Copyright -->
     {{- partial "post/copyright.html" . -}}
 
+    {{- partial "related.html" . -}}
+
     <!-- Reward -->
     {{- partial "post/reward.html" . -}}
 
@@ -52,6 +54,14 @@
           {{ end -}}
         </div>
       {{- end -}}
+
+      <script src="https://utteranc.es/client.js"
+            repo="kyon0304/kyon0304.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+      </script>
 
       <!-- Post Pagination -->
       <nav class="post-nav">
