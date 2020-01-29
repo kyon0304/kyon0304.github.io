@@ -2,7 +2,7 @@
 title: "不要为了避免使用锁定而被限制"
 date: 2019-09-17T09:43:54+08:00
 draft: false
-tags: ["鹦鹉学舌", "企业级架构", "架构"]
+tags: ["鹦鹉学舌", "架构"]
 ---
 
 翻译自 [Don't get locked up into avoiding lock-in](https://martinfowler.com/articles/oss-lockin.html)
