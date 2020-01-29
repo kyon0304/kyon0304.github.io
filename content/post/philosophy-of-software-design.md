@@ -3,6 +3,10 @@ title: "Philosophy of Software Design - 第七章 不同层，不同抽象"
 date: 2020-01-23T16:37:33+08:00
 lastMod: 2020-01-23T16:37:33+08:00
 tags: ["鹦鹉学舌", "学习笔记"]
+keywords: ["Philosophy of Software Design"]
+categories: ["Philosophy of Software Design"]
+enableOutdatedInfoWarning: false
+enableRelated: true
 ---
 
 软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不同层中的操作，就会发现每一层的抽象都会发生变化。比如：
