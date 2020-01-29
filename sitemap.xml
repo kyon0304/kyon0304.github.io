@@ -9,7 +9,21 @@
   </url>
   
   <url>
+    <loc>https://kyon.life/categories/</loc>
+    <lastmod>2020-01-23T16:37:33+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://kyon.life/</loc>
+    <lastmod>2020-01-23T16:37:33+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/categories/philosophy-of-software-design/</loc>
     <lastmod>2020-01-23T16:37:33+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -128,13 +142,6 @@
   </url>
   
   <url>
-    <loc>https://kyon.life/tags/%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%9E%B6%E6%9E%84/</loc>
-    <lastmod>2019-09-17T09:43:54+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://kyon.life/tags/%E6%9E%B6%E6%9E%84/</loc>
     <lastmod>2019-09-17T09:43:54+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -228,12 +235,6 @@
   <url>
     <loc>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</loc>
     <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/categories/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Philosophy of Software Design on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/categories/philosophy-of-software-design/</link>
+    <description>Recent content in Philosophy of Software Design on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 23 Jan 2020 16:37:33 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/categories/philosophy-of-software-design/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Philosophy of Software Design - 第七章 不同层，不同抽象</title>
+      <link>https://kyon.life/post/philosophy-of-software-design/</link>
+      <pubDate>Thu, 23 Jan 2020 16:37:33 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design/</guid>
+      <description>软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="kyon" /><meta name="description" content="软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不" /><meta name="keywords" content="kyon, blog, java, backend" />
+<meta name="author" content="kyon" /><meta name="description" content="软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不" /><meta name="keywords" content="Philosophy of Software Design" />
 
 
 
@@ -33,9 +33,9 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+<link href="/dist/even.67aeee15.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/css/share.min.css">
 
 
@@ -84,6 +84,8 @@
         <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
         <li class="mobile-menu-item">归档</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
       </a><a href="/tags/">
         <li class="mobile-menu-item">标签</li>
       </a><a href="/about/">
@@ -104,6 +106,8 @@
       </li><li class="menu-item">
         <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
         <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/about/">关于</a>
@@ -122,10 +126,12 @@
 
       <div class="post-meta">
         <span class="post-time"> 2020-01-23 </span>
-        
+        <div class="post-category">
+            <a href="/categories/philosophy-of-software-design/"> Philosophy of Software Design </a>
+            </div>
           <span class="more-meta"> 约 4497 字 </span>
           <span class="more-meta"> 预计阅读 9 分钟 </span>
-        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+        
       </div>
     </header>
 
@@ -262,6 +268,8 @@ pass-through 方法除了将它的参数传递给另外一个通常是和它签�
   </p>
 </div>
 
+    
+    
     <div class="social-share" data-initialized="true" data-wechat-qrcode-title="扫描分享">
     <center>
         <span style="font-size:16px;color:#c05b4d;">分享到：</span>
@@ -280,7 +288,15 @@ pass-through 方法除了将它的参数传递给另外一个通常是和它签�
       <div class="post-tags">
           <a href="/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/">鹦鹉学舌</a>
           <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
-          </div>
+          </div><script src="https://utteranc.es/client.js"
+            repo="kyon0304/kyon0304.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+      </script>
+
+      
       <nav class="post-nav">
         
         <a class="next" href="/post/http3/">
@@ -292,20 +308,7 @@ pass-through 方法除了将它的参数传递给另外一个通常是和它签�
     </footer>
   </article>
         </div>
-        <div id="disqus_thread"></div>
-    <script type="text/javascript">
-    (function() {
-      
-      
-      if (window.location.hostname === 'localhost') return;
-
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      var disqus_shortname = 'yabsk';
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
 
   
 
@@ -316,9 +319,6 @@ pass-through 方法除了将它的参数传递给另外一个通常是和它签�
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:kyon0304@gmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://stackoverflow.com/users/1196640/kyon" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="https://www.instagram/kyon_wy" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://kyon.life/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -332,11 +332,7 @@ pass-through 方法除了将它的参数传递给另外一个通常是和它签�
     <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
   </span>
 
-  <div class="busuanzi-footer">
-    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
-      <span class="division">|</span>
-    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
-  </div>
+  
 
   <span class="copyright-year">
     &copy; 
@@ -354,18 +350,10 @@ pass-through 方法除了将它的参数传递给另外一个通常是和它签�
       <i class="iconfont icon-up"></i>
     </div>
   </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js" integrity="sha256-jwCP0NAdCBloaIWTWHmW4i3snUNMHUNO+jr9rYd2iOI=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.locales.min.js" integrity="sha256-ZwofwC1Lf/faQCzN7nZtfijVV6hSwxjQMwXL4gn9qU8=" crossorigin="anonymous"></script>
-  <script><!-- NOTE: timeago.js uses the language code format like "zh_CN" (underscore and case sensitive) -->
-    var languageCode = "zh-cn".replace(/-/g, '_').replace(/_(.*)/, function ($0, $1) {return $0.replace($1, $1.toUpperCase());});
-    timeago().render(document.querySelectorAll('.timeago'), languageCode);
-    timeago.cancel();  
-  </script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.dd3f8fc8.min.js"></script>
   <script type="text/javascript">
     window.MathJax = {
       tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
@@ -381,7 +369,7 @@ var doNotTrack = false;
 if (!doNotTrack) {
 	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 	ga('create', 'UA-131420074-1', 'auto');
-	ga('set', 'anonymizeIp', true);
+	
 	ga('send', 'pageview');
 }
 </script>
