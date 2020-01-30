@@ -6,10 +6,19 @@
     <description>Recent content in 鹦鹉学舌 on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 23 Jan 2020 16:37:33 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jan 2020 20:27:11 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Philosophy of Software Design - 第八章 降低复杂度</title>
+      <link>https://kyon.life/post/philosophy-of-software-design-8/</link>
+      <pubDate>Mon, 27 Jan 2020 20:27:11 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design-8/</guid>
+      <description>这章介绍了另外一种如何设计更有深度的类的考虑方式。架设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块</description>
+    </item>
     
     <item>
       <title>Philosophy of Software Design - 第七章 不同层，不同抽象</title>
