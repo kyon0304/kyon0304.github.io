@@ -38,13 +38,14 @@
     <!-- Copyright -->
     {{- partial "post/copyright.html" . -}}
 
-    {{- partial "related.html" . -}}
-
     <!-- Reward -->
     {{- partial "post/reward.html" . -}}
 
     <!-- social share-->
     {{ partial "share.html" .}}
+
+    <!-- related post -->
+    {{- partial "related.html" . -}}
 
     <footer class="post-footer">
       {{ with .Params.tags -}}
