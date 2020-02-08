@@ -23,7 +23,7 @@
 <meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
 
 
-<meta name="generator" content="Hugo 0.62.2 with theme even" />
+<meta name="generator" content="Hugo 0.61.0 with theme even" />
 
 
 <link rel="canonical" href="https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/" />
@@ -34,7 +34,7 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link href="/dist/even.d6f6beac.min.css" rel="stylesheet">
+<link href="/dist/even.c27cbacf.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/share.min.css">
 
@@ -185,7 +185,7 @@
 <p>此时已经可以得到集合的基数为 $$n ≈ 2^k$$ 其中 k 为 bitmap 中从高位数起，1 第一次出现的位数。</p>
 <p><strong>桶平均</strong></p>
 <p>接下来，为了抵消一些偶然因素，LLC 引入了桶分组，类似于物理实验中的多次实验求平均值。</p>
-<p>将元素哈希后的 m 位二进制表示，拆分为两部分，前 p 位表示桶序号，后面的 m-p 位作为真正用于估计基数的比特串。桶序号相同的元素被分配到同一个桶，估计基数时，首先计算桶内比特串 1 第一次出现的位置，记为 P[i]，然后对 p 个桶加和取平均后再进行估算，此时 n 的估计值变为
+<p>将元素哈希后的 m 位二进制表示，拆分为两部分，前 p 位表示桶序号，后面的 m-p 位作为真正用于估计基数的比特串。桶序号相同的元素被分配到同一个桶，估计基数时，首先计算桶内比特串 1 第一次出现的位置，记为 P[i]，然后对 p 个桶加和取平均后再进行估算，此时 n 的估计值变为 
 $$n ≈ 2^{\frac {∑P[i]}{p}}$$</p>
 <p><strong>合并</strong>：以桶为合并的最小单位，桶序号相同的比特串进行 bitmap 的合并
 <strong>内存占用</strong>：内存使用与分桶数及哈希后的二进制位长度相关，假设哈希后数值表示为二进制为 32 位，则每个桶需要 5bit 内存来存当前桶第一个 1 出现的位置，内存占用即为 $$\frac {5*p}8 byte$$
@@ -273,6 +273,13 @@ $$n ≈ 2^{\frac {∑P[i]}{p}}$$</p>
           </a>
       </nav>
     </footer>
+    <script src="https://utteranc.es/client.js"
+      repo="kyon0304/kyon0304.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
   </article>
         </div>
         
