@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Philosophy of Software Design - 第八章 降低复杂性 - kyon&#39;s wonderland with ❤️</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="kyon" /><meta name="description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块" /><meta name="keywords" content="Philosophy of Software Design" />
+
+
+
+<meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
+
+
+<meta name="generator" content="Hugo 0.61.0 with theme even" />
+
+
+<link rel="canonical" href="https://kyon.life/post/philosophy-of-software-design-8/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link href="/dist/even.c27cbacf.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/share.min.css">
+
+
+<meta property="og:title" content="Philosophy of Software Design - 第八章 降低复杂性" />
+<meta property="og:description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-8/" />
+<meta property="article:published_time" content="2020-01-27T20:27:11+08:00" />
+<meta property="article:modified_time" content="2020-02-04T12:04:24+08:00" />
+<meta itemprop="name" content="Philosophy of Software Design - 第八章 降低复杂性">
+<meta itemprop="description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块">
+<meta itemprop="datePublished" content="2020-01-27T20:27:11&#43;08:00" />
+<meta itemprop="dateModified" content="2020-02-04T12:04:24&#43;08:00" />
+<meta itemprop="wordCount" content="2037">
+
+
+
+<meta itemprop="keywords" content="鹦鹉学舌,学习笔记," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Philosophy of Software Design - 第八章 降低复杂性"/>
+<meta name="twitter:description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">kyon&#39;s wonderland</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">kyon&#39;s wonderland</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Philosophy of Software Design - 第八章 降低复杂性</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-01-27 </span>
+        <div class="post-category">
+            <a href="/categories/philosophy-of-software-design/"> Philosophy of Software Design </a>
+            </div>
+          <span class="more-meta"> 约 2037 字 </span>
+          <span class="more-meta"> 预计阅读 5 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#81-">8.1 例：文本编辑器类</a></li>
+    <li><a href="#82-">8.2 例：配置参数</a></li>
+    <li><a href="#83-">8.3 过度实践</a></li>
+    <li><a href="#84-">8.4 结论</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块的使用者处理这个复杂实现吗？还是应该由你在模块内部处理。如果这个复杂实现和模块提供的功能有关，那么通常第二个答案是对的。大多数模块的使用者要多于开发者，所以由开发者受苦要好于使用者受苦。作为模块开发者，你应当尽全力方便使用者，即使那意味着额外的工作量。另外一种表述这个观点的方式是，<strong>模块有简单的接口比简单的实现更重要。</strong></p>
+<p>作为一个开发者，先实现简单功能，把复杂部分留给其他人的想法非常有诱惑力。如果出现了你不知道该如何处理的状况，最简单的办法就是抛出异常让调用者去处理。如果你不确定实现哪种策略，可以定义一些调整策略的配置参数，并留给系统管理员去找出最好的参数。</p>
+<p>像这样的解决办法会让你的生活在短期内更加轻松，但是它们放大了复杂度：许多人都必须处理同一个问题，而不是让同一个人去处理。比如，如果一个类抛出了一个异常，这个类都每个调用者都必须处理它。如果一个类暴露了配置参数，每个系统管理员在每次安装部署时，都需要学习一遍如何配置它们。</p>
+<h2 id="81-">8.1 例：文本编辑器类</h2>
+<p>考虑一下我们第 6、7 章讨论过的文本编辑器类，它为图形化界面的文本编辑器提供管理文本文件的功能。这个类提供了将文件从硬盘读取到内存、查询和修改文件在内存中的副本、将修改后的版本写回硬盘的功能。当学生们要实现这个类时，大多数都会选择面向文本行的接口，并提供读取、插入和删除整行文本的方法。这会得到一个实现简单、但是高层软件调用起来却很复杂的类。在用户接口调用这个级别，操作很少涉及到一整行。比如，按键操作导致单个字符插入到已存在的行中；拷贝或删除选择区域可以修改部分或多行。使用面向文本行的接口时，高层软件在实现用户接口时就不得不对行做拆分合并。</p>
+<p>像 6.3 章节中描述的面向字符的接口会将复杂性拉低。用户接口可以插入、删除任意长度的文本，而不需要拆分合并行：这样调用变简单了。文本类的实现可能会变复杂：如果内部使用行的形式来代表文本，那它就需要拆分合并行来实现面向字符的操作。这种实现方法更好，因为它把拆分合并的复杂度封装在了文本类中，这会降低系统总体的复杂度。</p>
+<h2 id="82-">8.2 例：配置参数</h2>
+<p>配置参数是将复杂性上移而不是下移的例子。一个类可以通过暴露一些控制它行为的配置参数，来代替在内部决定一个特定的行为，比如缓存大小或放弃前重试请求的次数。那么，用户就必须为参数指定一个合适的值。现在系统中的配置参数已经变得非常流行；一些系统有上百个参数。</p>
+<p>支持者为配置参数的合理性争辩道，它们允许用户根据自己特定的需求和工作负载调整系统。在一些场景中，低层的基础代码很难知道要应用的最好策略，而用户对他们的领域要熟悉的多。比如，用户可能会知道一些请求要比其他请求对时间更敏感，所以让用户为这些请求设置更高的优先级是说得通的。在类似的场景中，配置参数可以在更多的不同领域中获得更好的性能。</p>
+<p>然而，配置参数也为逃避处理重要事项并把它们转给其他人处理提供了借口。在许多场景中，用户或管理员很难甚至不可能为参数设置正确值。在另外的场景中，在系统实现时很少的额外工作就可以自动的设置正确的参数值。考虑一个需要处理丢包的网络协议。如果它发送了一个请求，在一定的时间间隔内却没有收到恢复，它就会重新发送请求。决定重试间隔的一种方式是引入一个配置参数。然而，传输协议可以通过自己测量请求成功的回复时间计算出一个合理的值，并使用它的倍数作为重试间隔。这种方式将复杂性拉低，节约了用户找出正确重试时间的力气。它还带来了可以动态计算重试间隔的好处，所以在条件变化时可以自动调整。相反，配置参数很容易过时。</p>
+<p>因此，应当尽量避免使用配置参数。在暴露一个配置参数前，问一下自己：“相较于我们自己决定参数值，调用者（或高层模块）可以知道更好的配置吗？”当你创建了配置参数时，看依稀你是否可以自动计算出合理的默认值，这样用户只需要在个别条件下提供配置参数值。理想情况下，每个模块应当完整地解决一个问题；配置参数会使解决方案变得不完整，这将增加系统的复杂度。</p>
+<h2 id="83-">8.3 过度实践</h2>
+<p>当要把复杂性拉低时需要谨慎考虑；这是一个容易过度实践的主意。一个极端的方式会是，将一整个应用的所有的功能都在单个类中实现，这明显是说不通的。拉低复杂性只在以下情况中说得通：(a)复杂性和类中存在的函数有密切关系时 (b) 拉低复杂性可以简化应用中其他许多地方的实现（c）拉低复杂性简化了类的接口。要记住真正的目标是最小化整个系统的复杂度。</p>
+<p>第六章描述了一些学生是如何在文本类中定义了会反映用户接口的方法，比如实现了回退健功能的方法。看上去这个实现好像是没问题的，因为它把复杂性拉低了。然而，将用户接口所需了解的知识强加到文本类中并不会大幅简化高层代码，而且用户接口相关的知识和文本类的核心功能关系也不大。在这种情况中，拉低复杂性只导致了信息泄漏。</p>
+<h2 id="84-">8.4 结论</h2>
+<p>当开发一个模块时，应当尽量将调用者的痛苦转移到自己身上。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">kyon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-02-04
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+    <div class="social-share" data-initialized="true" data-wechat-qrcode-title="扫描分享">
+    <center>
+        <span style="font-size:16px;color:#c05b4d;">分享到：</span>
+        <a href="#" class="social-share-icon icon-weibo"></a>
+        <a href="#" class="social-share-icon icon-wechat"></a>
+        <a href="#" class="social-share-icon icon-twitter"></a>
+        <a href="#" class="social-share-icon icon-qq"></a>
+        <a href="#" class="social-share-icon icon-qzone"></a>
+    </center>
+</div>
+
+<script src="/js/social-share.min.js"></script>
+
+
+    
+    
+    
+    <div class="related">
+        <span>相关阅读</span>
+        <ul>
+            
+            <li><a class="title" href="/post/philosophy-of-software-design-9/">Philosophy of Software Design 第九章 - 合并还是拆分</a></li>
+            
+            <li><a class="title" href="/post/philosophy-of-software-design/">Philosophy of Software Design - 第七章 不同层，不同抽象</a></li>
+            
+        </ul>
+    </div>
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/">鹦鹉学舌</a>
+          <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+          </div>
+      <script src="https://utteranc.es/client.js"
+          repo="kyon0304/kyon0304.github.io"
+          issue-term="pathname"
+          label="Comment"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+      </script>
+
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/philosophy-of-software-design-9/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Philosophy of Software Design 第九章 - 合并还是拆分</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/philosophy-of-software-design/">
+            <span class="next-text nav-default">Philosophy of Software Design - 第七章 不同层，不同抽象</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+    <script src="https://utteranc.es/client.js"
+      repo="kyon0304/kyon0304.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:kyon0304@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://stackoverflow.com/users/1196640/kyon" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://www.instagram/kyon_wy" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://kyon.life/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">kyon</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.d6ab6462.min.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-131420074-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+<script src="/js/social-share.min.js"></script>
+
+
+</body>
+</html>

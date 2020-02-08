@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>鹦鹉学舌 on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</link>
+    <description>Recent content in 鹦鹉学舌 on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 06 Feb 2020 10:53:42 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Philosophy of Software Design 第九章 - 合并还是拆分</title>
+      <link>https://kyon.life/post/philosophy-of-software-design-9/</link>
+      <pubDate>Thu, 06 Feb 2020 10:53:42 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design-9/</guid>
+      <description>软件设计中最基本的问题之一是：假定有两个不同的功能，应当在同一个地方实现它们，还是分开实现？这个问题存在于系统的各个层级：函数、方法、类和服</description>
+    </item>
+    
+    <item>
+      <title>Philosophy of Software Design - 第八章 降低复杂性</title>
+      <link>https://kyon.life/post/philosophy-of-software-design-8/</link>
+      <pubDate>Mon, 27 Jan 2020 20:27:11 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design-8/</guid>
+      <description>这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块</description>
+    </item>
+    
+    <item>
+      <title>Philosophy of Software Design - 第七章 不同层，不同抽象</title>
+      <link>https://kyon.life/post/philosophy-of-software-design/</link>
+      <pubDate>Thu, 23 Jan 2020 16:37:33 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design/</guid>
+      <description>软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不</description>
+    </item>
+    
+    <item>
+      <title>不要为了避免使用锁定而被限制</title>
+      <link>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</link>
+      <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</guid>
+      <description>翻译自 Don&#39;t get locked up into avoiding lock-in 架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行</description>
+    </item>
+    
+    <item>
+      <title>The Three Buckets</title>
+      <link>https://kyon.life/post/the-three-buckets/</link>
+      <pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/the-three-buckets/</guid>
+      <description>翻译自 Guide to Product Planning: Three Feature Buckets，一篇 2009 年的文章。 把将要开发的功能的概念分类到下面三个桶里的一个： Metric Movers: 这些功能会很大程度上改变商业目标和产品</description>
+    </item>
+    
+    <item>
+      <title>How to Be a Great Product Manager</title>
+      <link>https://kyon.life/post/how-to-be-a-great-product-manager/</link>
+      <pubDate>Tue, 03 Sep 2019 15:05:43 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/how-to-be-a-great-product-manager/</guid>
+      <description>翻译自 Be a Great Product Leader，一篇 2011 年的文章。 了解我的人都知道，我对项目管理充满热情。我相信，项目管理可以帮助一个拥有技术和设计人员的跨功能模</description>
+    </item>
+    
+  </channel>
+</rss>

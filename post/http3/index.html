@@ -34,7 +34,7 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/dist/even.c27cbacf.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/share.min.css">
 
@@ -84,6 +84,8 @@
         <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
         <li class="mobile-menu-item">归档</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
       </a><a href="/tags/">
         <li class="mobile-menu-item">标签</li>
       </a><a href="/about/">
@@ -103,6 +105,8 @@
         <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
@@ -130,6 +134,11 @@
     </header>
 
     
+  <div class="post-outdated">
+    <div class="hint">
+      <p>【注意】最后更新于 <span class="timeago" datetime="2020-01-06T10:13:03" title="January 6, 2020">January 6, 2020</span>，文中内容可能已过时，请谨慎使用。</p>
+    </div>
+  </div>
     <div class="post-content">
       <p>看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。</p>
 <p>以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。</p>
@@ -182,8 +191,22 @@
           <a href="/tags/http/">http</a>
           <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
           </div>
+      <script src="https://utteranc.es/client.js"
+          repo="kyon0304/kyon0304.github.io"
+          issue-term="pathname"
+          label="Comment"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+      </script>
+
+      
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/philosophy-of-software-design/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Philosophy of Software Design - 第七章 不同层，不同抽象</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/threadlocal/">
             <span class="next-text nav-default">Threadlocal 梳理</span>
             <span class="next-text nav-mobile">下一篇</span>
@@ -260,7 +283,7 @@
     timeago().render(document.querySelectorAll('.timeago'), languageCode);
     timeago.cancel();  
   </script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+<script type="text/javascript" src="/dist/even.d6ab6462.min.js"></script>
   <script type="text/javascript">
     window.MathJax = {
       tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
@@ -276,7 +299,7 @@ var doNotTrack = false;
 if (!doNotTrack) {
 	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 	ga('create', 'UA-131420074-1', 'auto');
-	ga('set', 'anonymizeIp', true);
+	
 	ga('send', 'pageview');
 }
 </script>
