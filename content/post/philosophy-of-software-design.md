@@ -42,7 +42,8 @@ public class TextDocument ... {
 ```
 这个类里 15 个公共方法，其中 13 个是 pass-through 方法
 
-> 红色警告 ⚠️: Pass-through 方法
+> **红色警告 ⚠️: Pass-through 方法**
+>
 > pass-through 方法除了将它的参数传递给另外一个通常是和它签名类似的函数外，不实现任何功能。这是类间的责任划分不明确的典型情况。
 
 pass-through 方法使把类变浅：它们增加了类接口的复杂度，也就是增加了复杂度，对系统整体来说却没有新增任何功能。上面例子中的四个方法，只有最后一个实现了一点功能：检查了参数的有效性。pass-through 方法还会制造类之间的依赖：如果 `TextArea` 类中的 `insertString` 签名发生变化，`TextDocument` 中的 `insertString` 方法也必须跟着修改。
