@@ -23,7 +23,7 @@
 <meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
 
 
-<meta name="generator" content="Hugo 0.61.0 with theme even" />
+<meta name="generator" content="Hugo 0.62.2 with theme even" />
 
 
 <link rel="canonical" href="https://kyon.life/post/threadlocal/" />
@@ -34,7 +34,7 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link href="/dist/even.c27cbacf.min.css" rel="stylesheet">
+<link href="/dist/even.d6f6beac.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/share.min.css">
 
@@ -138,19 +138,19 @@
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#heading">使用场景</a></li>
-    <li><a href="#heading-1">实现</a>
+    <li><a href="#使用场景">使用场景</a></li>
+    <li><a href="#实现">实现</a>
       <ul>
-        <li><a href="#heading-2">如何存储</a></li>
-        <li><a href="#heading-3">获取过程</a></li>
-        <li><a href="#heading-4">创建过程</a></li>
-        <li><a href="#heading-5">总结</a></li>
+        <li><a href="#如何存储">如何存储</a></li>
+        <li><a href="#获取过程">获取过程</a></li>
+        <li><a href="#创建过程">创建过程</a></li>
+        <li><a href="#总结">总结</a></li>
       </ul>
     </li>
-    <li><a href="#heading-6">垃圾回收</a></li>
-    <li><a href="#heading-7">一种使用方式</a></li>
-    <li><a href="#heading-8">其他</a></li>
-    <li><a href="#heading-9">参考</a></li>
+    <li><a href="#垃圾回收">垃圾回收</a></li>
+    <li><a href="#一种使用方式">一种使用方式</a></li>
+    <li><a href="#其他">其他</a></li>
+    <li><a href="#参考">参考</a></li>
   </ul>
 </nav>
   </div>
@@ -161,11 +161,11 @@
     </div>
   </div>
     <div class="post-content">
-      <h2 id="heading">使用场景</h2>
+      <h2 id="使用场景">使用场景</h2>
 <p>用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见的使用场景，比如存储登录用户信息，同一个 request 的 trace id 等。</p>
-<h2 id="heading-1">实现</h2>
+<h2 id="实现">实现</h2>
 <p>ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。</p>
-<h3 id="heading-2">如何存储</h3>
+<h3 id="如何存储">如何存储</h3>
 <p>首先，用一张图来表示一下 threadlocal 是如何存储数据的：</p>
 <p><img src="/media/threadlocal/threadlocal.png" alt="threadlocal.png"></p>
 <p>可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 <code>table</code>，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。</p>
@@ -203,7 +203,7 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="heading-3">获取过程</h3>
+</div><h3 id="获取过程">获取过程</h3>
 <p>上面说明了 ThreadLocal 数据是如何存储的，那么当使用 ThreadLocal 时，是如何创建和获取数据的呢？一个简单的使用 ThreadLocal 的代码片段如下所示：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -361,7 +361,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p><code>this</code> 是当前 ThreadLocal 对象实例，使用它作为 key，在 ThreadLocalMap 持有的 <code>Entry[] table</code> 中索引相应的 Entry <code>e</code>，可以看到，这里便是上面说到的索引 Entry 的两种方式：首先根据 hashcode 快速索引，如果找不到，则调用 <code>getEntryAfterMiss()</code> 方法，将当前 ThreadLocal 对象实例 <code>this</code> 作为 key，与 Entry 的 referant 作比对，获取相应的 entry。</p>
-<h3 id="heading-4">创建过程</h3>
+<h3 id="创建过程">创建过程</h3>
 <p>接下来看下如果获取不到 Entry，ThreadLocal 如何通过 <code>setInitialValue()</code> 进行初始化：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -470,10 +470,10 @@
 </div><p>首先，调用 <code>initialValue()</code> 拿到用户需要存储的值。我们创建 ThreadLocal 对象时可以 override <code>initialValue()</code> 方法，并返回需要存储的数据。</p>
 <p>获取值后，再通过 <code>getMap(t)</code> 获取当前线程所持有的 ThreadLocalMap 实例即这里的变量 <code>map</code>，如果 <code>map</code> 不为空，则调用 <code>set(ThreadLocal&lt;?&gt; key, Object value)</code>将用户数据放入 referant 与当前 threadlocal 实例对象对应的 entry，为空则调用 <code>createMap(Thread t, T firstValue)</code> 进行创建，并赋值。</p>
 <p>从这里也可以看到，当不同线程访问同一个 threadlocal 对象时，获取 map 也是要根据当前线程来得到，因此不同线程会有各自独享的本地变量。</p>
-<h3 id="heading-5">总结</h3>
+<h3 id="总结">总结</h3>
 <p>同一个线程中，不同的 ThreadLocal 实例，都会存储在线程成员变量 <code>ThreadLocal.ThreadLocalMap threadlocals</code> 的 <code>Entry[] table</code> 数组中，不同的 ThreadLocal 实例，通过 ThreadLocal 实例的 hashcode/ Entry 变量的弱引用 referant 进行区分。</p>
 <p>同一个 ThreadLocal 类型变量的定义，不同线程去执行时，会在自己的线程中单独创建、获取，从而持有线程独享的本地变量。</p>
-<h2 id="heading-6">垃圾回收</h2>
+<h2 id="垃圾回收">垃圾回收</h2>
 <p>ThreadLocal 中的 Entry 类是弱引用的子类，弱引用的使用方式是，如果弱引用对象指向的对象，只有弱引用这一条路径，则该对象会在下一次 YGC 中被回收。Entry 的 referant 是 threadlocal 对象，也即，当只有 Entry 指向这个 threadlocal 实例时，不会劫持对象，影响垃圾回收。另一方面来讲，当 Entry 实例检测到 referant 指向为 null 时，会将成员变量 value 也设置为 null，方便垃圾回收。</p>
 <p>但是为了方便使用，threadlocal 对象都是声明为静态的，这就是说，它不会随着线程结束而销毁，这就意味着两个问题</p>
 <ol>
@@ -497,7 +497,7 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="heading-7">一种使用方式</h2>
+</div><h2 id="一种使用方式">一种使用方式</h2>
 <p>一种便利函数，相比于不同变量分别去创建 ThreadLocal 类型的变量，在 Entry 中通过 referant 去区分，不如直接自己创建一个 HashMap 放到同一个 ThreadLocal 实例中（即只使用一个 Entry），在业务逻辑层面直接对不同变量通过名字进行映射，这样需要用到时可以随时 <code>put()</code>/<code>get()</code>，而不需要为每个要使用的全局变量都单独创建一个 ThreadLocal 实例。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -667,9 +667,9 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="heading-8">其他</h2>
+</div><h2 id="其他">其他</h2>
 <p>因为目前还没有用到，这里先备注一下，以后要用到的话，可以搜一下用法：ThreadLocal 是支持子线程继承的，即将父线程的本地变量拷贝到子线程中使用。</p>
-<h2 id="heading-9">参考</h2>
+<h2 id="参考">参考</h2>
 <ul>
 <li><a href="https://book.douban.com/subject/30333948/">码出高效：Java开发手册</a></li>
 <li>Java ThreadLocal 实现源码</li>
@@ -738,13 +738,6 @@
           </a>
       </nav>
     </footer>
-    <script src="https://utteranc.es/client.js"
-      repo="kyon0304/kyon0304.github.io"
-      issue-term="pathname"
-      theme="github-light"
-      crossorigin="anonymous"
-      async>
-    </script>
   </article>
         </div>
         

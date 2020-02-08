@@ -23,7 +23,7 @@
 <meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
 
 
-<meta name="generator" content="Hugo 0.61.0 with theme even" />
+<meta name="generator" content="Hugo 0.62.2 with theme even" />
 
 
 <link rel="canonical" href="https://kyon.life/post/config-server-with-spring-boot-and-disconf/" />
@@ -34,7 +34,7 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link href="/dist/even.c27cbacf.min.css" rel="stylesheet">
+<link href="/dist/even.d6f6beac.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/share.min.css">
 
@@ -138,15 +138,15 @@
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#disconf-">disconf 简介</a>
+    <li><a href="#disconf-简介">disconf 简介</a>
       <ul>
-        <li><a href="#heading">设计架构</a></li>
-        <li><a href="#heading-1">运行流程</a></li>
+        <li><a href="#设计架构">设计架构</a></li>
+        <li><a href="#运行流程">运行流程</a></li>
       </ul>
     </li>
-    <li><a href="#disconf--1">disconf 使用准备（魔改）</a></li>
-    <li><a href="#heading-2">集成到项目中</a></li>
-    <li><a href="#heading-3">遇到的问题</a></li>
+    <li><a href="#disconf-使用准备魔改">disconf 使用准备（魔改）</a></li>
+    <li><a href="#集成到项目中">集成到项目中</a></li>
+    <li><a href="#遇到的问题">遇到的问题</a></li>
   </ul>
 </nav>
   </div>
@@ -157,14 +157,14 @@
     </div>
   </div>
     <div class="post-content">
-      <h2 id="disconf-">disconf 简介</h2>
+      <h2 id="disconf-简介">disconf 简介</h2>
 <p>disconf 是百度的某位员工开源的分布式配置中心，<a href="https://disconf.readthedocs.io/zh_CN/latest/index.html">文档地址</a>，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化查看/更新配置。相比于 spring boot admin 中提供的 refresh context 功能，优势在于可以一次更改，应用于所有同类机器配置，而 spring boot admin 需要对每个实例进行单独修改。除此之外，spring boot admin 在界面及交互上吊打 disconf。</p>
-<h3 id="heading">设计架构</h3>
+<h3 id="设计架构">设计架构</h3>
 <ul>
 <li>server 端包含 springmvc 用于处理业务逻辑，mysql 用于存储配置文件，两个 redis 用于用户登录，zk 用于配置更新的通知， web 端用于用户登录后统一查看/更新配置</li>
 <li>client 端以 pom 方式引入项目内即可（需要魔改一下，见后）</li>
 </ul>
-<h3 id="heading-1">运行流程</h3>
+<h3 id="运行流程">运行流程</h3>
 <p><img src="/media/disconf/diconf-client-process.jpg" alt="process.jpeg"></p>
 <p><strong>启动事件A：</strong>
 以下按顺序发生。</p>
@@ -198,7 +198,7 @@
 </ul>
 <p>以上完全引用自 <a href="https://disconf.readthedocs.io/zh_CN/latest/design/src/disconf-client%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3.html">disconf 官方文档</a></p>
 <p>这边使用时，只使用了基于 xml 的静态配置部分，即配置文件的托管和下载，动态加载部分，由于 disconf 要求配置文件的拆分方式需要按不同组件划分，并对应不同的 java config bean，而且和 spring 自动加载的 bean 的配合也不好，所以放弃使用。</p>
-<h2 id="disconf--1">disconf 使用准备（魔改）</h2>
+<h2 id="disconf-使用准备魔改">disconf 使用准备（魔改）</h2>
 <p>由于 disconf 已经三年多没有更新（最新一次版本发布在 20160911），使用的时候需要对 client 端做一些 hack，这边主要做了两处修改：</p>
 <ol>
 <li>依赖的 spring 提供的 hook 函数已经先是 deprecated 现在已经被删除了，</li>
@@ -306,7 +306,7 @@ index fc62fef0..dd203736 100644
 </div>
 </div><p>修改后重新打包引入项目。</p>
 <p>disconf server 端有别人准备好的 <a href="https://github.com/zq2599/docker_disconf">docker-compose 文件</a>，直接下载使用即可。这里有一点需要注意，tomcat 依赖的服务都是以 link 方式注入容器的，所以 server 告知 client 的 zookeeper 的连接信息不是 ip（还好不是）而是 servername（zkhost），需要在本地配置下 hosts 文件，指向 zookeeper 的连接地址。</p>
-<h2 id="heading-2">集成到项目中</h2>
+<h2 id="集成到项目中">集成到项目中</h2>
 <p>考虑配置中心需要完成的事情：</p>
 <ol>
 <li>项目配置统一存储、查看</li>
@@ -329,7 +329,7 @@ index fc62fef0..dd203736 100644
 <li>spring 无法重新加载/兼容性有问题，则需要手动重新启动应用，此时回到第二步</li>
 </ol>
 <p>嗯，还是比较顺滑的。</p>
-<h2 id="heading-3">遇到的问题</h2>
+<h2 id="遇到的问题">遇到的问题</h2>
 <ol>
 <li>定时任务注解 <code>@Scheduled</code> 和 <code>@RefreshScope</code> 不兼容</li>
 <li>加密组件 jasypt-spring-boot-starter 的解密流程在 spring 重新加载 bean 时没有被执行到，加密属性直接作为属性值传给 bean 导致报错</li>
@@ -436,13 +436,6 @@ index fc62fef0..dd203736 100644
           </a>
       </nav>
     </footer>
-    <script src="https://utteranc.es/client.js"
-      repo="kyon0304/kyon0304.github.io"
-      issue-term="pathname"
-      theme="github-light"
-      crossorigin="anonymous"
-      async>
-    </script>
   </article>
         </div>
         

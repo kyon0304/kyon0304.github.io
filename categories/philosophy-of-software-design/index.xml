@@ -6,19 +6,10 @@
     <description>Recent content in Philosophy of Software Design on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 06 Feb 2020 10:53:42 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jan 2020 20:27:11 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/categories/philosophy-of-software-design/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Philosophy of Software Design 第九章 - 合并还是拆分</title>
-      <link>https://kyon.life/post/philosophy-of-software-design-9/</link>
-      <pubDate>Thu, 06 Feb 2020 10:53:42 +0800</pubDate>
-      
-      <guid>https://kyon.life/post/philosophy-of-software-design-9/</guid>
-      <description>软件设计中最基本的问题之一是：假定有两个不同的功能，应当在同一个地方实现它们，还是分开实现？这个问题存在于系统的各个层级：函数、方法、类和服</description>
-    </item>
     
     <item>
       <title>Philosophy of Software Design - 第八章 降低复杂性</title>
