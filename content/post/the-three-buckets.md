@@ -2,7 +2,7 @@
 title: "The Three Buckets"
 date: 2019-09-03T15:07:03+08:00
 draft: false
-tags: ["翻译", "howto", "产品"]
+tags: ["鹦鹉学舌", "howto", "产品"]
 ---
 
 翻译自 [Guide to Product Planning: Three Feature Buckets](https://adamnash.blog/2009/07/22/guide-to-product-planning-three-feature-buckets/)，一篇 2009 年的文章。

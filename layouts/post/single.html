@@ -44,6 +44,9 @@
     <!-- social share-->
     {{ partial "share.html" .}}
 
+    <!-- related post -->
+    {{- partial "related.html" . -}}
+
     <footer class="post-footer">
       {{ with .Params.tags -}}
         <div class="post-tags">
@@ -52,6 +55,16 @@
           {{ end -}}
         </div>
       {{- end -}}
+
+      <!-- comment based on github issue -->
+      <script src="https://utteranc.es/client.js"
+          repo="kyon0304/kyon0304.github.io"
+          issue-term="pathname"
+          label="Comment"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+      </script>
 
       <!-- Post Pagination -->
       <nav class="post-nav">

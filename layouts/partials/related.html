@@ -1,0 +1,13 @@
+{{- if or .Params.enableRelated (and .Site.Params.enableRelated (ne .Params.enableRelated false)) }}
+    {{ $related := .Site.RegularPages.Related . | first 3 }}
+    {{ with $related }}
+    <div class="related">
+        <span>相关阅读</span>
+        <ul>
+            {{ range . }}
+            <li><a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+            {{ end }}
+        </ul>
+    </div>
+    {{ end }}
+{{- end -}}
