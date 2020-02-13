@@ -6,10 +6,19 @@
     <description>Recent content in Posts on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 06 Feb 2020 10:53:42 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 10 Feb 2020 13:03:59 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Philosophy of Software Design 第十章 通过定义使得错误不复存在</title>
+      <link>https://kyon.life/post/philosophy-of-software-design-10/</link>
+      <pubDate>Mon, 10 Feb 2020 13:03:59 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design-10/</guid>
+      <description>异常处理是软件系统中最糟糕的复杂度来源。处理特殊条件的代码天生比处理正常情况的代码更难编写，而且开发者经常不管异常应该怎样处理就定义了它们。</description>
+    </item>
     
     <item>
       <title>Philosophy of Software Design 第九章 - 合并还是拆分</title>

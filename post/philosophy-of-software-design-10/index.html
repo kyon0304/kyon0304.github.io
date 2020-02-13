@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Philosophy of Software Design 第十章 通过定义使得错误不复存在 - kyon&#39;s wonderland with ❤️</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="kyon" /><meta name="description" content="异常处理是软件系统中最糟糕的复杂度来源。处理特殊条件的代码天生比处理正常情况的代码更难编写，而且开发者经常不管异常应该怎样处理就定义了它们。" /><meta name="keywords" content="Philosophy of Software Design" />
+
+
+
+<meta name="google-site-verification" content="w5TUU5UWDm77hp1HeRq6o3T67F-hpZParl5hfyNpkdE" />
+
+
+<meta name="generator" content="Hugo 0.61.0 with theme even" />
+
+
+<link rel="canonical" href="https://kyon.life/post/philosophy-of-software-design-10/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link href="/dist/even.c27cbacf.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/share.min.css">
+
+
+<meta property="og:title" content="Philosophy of Software Design 第十章 通过定义使得错误不复存在" />
+<meta property="og:description" content="异常处理是软件系统中最糟糕的复杂度来源。处理特殊条件的代码天生比处理正常情况的代码更难编写，而且开发者经常不管异常应该怎样处理就定义了它们。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-10/" />
+<meta property="article:published_time" content="2020-02-10T13:03:59+08:00" />
+<meta property="article:modified_time" content="2020-02-13T22:23:22+08:00" />
+<meta itemprop="name" content="Philosophy of Software Design 第十章 通过定义使得错误不复存在">
+<meta itemprop="description" content="异常处理是软件系统中最糟糕的复杂度来源。处理特殊条件的代码天生比处理正常情况的代码更难编写，而且开发者经常不管异常应该怎样处理就定义了它们。">
+<meta itemprop="datePublished" content="2020-02-10T13:03:59&#43;08:00" />
+<meta itemprop="dateModified" content="2020-02-13T22:23:22&#43;08:00" />
+<meta itemprop="wordCount" content="9511">
+
+
+
+<meta itemprop="keywords" content="鹦鹉学舌,学习笔记," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Philosophy of Software Design 第十章 通过定义使得错误不复存在"/>
+<meta name="twitter:description" content="异常处理是软件系统中最糟糕的复杂度来源。处理特殊条件的代码天生比处理正常情况的代码更难编写，而且开发者经常不管异常应该怎样处理就定义了它们。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">kyon&#39;s wonderland</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">kyon&#39;s wonderland</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Philosophy of Software Design 第十章 通过定义使得错误不复存在</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-02-10 </span>
+        <div class="post-category">
+            <a href="/categories/philosophy-of-software-design/"> Philosophy of Software Design </a>
+            </div>
+          <span class="more-meta"> 约 9511 字 </span>
+          <span class="more-meta"> 预计阅读 19 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#101-">10.1 为什么异常会增加复杂性</a></li>
+    <li><a href="#102-">10.2 太多异常</a></li>
+    <li><a href="#103-">10.3 通过定义使得错误不复存在</a></li>
+    <li><a href="#104-windows-">10.4 例子：Windows 系统的文件删除</a></li>
+    <li><a href="#105-java-">10.5 例子：Java 子字符串方法</a></li>
+    <li><a href="#106-">10.6 屏蔽异常</a></li>
+    <li><a href="#107-">10.7 聚集异常</a></li>
+    <li><a href="#108-">10.8 崩溃就行？</a></li>
+    <li><a href="#109-">10.9 通过设计使得特殊情况不复存在</a></li>
+    <li><a href="#1010-">10.10 过度实践</a></li>
+    <li><a href="#1011-">10.11 结论</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>异常处理是软件系统中最糟糕的复杂度来源。处理特殊条件的代码天生比处理正常情况的代码更难编写，而且开发者经常不管异常应该怎样处理就定义了它们。这章讨论了为什么异常对系统复杂度的影响不成比例的大，然后展示了如何简化异常处理。总体来说，本章关键的教训是减少必须处理异常的地方；在许多场景中，可以修改操作的语义，这样正常的操作就可以处理所有情况，因此就没有异常需要上报了（如本章标题）</p>
+<h2 id="101-">10.1 为什么异常会增加复杂性</h2>
+<p>我用 <code>异常 (exception)</code> 这个术语来指代任何改变程序正常流程的特殊情况。许多编程语言都包含一套正式的异常处理机制，允许底层代码抛出异常由封装代码捕获。然而，在不使用正式的异常处理机制时也有可能发生异常，比如当方法返回一个特殊的值，表示它没有完成正常的行为。所有这些形式的异常都会影响到复杂度。</p>
+<p>一段特定的代码会以几种不同的方式遇到异常：</p>
+<ul>
+<li>调用者可能会提供错误的参数或配置信息</li>
+<li>被调用的函数可能无法完成被请求的操作。比如，I/O 可能会失败，或者请求的资源无法使用</li>
+<li>在一个分布式系统中，网络数据包可能会丢失或延迟，服务器可能无法及时响应，或对端以一种无法预测的方式进行通信</li>
+<li>代码可能会检测到 bug，内部不一致，或者其他它无法处理的情况</li>
+</ul>
+<p>大型系统必须处理许多异常情况，尤其是如果它们还是分布式的或者需要容错的话。异常处理可能会占据整个系统代码的一大部分。</p>
+<p>异常处理的代码天生比处理正常情况的代码更难编写。异常打断了代码正常的代码执行流程；而且通常意味着某些事情没有按预期进行。当异常发生时，程序可以通过两种方式处理它，每种方式都可能很复杂。第一种方式是不处理异常，继续前进完成进行中的工作。比如，如果出现了网络丢包，可以重新发送；如果数据损坏了，可以从冗余数据中恢复。第二种方式，中止当前的操作并上报异常。然而，中止操作可能会很复杂，因为异常发生时，系统可能处于不一致的状态（数据结构可能只被初始化了一部分）；异常处理代码必须恢复一致性，比如回滚所有异常发生前的改变。</p>
+<p>更进一步地，异常处理代码可能会引入更多的异常。考虑重发网络丢包的情况。可能数据包实际上并没有丢，只是简单地延迟了。在这个情景中，重发的数据包会导致重复的数据包到达对端；这就引入了新的对端必须处理的异常情况。或者，考虑从冗余数据中恢复丢失数据的情况：如果冗余数据也丢失了呢？在恢复期间再次发生的异常通常比第一个异常更加微妙和复杂。如果通过中止处理中的操作来处理异常，那么必须作为另外一个异常上报给调用者。为了防止产生无尽的异常链，开发者最终必须找到一种不引入更多异常的方式来处理异常。</p>
+<p>支持异常机制的语言通常是繁琐笨拙的，使得异常处理代码更加难以阅读。比如，参考下面的代码，使用 Java 的对象序列化和反序列化从一个文件中读出的推文：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="k">try</span> <span class="o">(</span>
+      <span class="n">FileInputStream</span> <span class="n">fileStream</span> <span class="o">=</span>
+                   <span class="k">new</span> <span class="n">FileInputStream</span><span class="o">(</span><span class="n">fileName</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">BufferedInputStream</span> <span class="n">bufferedStream</span> <span class="o">=</span>
+                   <span class="k">new</span> <span class="n">BufferedInputStream</span><span class="o">(</span><span class="n">fileStream</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">ObjectInputStream</span> <span class="n">objectStream</span> <span class="o">=</span>
+                   <span class="k">new</span> <span class="n">ObjectInputStream</span><span class="o">(</span><span class="n">bufferedStream</span><span class="o">)</span><span class="o">;</span>
+<span class="o">)</span> <span class="o">{</span>
+      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">tweetsPerFile</span><span class="o">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">tweets</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="o">(</span><span class="n">Tweet</span><span class="o">)</span> <span class="n">objectStream</span><span class="o">.</span><span class="na">readObject</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span> <span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">FileNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="o">.</span><span class="o">.</span><span class="o">.</span>
+<span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="o">.</span><span class="o">.</span><span class="o">.</span>
+<span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">EOFException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// Not a problem: not all tweet files have full
+</span><span class="c1"></span>      <span class="c1">// set of tweets.
+</span><span class="c1"></span><span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="o">.</span><span class="o">.</span><span class="o">.</span>
+<span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">ClassCastException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="o">.</span><span class="o">.</span><span class="o">.</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>都还没算上处理异常的代码，仅 <code>try-catch</code> 模板代码就比正常流程的操作代码多。而且很难将错误处理代码和正常流程的代码关联起来：比如，每个异常是从哪里抛出的很不明显。另外一种方式是把代码拆分为很多个单独的 <code>try</code> 代码块；极端情况下，每一行代码就会有一个 <code>try</code> 产生一个异常。这样异常怎么产生的变清晰了，但是 <code>try</code> 本身会打乱流程，使得代码难以搞懂；而且，多个 <code>try</code> 代码块可能会产生重复的异常处理代码。</p>
+<p>很难保证异常处理代码真的工作。一些异常，比如 I/O 错误，在测试环境中很难产生，所以很难测试处理这些异常的代码。运行中的系统很少出现异常，所以异常处理代码基本不会执行到。可能在直到异常处理代码最后被运行前的很长一段时间都检测不到 bug，那么很有可能它是无法正常工作的（我最喜欢的一个格言：“没有被执行过的代码无法工作”）。最近一项研究发现，数据敏感的分布式系统中超过 90% 的严重失败是异常处理中的错误导致的<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>。很难调试异常处理代码中的问题，因为它太少发生了。</p>
+<h2 id="102-">10.2 太多异常</h2>
+<p>通过定义不必要的异常，程序员加剧了异常处理相关的问题。大多数程序员被教导检测和报告异常非常重要；他们把这种教导理解为“检测到的错误越多越好”。这就导致一种过度防御的风格，任何似乎有一点点可疑的地方都会被当做异常拒绝，最终导致不必要的异常泛滥，增加了系统的复杂性。</p>
+<p>在设计 Tcl 脚本语言时我自己也犯了这个错误。Tcl 中有一个 unset 命令可以用于删除变量。我把 unset 定义为当变量不存在时就抛出错误。当时的我认为，如果有人试图删除一个不存在的变量，那肯定是个很大的问题，所以 Tcl 应该报告它。然而，unset 最常见的用途是清除上一个操作创建的临时状态。通常很难预测出什么状态被创建了，尤其是如果操作半途中止了。因此，最简单的是删除所有可能被创建的变量。unset 的定义使得这种使用方式很难处理：结果开发者把 unset 调用封装在 catch 声明中来捕获和忽略 unset 抛出的错误。回想起来，unset 命令的定义是我在设计 Tcl 时犯的最大的错误之一。</p>
+<p>用异常来避免处理复杂场景非常有诱惑力：相比找出一种简洁的方式处理它，只需要抛出异常并把这个问题抛给调用者。有人可能会争辩说这种方式可以赋予调用者的更强的能力，因为它允许每个调用者以不同的方式处理异常。然而，如果你不知道该怎么处理某个特殊场景，那么调用者也有很大可能不知道。在这种情况抛出异常只是将问题传递给了其他人，并且增加了系统的复杂性。</p>
+<p>类抛出的异常是它的接口的一部分；<strong>抛出很多异常的类有着复杂的接口，而且它们比更少异常的类更浅。</strong> 异常是接口中尤为复杂的一部分。它在被捕获前可能会向上传播好几个栈层级，所以可能不止影响方法的调用者，还有可能潜在地影响更高层的调用者（和它们的接口）。</p>
+<p>抛出异常很容易；处理它们就困难了。因此，异常的复杂性来源于异常处理代码。降低异常处理带来的复杂性导致的损失最好的办法是 <strong>减少必须处理异常的地方</strong>。本章余下的部分将会讨论四种技术，来减少异常处理的个数。</p>
+<h2 id="103-">10.3 通过定义使得错误不复存在</h2>
+<p>消除异常处理带来的复杂性的最好方式是，以不需要处理异常为目标定义你的接口：<strong>不复存在的错误定义</strong>。这听上去可能做出了牺牲，但是实践中却很有效。考虑一下上面讨论的 Tcl unset 命令。要删除一个未知变量时，它应该不做任何事，简单地返回，而不是抛出错误。我当时应该稍微改变一下 unset 的定义：unset 应该保证一个变量不再存在，而不是删除一个变量。使用第二个定义时，变量不存在时 unset 无法完成工作，所以生成一个异常是有意义的。使用第一个定义时，unset 处理不存在的变量就会非常自然。这种情况下，它的工作已经完成了，所以它可以简单的返回。不再有错误情况需要上报。</p>
+<h2 id="104-windows-">10.4 例子：Windows 系统的文件删除</h2>
+<p>文件删除提供了另一个关于如何可以通过定义消除异常的例子。Windows 操作系统不允许删除被进程打开的文件。这对开发者和用户来说是一个持续的沮丧感来源。为了删除使用中的文件，用户必须找遍整个系统定位到正在打开这个文件的进程，然后杀掉这个进程。有时候用户放弃了，然后重启他们的系统，就是为了删除一个文件。</p>
+<p>Unix 操作系统更优雅地定义了文件删除。在 Unix 中，如果删除一个文件时它正处于打开状态，Unix 不会立即删除文件。相反，它把文件标记为删除，然后删除操作就成功返回了。文件名被从它所在的目录上移除，所以其他线程就无法打开旧文件了，也可以创建同名的新文件，但是已有文件数据还存在。已经打开这个文件的线程可以继续正常的读写。一旦所有访问这个文件的线程都关闭了这个文件，它的数据就被释放了。</p>
+<p>Unix 系统的定义方式去除了两种不同类型的错误。第一种，如果文件当前正在使用，不再返回错误；删除操作成功返回，文件最终会被删除。第二种，删除一个正在使用的文件不会向处理这个文件的线程抛出异常。这个问题另外一种可能的解决方式是，立即删除文件并且标记这个文件所有打开句柄并禁用它们；任何对这个已经删除的文件读写的尝试都会失败。然而，这种方式会在处理它的线程中产生新的错误。相反，Unix 允许线程继续对文件正常操作，对文件的删除延迟使得错误定义不复存在。</p>
+<p>Unix 允许线程继续读写注定要消失的文件似乎很奇怪，但是我从来没有遇到过任何由于这种处理方式导致严重问题的情况。不管是对开发者还是用户来说，Unix 对文件删除的定义要比 Windows 的定义易用得多。</p>
+<h2 id="105-java-">10.5 例子：Java 子字符串方法</h2>
+<p>作为最后一个例子，考虑 Java 的 String 类和它的子字符串方法。子字符串方法接受字符串中的两个索引位置作为参数，返回一个子字符串，起始于原字符串中第一个索引位置，结束于第二个索引位置前一个字符，然而，如果任意一个索引超出了字符串的范围，子字符串方法就会抛出 <code>IndexOutOfBoundsException</code> 异常。这是个没必要的异常而且使得这个方法更难以使用。我经常发现自己的使用场景是这样的，其中一个或两个索引都超出了字符串的范围，我想要抽取出字符串与指定范围重合部分的字符。不幸的是，我必须得检查每一个索引，然后把它们规整为 0 或者字符串的长度；本来只有一行的方法调用现在变成了 5-10 行代码。</p>
+<p>Java 的子字符串方法如果自动做了这个调整的话就会变得更加好用，它实现一个这样的 API：“返回字符串中位置位于起始索引之后结束索引之前的字符（如果有的话）”，这是一个简单而且自然的 API，而且通过这样的定义，<code>IndexOutOfBoundsException</code> 异常不复存在。即使两个索引或其中一个是负数、起始索引比结束索引大，这个方法的行为也是良好定义的。这种方式简化了接口的同时还提高了它的功能性，所以使得这个方法更深。许多其他编程语言采取了这种无异常的方式；比如，对于范围外的列表 slices，Python 返回空。</p>
+<p>当我为通过定义使得错误不复存在时，有的人会反驳抛出异常可以捕获 bug；如果通过定义消除了异常，难道不会得到一个 bug 更多的系统？或许这就是为什么 Java 开发者决定子字符串方法应当抛出异常。倾向于使用异常的方式可能可以捕获一些 bug，但是它也增加了复杂性，从而导致其他 bug。在倾向于使用异常的方式里，开发者必须编写额外的代码来避免或忽略异常，这会导致产生 bug 的可能性增高；或者，他们可能忘记编写额外的代码，这种情况下，运行时就会抛出意料外的异常。相比之下，通过定义消除异常可以简化接口而且减少必须编写的代码数量。</p>
+<p><strong>总的来说，减少 bug 最好的办法是使软件更简单。</strong></p>
+<h2 id="106-">10.6 屏蔽异常</h2>
+<p>减少异常处理的第二种技术是 <em>异常屏蔽</em>。使用这种方式，异常情况在系统的较低层级就会被检测和处理，这样较高层级就不需要了解了。异常屏蔽在分布式系统中尤其常见。举例来说，在一个网络传输协议比如 TCP 中，数据包可能会由于各种原因被丢弃，比如数据损坏和网络拥挤。TCP 通过重发屏蔽了数据包丢失的问题，所有数据最终都会到达，客户端并不知道发生了丢包。</p>
+<p>关于屏蔽的更具争议性的例子出现在 NFS 网络文件系统中。如果 NFS 文件服务器由于任何原因崩溃或无响应，客户端会不断地向服务器重发请求直到问题最终解决。客户端底层的文件系统代码不会向调用它的应用上报任何异常。处理中的操作（以及应用）只是表现为卡死，直到操作最终成功完成。如果持续的卡死超出了一小段时间，NFS 客户端就会在用户控制台打印一段类似这样的消息“NFS 服务器 xyzzy 不响应，正在尝试。”</p>
+<p>NFS 用户经常抱怨他们的应用在等待 NFS 服务器继续正常操作时卡死。许多人曾建议 NFS 应该用一个异常中止操作而不是挂起。然而，报告异常会使事情更加糟糕。当应用无法访问它的文件时，它能做的事情非常少。一种可能是重试文件操作，但是这依旧会挂起应用，而且在 NFS 层的同一个地方进行重试要比在每个应用的每个文件系统调用（编译器不应该操心这种事情！）中重试更简单。另外一种可能是，应用中止然后向它的调用者返回错误。调用者很可能也不知道该做什么，所以它也会中止操作，最终用户的工作环境就会崩溃。当文件服务器宕机时，用户还是不能完成工作，而且当文件服务器开始服务后，还得重启所有应用。</p>
+<p>因此，最好的选择是 NFS 屏蔽错误然后挂起应用。使用这种方式，应用不需要任何处理服务器问题的代码，而且当服务器开始服务后可以无缝地继续操作。如果用户厌倦了等待，他们总是可以手动地中止应用。</p>
+<p>异常屏蔽并不是在所有场景都适用，但是在适用的场景中，是一个强有力的工具。屏蔽异常可以得到一个更深的类，因为它减少了类的接口（用户需要了解的异常更少）而且以屏蔽异常的代码的方式，增加了类的功能性。异常屏蔽是拉低复杂性的一个例子。</p>
+<h2 id="107-">10.7 聚集异常</h2>
+<p>减少与异常相关的复杂性的第三个技术是 <em>异常聚集</em>。异常聚集背后的思想是，用同一段代码处理多个异常；与其为许多单独的异常编写不同的处理程序，不如用一个处理程序在同一个地方处理所有异常。</p>
+<p>考虑在一个 Web 服务器上如何处理缺少参数。Web 服务器实现了一个 URL 的集合。当服务器接收到一个 URL 时，会把它分派给特定的服务方法进行处理并生成响应。URL 中包含多个用来生成响应的参数。每个服务方法会调用更低层的方法（假设是 <code>getParameter</code>） 从 URL 中获得它需要的参数。如果 URL 中没有预期的参数，<code>getParameter</code> 会抛出异常。</p>
+<p>当软件设计课上的学生实现这样一个服务器时，他们中许多人将每个不同的 <code>getParameter</code> 调用都封装在不同的异常处理中来捕获 <code>NoSuchParameter</code> 异常，如图 10.1 所示。导致产生了一大堆处理程序，都做着基本相同的事情（生成一个错误响应）。</p>
+<p><img src="/media/software-design/figure-10-1.png" alt="图 10.1"></p>
+<p><em><strong>图 10.1</strong> 顶部的代码负责分发 URL 到 Web 服务器多个方法中的一个，每一个都处理一个特定的 URL。这些方法（底部）都会适用来自 HTTP 请求的参数。在这个图中，每个 <code>getParameter</code> 调用都有一个单独的异常处理程序；这导致了重复代码。</em></p>
+<p>一种更好的方式是聚集这些异常。与其在每个单独的服务方法中捕获异常，不如像图 10.2 中那样，让它们传播到 Web 服务器的顶级调度方法中。这个方法中一个处理程序可以捕获所有异常并为缺失的参数生成一个合适的响应。</p>
+<p><img src="/media/software-design/figure-10-2.png" alt="图 10.2"></p>
+<p><em><strong>图 10.2</strong> 这段代码的功能和 图 10.1 相同，但是异常处理聚集到了一起：调度方法中单个的异常处理程序捕获了所有指定 URL 方法的 <code>NoSuchParameter</code>异常</em></p>
+<p>在 Web 服务器的例子中，聚集的方法甚至可以更进一步。处理网页时，除了缺少参数，还可能会有许多其他错误；比如，参数语法可能不对（方法接受整型参数但是收到的值是 &ldquo;xyz&rdquo;），或者用户没有执行这个请求的权限；在每种情况中，都应该产生一个错误响应；这些错误在错误响应中只有错误消息不一样（“&lsquo;quantity&rsquo; 参数是必填项”或“&lsquo;quantity&rsquo; 参数值'xyz'错误，必须是正整数”）。因此，所有情况都可以由顶层单个异常处理程序处理。可以在抛出异常时生成错误消息并将它包含在异常记录中；比如，<code>getParameter</code> 会生成消息 “URL 缺少必填项 &lsquo;quantity&rsquo;”。顶层处理程序会从异常中获取错误消息，并把它放入错误响应中。</p>
+<p>在前面几段中讨论的聚集，从封装和信息隐藏角度看有很好的属性。顶层的异常处理封装了关于如何生成错误响应的知识，但是对具体的错误一无所知；它只是使用了异常提供的错误消息。<code>getParameter</code> 方法封装了关于如何从 URL 中获取参数的知识，而且当获取出错时，也知道如何以一种可读的方式描述。这两种信息是紧密相关的，所以把它们放到同一个地方是有意义的。然而，<code>getParameter</code> 并不知道 HTTP 错误响应的语法知识。当有新功能添加到 web 服务器时，像 <code>getParameter</code> 这样的新方法可能也会有它们自己的错误。如果新方法以 <code>getParameter</code> 相同的方式抛出异常（通过生成继承自相同父类的异常并在每个异常中包含一个错误消息），它们就可以不做任何改变的嵌入现有系统中：顶层处理程序会自动地为它们生成错误响应。</p>
+<p>这个例子展示了一种对异常处理而言通用的设计模式。如果一个系统处理一个系列的请求，定义这样一个异常就很有用：它中止当前请求，清理系统状态，然后继续处理下一个请求。可以为不同的情况定义不同的异常子类。在处理请求的任何地方可以抛出异常并中止请求；在靠近系统顶部的处理请求的循环中捕获异常。这种类型的异常应该和其他严重的会导致整个系统错误的异常清晰的区分开。</p>
+<p>如果异常在被处理前可以向上传播多个执行栈的层级，这时异常聚集最有效。因为这样允许来自更多的方法的更多异常可以在同一个地方处理。这是异常屏蔽的反面：异常屏蔽当异常在底层方法中处理时最有效。对异常屏蔽来说，底层方法通常是由许多其他方法使用的库函数，所以允许异常传播会导致需要处理的地方增多。屏蔽和聚集这两种方式在把异常处理放在可以处理最多异常的地方这个方面相似，消除了在其他方式下创建更多的处理程序的需要。</p>
+<p>异常聚集另一个例子出现在 RAMCloud 存储系统中的崩溃恢复里。RAMCloud 系统由许多存储服务器组成，每个对象它们都保存了多份，这样系统就可以从各种失败中恢复。比如，如果一台服务器崩溃并丢失了它上面所有的数据，RAMCloud 可以从存储在其他服务器上的备份数据重新构建出丢失的数据。也可能发生更小规模的错误；比如，可能是服务器上的一个对象损坏了。</p>
+<p>RAMCloud 没有对每一种不同的错误都设置单独的恢复机制。相反，RAMCloud把许多小错误“提升”成一个大错误。原则上，RAMCloud 可以从备份数据恢复损坏的对象。然而，它并不会这么做。相反，如果发现有损坏的对象，就会让包含这个对象的整个服务器宕机。RAMCloud 使用这种方式是因为崩溃恢复非常复杂，这种方式最小化了必须实现的不同恢复机制的个数。为崩溃的服务器创建一种恢复机制是不可避免的，所以其他类型的恢复 RAMCloud 也使用同样的恢复机制。这减少了必须编写的代码数量，而且也意味着可以更多的使用到服务器崩溃恢复程序。最终，恢复代码中的 bug 更有可能被发现和修复。</p>
+<p>把对象损坏提升为服务器崩溃的一个缺点是，这样做大幅提升了恢复代价。在 RAMCloud 这不成问题，因为对象损坏非常少见。然而，把经常发生的错误进行提升是说不通的。举例来说，每当有网络丢包就当作服务器崩溃是不切实际的。</p>
+<p>考虑异常聚集的一种方式是， 它用一种可以处理多种场景的通用机制，代替了多个为特定场景定制的专用机制。这是通用机制的好处的另外一个例子。</p>
+<h2 id="108-">10.8 崩溃就行？</h2>
+<p>降低异常相关的复杂度的第四种技术是，使应用崩溃。在大多数应用中总是会有一些不值得处理的错误。通常，这些错误不经常出现而且很难甚至无法处理。应付这些错误最简单的办法是打印诊断信息然后中止应用。</p>
+<p>一个例子是分配存储时出现的“内存不足”报错。考虑下 C 语言中的 <code>malloc</code> 函数，如果无法分配到预期的内存就会返回 NULL。这是一种不幸的行为，因为它假设每个 <code>malloc</code> 的调用者都会检查返回值，如果没有获得内存就会采取相应的措施。应用中有大量的 <code>malloc</code> 调用，所以每次调用都要检查返回的话会显著增加复杂性。如果开发者忘记做检查（这很有可能），那么当内存耗尽时应用就会去解析一个空指针，最终导致崩溃，却隐藏了真正的问题。</p>
+<p>更进一步地说，当内存耗尽时，应用也做不了什么。原则上，应用可以寻找能释放的内存，但是如果有的话它应该早已经释放了，从而防止内存不足的错误发生。现在系统的内存非常充足，几乎不会出现内存耗尽的情况；当这种情况出现时，就说明应用里有 bug。因此，尝试处理内存不足的错误是没有意义的；复杂性太高而收益太小。</p>
+<p>一种更好的方式是，定义一个新方法 <code>ckalloc</code>，它会调用 <code>malloc</code> 方法，检查返回结果，如果内存耗尽就会中止应用并返回一条错误消息。应用从来不会直接调用 <code>malloc</code>，而是会调用 <code>ckalloc</code>。</p>
+<p>在更新的编程语言比如 C++ 和 Java 中，如果内存耗尽新的操作就会抛出异常。捕获这个异常没什么意义，因为异常处理程序也很有可能尝试申请内存，最终也会以失败告终。动态申请内存在现代应用中是如此基础，以至于当内存耗尽时，让应用再继续运行就没什么意义了；一旦检测到这种错误越快崩溃越好。</p>
+<p>有许多这样的错误存在，当它们出现时应当使应用崩溃。对大多数程序来说，当读写一个打开的文件时出现 I/O 错误（比如磁盘错误），或无法打开网络套接字，这时应用无法恢复，所以中止程序并返回一个清晰明了的错误消息是一个明智的方式。这些错误不常出现，所以它们不太可能会影响应用整体的可用性。当程序遇到内部错误时，比如不一致的数据结构，中止程序也是适当的。这样的情况有可能表明程序里有 bug。</p>
+<p>因为某个错误而崩溃是否可接受要视应用而定。对于一个备份存储系统来说，遇到 I/O 错误时就退出程序是不合适的。相反，系统必须用备份数据恢复任何丢失的信息。恢复机制会大幅增加程序的复杂性，但是恢复丢失的数据对这个系统来说是必须提供给用户的基础价值。</p>
+<h2 id="109-">10.9 通过设计使得特殊情况不复存在</h2>
+<p>和使得异常不复存在一样的道理，使得特殊情况不复存在也是有意义的。特殊情况会使代码充满 <code>if</code> 语句，这会产生难懂和容易产生 bug 的代码。因此，可能的话应该消除特殊情况。最好的方式是通过设计，正常情况可以自动的处理特殊情况而不需要额外的代码。</p>
+<p>在第 6 章介绍的文本编辑器项目中，学生们需要实现一种选择文本然后拷贝或删除选区的机制。大多数学生在他们实现的选区机制中引入了一个状态变量，用来指示选区是否存在。他们之所以选择这种实现方式，可能是因为有时候屏幕上选区不可见，因此在实现中出现这个概念的变量似乎很自然。然而，这种方式会有大量“没有选区”情况的检测和特殊处理。</p>
+<p>通过消除“没有选区”的特殊情况，这样选区一直都存在，选区的处理代码可以被简化。当屏幕上没有选区可见时，它可以由一个空选区来表示，它的开始和结束位置相同。通过这种方式，选区管理代码就不需要检查是否“没有选区”。当拷贝选区时，如果选区是空的，那么就会在新位置插入 0 字节（如果实现正确，不需要把 0 字节作为特殊情况进行检查）。类似的，设计代码使得删除选区时不需要处理任何特殊情况检查也是可能的。考虑一个单行的选区。删除选区时，会抽取这一行中选区之前的部分，并和选区之后的部分连接起来构成一个新行。如果选区是空的，这种方式会重新生成一遍原来的行。</p>
+<p>这个例子也展示了第七章中的理念“不同层，不同抽象”。“没有选区”的概念在考虑用户如何使用应用界面时有意义，但是这不代表必须在应用里显示地表示出这个概念。设计一种一直存在的选区，只不过有时为空因此不可见，会使得实现更加简单。</p>
+<h2 id="1010-">10.10 过度实践</h2>
+<p>通过定义消除异常，或者把它们屏蔽到某个模块中，只有在模块外不需要异常信息时行得通。这一章的例子都是这样的，比如 Tcl 的 <code>unset</code> 命令和 Java 的 <code>substring</code> 方法；在调用者关心异常检测到的特殊情况时，有其他方式可以让它获得信息。</p>
+<p>然而，有可能会把这个理念过度实践。在一个网络通信模块中，一个学生团队屏蔽了所有网络异常：如果出现网络错误，模块就会捕获并丢弃它，然后像没发生过任何问题一样继续。这意味着使用这个模块的应用无法知道消息已经丢失了或对端服务器已经崩溃了；没有这些信息，不可能构建出健壮的应用。在这个情况中，模块把异常暴露出来是很有必要的，即使它们会增加模块接口的复杂度。</p>
+<p>和软件设计中很多其他领域一样，使用异常时，你必须决定哪些重要哪些不重要。不重要的东西应该隐藏，而且隐藏得越多越好。但是当遇到重要东西时，必须暴露出来。</p>
+<h2 id="1011-">10.11 结论</h2>
+<p>任何形式的特殊情况都会使得代码更难懂而且增加出现 bug 的可能性。本章关注于是特殊情况代码最重要来源的异常，并且讨论了如何减少必须处理异常的地方。最好的方式是重新定义语义，消除错误情况。对于不能通过定义去除的错误，应该寻找可以将它们屏蔽在底层的机会，这样它们的影响就会受限，或者将多个具体场景的处理程序聚集成一个更通用的处理程序。所有这些技术，会对整体统的复杂度有明显的影响。</p>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>Ding Yuan et. al., “Simple Testing Can Prevent Most Critical Failures: An Analysis of Production Failures in Distributed Data-Intensive Systems,” 2014 USENIX Conference on operating System Design and Implementation. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">kyon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-02-13
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+    <div class="social-share" data-initialized="true" data-wechat-qrcode-title="扫描分享">
+    <center>
+        <span style="font-size:16px;color:#c05b4d;">分享到：</span>
+        <a href="#" class="social-share-icon icon-weibo"></a>
+        <a href="#" class="social-share-icon icon-wechat"></a>
+        <a href="#" class="social-share-icon icon-twitter"></a>
+        <a href="#" class="social-share-icon icon-qq"></a>
+        <a href="#" class="social-share-icon icon-qzone"></a>
+    </center>
+</div>
+
+<script src="/js/social-share.min.js"></script>
+
+
+    
+    
+    
+    <div class="related">
+        <span>相关阅读</span>
+        <ul>
+            
+            <li><a class="title" href="/post/philosophy-of-software-design-9/">Philosophy of Software Design 第九章 - 合并还是拆分</a></li>
+            
+            <li><a class="title" href="/post/philosophy-of-software-design-8/">Philosophy of Software Design - 第八章 降低复杂性</a></li>
+            
+            <li><a class="title" href="/post/philosophy-of-software-design/">Philosophy of Software Design - 第七章 不同层，不同抽象</a></li>
+            
+        </ul>
+    </div>
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/">鹦鹉学舌</a>
+          <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+          </div>
+      <script src="https://utteranc.es/client.js"
+          repo="kyon0304/kyon0304.github.io"
+          issue-term="pathname"
+          label="Comment"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+      </script>
+
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/philosophy-of-software-design-9/">
+            <span class="next-text nav-default">Philosophy of Software Design 第九章 - 合并还是拆分</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:kyon0304@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://stackoverflow.com/users/1196640/kyon" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://www.instagram/kyon_wy" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://kyon.life/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">kyon</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.d6ab6462.min.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-131420074-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+<script src="/js/social-share.min.js"></script>
+
+
+</body>
+</html>
