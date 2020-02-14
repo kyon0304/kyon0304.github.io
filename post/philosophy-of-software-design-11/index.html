@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Philosophy of Software Design - 第八章 降低复杂性 - kyon&#39;s wonderland with ❤️</title>
+  <title>Philosophy of Software Design 第十一章 设计两次 - kyon&#39;s wonderland with ❤️</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="kyon" /><meta name="description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块" /><meta name="keywords" content="Philosophy of Software Design" />
+<meta name="author" content="kyon" /><meta name="description" content="设计软件是很难的，所以当你考虑如何构建一个模块或系统时，不太可能第一个想法就会产生最好的设计。如果对每个主要的设计决定都多考虑几个选项，会得" /><meta name="keywords" content="Philosophy of Software Design" />
 
 
 
@@ -26,7 +26,7 @@
 <meta name="generator" content="Hugo 0.61.0 with theme even" />
 
 
-<link rel="canonical" href="https://kyon.life/post/philosophy-of-software-design-8/" />
+<link rel="canonical" href="https://kyon.life/post/philosophy-of-software-design-11/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -39,23 +39,23 @@
 <link rel="stylesheet" href="/css/share.min.css">
 
 
-<meta property="og:title" content="Philosophy of Software Design - 第八章 降低复杂性" />
-<meta property="og:description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块" />
+<meta property="og:title" content="Philosophy of Software Design 第十一章 设计两次" />
+<meta property="og:description" content="设计软件是很难的，所以当你考虑如何构建一个模块或系统时，不太可能第一个想法就会产生最好的设计。如果对每个主要的设计决定都多考虑几个选项，会得" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-8/" />
-<meta property="article:published_time" content="2020-01-27T20:27:11+08:00" />
-<meta property="article:modified_time" content="2020-02-04T12:04:24+08:00" />
-<meta itemprop="name" content="Philosophy of Software Design - 第八章 降低复杂性">
-<meta itemprop="description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块">
-<meta itemprop="datePublished" content="2020-01-27T20:27:11&#43;08:00" />
-<meta itemprop="dateModified" content="2020-02-04T12:04:24&#43;08:00" />
-<meta itemprop="wordCount" content="2037">
+<meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-11/" />
+<meta property="article:published_time" content="2020-02-14T10:47:48+08:00" />
+<meta property="article:modified_time" content="2020-02-14T12:48:48+08:00" />
+<meta itemprop="name" content="Philosophy of Software Design 第十一章 设计两次">
+<meta itemprop="description" content="设计软件是很难的，所以当你考虑如何构建一个模块或系统时，不太可能第一个想法就会产生最好的设计。如果对每个主要的设计决定都多考虑几个选项，会得">
+<meta itemprop="datePublished" content="2020-02-14T10:47:48&#43;08:00" />
+<meta itemprop="dateModified" content="2020-02-14T12:48:48&#43;08:00" />
+<meta itemprop="wordCount" content="1948">
 
 
 
 <meta itemprop="keywords" content="鹦鹉学舌,学习笔记," /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Philosophy of Software Design - 第八章 降低复杂性"/>
-<meta name="twitter:description" content="这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块"/>
+<meta name="twitter:title" content="Philosophy of Software Design 第十一章 设计两次"/>
+<meta name="twitter:description" content="设计软件是很难的，所以当你考虑如何构建一个模块或系统时，不太可能第一个想法就会产生最好的设计。如果对每个主要的设计决定都多考虑几个选项，会得"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -122,15 +122,15 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">Philosophy of Software Design - 第八章 降低复杂性</h1>
+      <h1 class="post-title">Philosophy of Software Design 第十一章 设计两次</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 2020-01-27 </span>
+        <span class="post-time"> 2020-02-14 </span>
         <div class="post-category">
             <a href="/categories/philosophy-of-software-design/"> Philosophy of Software Design </a>
             </div>
-          <span class="more-meta"> 约 2037 字 </span>
-          <span class="more-meta"> 预计阅读 5 分钟 </span>
+          <span class="more-meta"> 约 1948 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
         <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
     </header>
@@ -138,33 +138,26 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#81-">8.1 例：文本编辑器类</a></li>
-    <li><a href="#82-">8.2 例：配置参数</a></li>
-    <li><a href="#83-">8.3 过度实践</a></li>
-    <li><a href="#84-">8.4 结论</a></li>
-  </ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
-      <p>这章介绍了另外一种如何设计更有深度的类的考虑方式。假设你正在新建一个模块，然后发现了一处无法避免的复杂实现。下面哪种处理方式更好：应该让模块的使用者处理这个复杂实现吗？还是应该由你在模块内部处理。如果这个复杂实现和模块提供的功能有关，那么通常第二个答案是对的。大多数模块的使用者要多于开发者，所以由开发者受苦要好于使用者受苦。作为模块开发者，你应当尽全力方便使用者，即使那意味着额外的工作量。另外一种表述这个观点的方式是，<strong>模块有简单的接口比简单的实现更重要。</strong></p>
-<p>作为一个开发者，先实现简单功能，把复杂部分留给其他人的想法非常有诱惑力。如果出现了你不知道该如何处理的状况，最简单的办法就是抛出异常让调用者去处理。如果你不确定实现哪种策略，可以定义一些调整策略的配置参数，并留给系统管理员去找出最好的参数。</p>
-<p>像这样的解决办法会让你的生活在短期内更加轻松，但是它们放大了复杂度：许多人都必须处理同一个问题，而不是让同一个人去处理。比如，如果一个类抛出了一个异常，这个类都每个调用者都必须处理它。如果一个类暴露了配置参数，每个系统管理员在每次安装部署时，都需要学习一遍如何配置它们。</p>
-<h2 id="81-">8.1 例：文本编辑器类</h2>
-<p>考虑一下我们第 6、7 章讨论过的文本编辑器类，它为图形化界面的文本编辑器提供管理文本文件的功能。这个类提供了将文件从硬盘读取到内存、查询和修改文件在内存中的副本、将修改后的版本写回硬盘的功能。当学生们要实现这个类时，大多数都会选择面向文本行的接口，并提供读取、插入和删除整行文本的方法。这会得到一个实现简单、但是高层软件调用起来却很复杂的类。在用户接口调用这个级别，操作很少涉及到一整行。比如，按键操作导致单个字符插入到已存在的行中；拷贝或删除选择区域可以修改部分或多行。使用面向文本行的接口时，高层软件在实现用户接口时就不得不对行做拆分合并。</p>
-<p>像 6.3 章节中描述的面向字符的接口会将复杂性拉低。用户接口可以插入、删除任意长度的文本，而不需要拆分合并行：这样调用变简单了。文本类的实现可能会变复杂：如果内部使用行的形式来代表文本，那它就需要拆分合并行来实现面向字符的操作。这种实现方法更好，因为它把拆分合并的复杂度封装在了文本类中，这会降低系统总体的复杂度。</p>
-<h2 id="82-">8.2 例：配置参数</h2>
-<p>配置参数是将复杂性上移而不是下移的例子。一个类可以通过暴露一些控制它行为的配置参数，来代替在内部决定一个特定的行为，比如缓存大小或放弃前重试请求的次数。那么，用户就必须为参数指定一个合适的值。现在系统中的配置参数已经变得非常流行；一些系统有上百个参数。</p>
-<p>支持者为配置参数的合理性争辩道，它们允许用户根据自己特定的需求和工作负载调整系统。在一些场景中，低层的基础代码很难知道要应用的最好策略，而用户对他们的领域要熟悉的多。比如，用户可能会知道一些请求要比其他请求对时间更敏感，所以让用户为这些请求设置更高的优先级是说得通的。在类似的场景中，配置参数可以在更多的不同领域中获得更好的性能。</p>
-<p>然而，配置参数也为逃避处理重要事项并把它们转给其他人处理提供了借口。在许多场景中，用户或管理员很难甚至不可能为参数设置正确值。在另外的场景中，在系统实现时很少的额外工作就可以自动的设置正确的参数值。考虑一个需要处理丢包的网络协议。如果它发送了一个请求，在一定的时间间隔内却没有收到恢复，它就会重新发送请求。决定重试间隔的一种方式是引入一个配置参数。然而，传输协议可以通过自己测量请求成功的回复时间计算出一个合理的值，并使用它的倍数作为重试间隔。这种方式将复杂性拉低，节约了用户找出正确重试时间的力气。它还带来了可以动态计算重试间隔的好处，所以在条件变化时可以自动调整。相反，配置参数很容易过时。</p>
-<p>因此，应当尽量避免使用配置参数。在暴露一个配置参数前，问一下自己：“相较于我们自己决定参数值，调用者（或高层模块）可以知道更好的配置吗？”当你创建了配置参数时，看依稀你是否可以自动计算出合理的默认值，这样用户只需要在个别条件下提供配置参数值。理想情况下，每个模块应当完整地解决一个问题；配置参数会使解决方案变得不完整，这将增加系统的复杂度。</p>
-<h2 id="83-">8.3 过度实践</h2>
-<p>当要把复杂性拉低时需要谨慎考虑；这是一个容易过度实践的主意。一个极端的方式会是，将一整个应用的所有的功能都在单个类中实现，这明显是说不通的。拉低复杂性只在以下情况中说得通：(a)复杂性和类中存在的函数有密切关系时 (b) 拉低复杂性可以简化应用中其他许多地方的实现（c）拉低复杂性简化了类的接口。要记住真正的目标是最小化整个系统的复杂度。</p>
-<p>第六章描述了一些学生是如何在文本类中定义了会反映用户接口的方法，比如实现了回退健功能的方法。看上去这个实现好像是没问题的，因为它把复杂性拉低了。然而，将用户接口所需了解的知识强加到文本类中并不会大幅简化高层代码，而且用户接口相关的知识和文本类的核心功能关系也不大。在这种情况中，拉低复杂性只导致了信息泄漏。</p>
-<h2 id="84-">8.4 结论</h2>
-<p>当开发一个模块时，应当尽量将调用者的痛苦转移到自己身上。</p>
+      <p>设计软件是很难的，所以当你考虑如何构建一个模块或系统时，不太可能第一个想法就会产生最好的设计。如果对每个主要的设计决定都多考虑几个选项，会得到一个好得多的结果：<strong>设计两次</strong>。</p>
+<p>假设你正在设计图形化文本编辑器中管理文本的类。第一步是定义这个类由编辑器中其他部分使用的的接口；与其使用第一个蹦到脑子里的主意，不如多考虑几种可能性。其中一个选择是面向行的接口，插入、修改和删除整行的文本。另外一个选择是基于单个字符的插入和删除接口。第三个选择是面向字符串的接口，对可能跨越行边界的任意范围的字符进行操作。不需要把每个选项的所有功能特性都确定下来；到目前为止，把几个重要的方法大概轮廓勾勒出来就足够了。</p>
+<p>尝试选择和其他几种有本质区别的方式；这样你可以学到更多。即使你很确定只有一种合理的方式，也要考虑一下第二种设计方式，不管你认为它会有多糟糕。思考那个设计的弱点并且把它和其他设计的功能做对比是很有启发性的。</p>
+<p>当你粗略地描绘出几种不同的设计后，列一个每个设计的优缺点的表格。最重要的考量是，这个接口对高层的软件来说是否易用。在上面的例子中，面向行和面向字符的接口都需要使用文本类的接口做额外的工作。使用面向行的接口时，当遇到部分或跨行的操作比如剪切和复制选区时，高层的软件需要拆分和合并行。使用面向字符的接口时，对于需要修改多个字符的操作需要循环实现。另外也需要考虑如下几种因素：</p>
+<ul>
+<li>其中一种选择比其他有着更简单的接口吗？在文本类的例子中，所有的文本接口都差不多简单。</li>
+<li>其中一个接口比其他更通用吗？</li>
+<li>使用其中一个接口的实现会比其他更高效吗？在文本类的例子中，面向字符的接口很可能会比起另外的慢很多，因为它要求每一个字符都调用文本类一次</li>
+</ul>
+<p>当你比较过几种不同的设计以后，你将可以更好地确定最佳设计。最好的选择可能是可选项中的一种，或者你可能发现可以把多个选项的功能组合成一个新的设计，会比原来的选择更好。</p>
+<p>有时每个选择都不太好；当这种情况发生时，考虑一下能不能想到另外的方案。用你在原有选择中发现的问题来驱动新的设计。如果你正在设计文本类并且只想到了面向行和面向字符的这两种设计方式，你可能会注意到，这两种方式用起来都很别扭，因为它们要求高层软件做额外的文本操作。这是一个红色警告：如果需要有一个文本类，那么它应该处理所有和文本相关的操作。为了消除额外的文本操作，文本接口应该和高层软件中的操作更匹配。这些操作并不总是对应到单个字符或单行。这条推理应该引导你得到一个面向范围的 API，这会消除之前设计中的问题。</p>
+<p>设计两次的原则可以应用在系统中的许多层级。对于模块来说，你可以先用这个原则来选择接口，像上面描述的那样。然后当你设计实现时可以再次应用这个原则：对于文本类来说，你可能考虑过各种实现比如行的链表，固定长度的字符块，或者“gap buffer”。设计实现时的目标和设计接口时并不一样：对于实现来说，最重要的是简洁和性能。在设计系统的高层时多探索几种可能性也是很有用的，比如当选择用户界面的功能时，或者将系统拆解为主要模块时。在每个例子中，如果能够比较几个不同的选择就可以更容易发现最好的方案。</p>
+<p>设计两遍并不需要占用非常多额外的时间。对于一个小模块比如类来说，你可能都用不到一两个小时来考虑可选项。相比于在实现类时你需要花去好几天甚至好几个星期，这是非常少的时间了。最开始的设计实验很可能最终会有助于得到一个更好的设计，收益会远大于在设计两遍时花费的时间。对于更大的模块，最开始的设计探索会花费更多的时间，但是实现也会更慢，而且更好的设计的收益也会更高。</p>
+<p>我注意到设计两遍的原则有时候对非常聪明的人来说很难接受。当他们成长时，聪明人发现他们关于任何问题的第一个快速的想法都足够好；没有必要再考虑第二种或者第三种可能。这就培养了一种糟糕的工作习惯。然而，当这些人更年长一些，他们不断提升进入有着越来越难的问题的环境中。最终，每个人都会到达第一个想法不够好的地步；如果你想要获得真正厉害的结果，就必须考虑第二种可能，或者可能是第三种，不管你有多聪明。大型软件系统的设计就属于这个分类：没有人可以第一次尝试就把它做对。</p>
+<p>不幸的是，我经常看到坚持实现第一个想法的聪明人，这导致他们无法发挥真正的潜能（同时也使得和他们共事令人沮丧）。或许他们下意识地认为“聪明人可以第一次就做对”，所以如果他们尝试不同地设计就会表明他们其实并不聪明。不是这样的。不是你不聪明；而是问题真的很难！而且，这是一件好事：相比完全不用动脑的简单问题，解决需要仔细思考的难题要有趣得多。</p>
+<p>设计两遍的方式不仅提高了你的设计，而且可以提高你设计的技能。设计和比较不同方式的过程会教给你影响设计好坏的因素。随着时间的推移，排除糟糕的设计并磨练真正厉害的设计对你来说会越来越容易。</p>
 
     </div>
 
@@ -176,7 +169,7 @@
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        2020-02-04
+        2020-02-14
         
     </span>
   </p>
@@ -208,11 +201,11 @@
         <span>相关阅读</span>
         <ul>
             
-            <li><a class="title" href="/post/philosophy-of-software-design-11/">Philosophy of Software Design 第十一章 设计两次</a></li>
-            
             <li><a class="title" href="/post/philosophy-of-software-design-10/">Philosophy of Software Design 第十章 通过定义使得错误不复存在</a></li>
             
             <li><a class="title" href="/post/philosophy-of-software-design-9/">Philosophy of Software Design 第九章 - 合并还是拆分</a></li>
+            
+            <li><a class="title" href="/post/philosophy-of-software-design-8/">Philosophy of Software Design - 第八章 降低复杂性</a></li>
             
         </ul>
     </div>
@@ -232,13 +225,9 @@
 
       
       <nav class="post-nav">
-        <a class="prev" href="/post/philosophy-of-software-design-9/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Philosophy of Software Design 第九章 - 合并还是拆分</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        <a class="next" href="/post/philosophy-of-software-design/">
-            <span class="next-text nav-default">Philosophy of Software Design - 第七章 不同层，不同抽象</span>
+        
+        <a class="next" href="/post/philosophy-of-software-design-10/">
+            <span class="next-text nav-default">Philosophy of Software Design 第十章 通过定义使得错误不复存在</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
