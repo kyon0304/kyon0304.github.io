@@ -1,21 +1,26 @@
 ---
-title: "Spring Config"
+title: "使线上 Spring 应用更好部署和调试"
 date: 2020-02-17T21:32:03+08:00
 lastMod: 2020-02-18T00:04:03+08:00
-tags: ["实操", "spring", "配置中心", "spring boot"]
+tags: ["实操", "spring", "配置中心", "spring boot", "服务发现"]
 enableRelated: false
 enableOutdatedInfoWarning: true
 ---
 
-主要涉及四个组件的配置
+运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server 地址，在 k8s 中部署也更自然。
 
-spring-cloud-config，spring-boot-admin
+运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。
 
-spring-zookeeper-discovery，spring-boot-actuator
+要做到以上的事情，主要涉及四个组件的配置：
+
+- spring-cloud-config
+- spring-boot-admin
+- spring-zookeeper-discovery
+- spring-boot-actuator
 
 ## 效果展示
 
-配置完成后效果图如下
+配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。
 
 ![figure-1](/media/spring-config/figure-spring-config-1.png)
 
@@ -87,6 +92,8 @@ public class AdminApplication {
 
 ```bash
 ##################################### Spring Cloud Config Server Start ##################################################
+# 用户需要修改配置时，修改这个库中对应的文件，并提交&push
+# 应用可以动态修改，如果没有生效或进入一种未知状态，可以重启应用，这时新修改的属性肯定就可以生效了
 spring.cloud.config.server.git.uri=file://${user.home}/config-repo
 ##################################### Spring Cloud Config Server End ####################################################
 ```
