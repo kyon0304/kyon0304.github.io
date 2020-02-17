@@ -12,12 +12,12 @@
     
     
     <item>
-      <title>Spring Config</title>
+      <title>使线上 Spring 应用更好部署和调试</title>
       <link>https://kyon.life/post/spring-config/</link>
       <pubDate>Mon, 17 Feb 2020 21:32:03 +0800</pubDate>
       
       <guid>https://kyon.life/post/spring-config/</guid>
-      <description>主要涉及四个组件的配置 spring-cloud-config，spring-boot-admin spring-zookeeper-disco</description>
+      <description>运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server</description>
     </item>
     
     <item>

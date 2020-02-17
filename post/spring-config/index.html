@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Spring Config - kyon&#39;s wonderland with ❤️</title>
+  <title>使线上 Spring 应用更好部署和调试 - kyon&#39;s wonderland with ❤️</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="kyon" /><meta name="description" content="主要涉及四个组件的配置 spring-cloud-config，spring-boot-admin spring-zookeeper-disco" /><meta name="keywords" content="kyon, blog, java, backend" />
+<meta name="author" content="kyon" /><meta name="description" content="运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server" /><meta name="keywords" content="kyon, blog, java, backend" />
 
 
 
@@ -39,23 +39,23 @@
 <link rel="stylesheet" href="/css/share.min.css">
 
 
-<meta property="og:title" content="Spring Config" />
-<meta property="og:description" content="主要涉及四个组件的配置 spring-cloud-config，spring-boot-admin spring-zookeeper-disco" />
+<meta property="og:title" content="使线上 Spring 应用更好部署和调试" />
+<meta property="og:description" content="运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/spring-config/" />
 <meta property="article:published_time" content="2020-02-17T21:32:03+08:00" />
 <meta property="article:modified_time" content="2020-02-18T00:04:03+08:00" />
-<meta itemprop="name" content="Spring Config">
-<meta itemprop="description" content="主要涉及四个组件的配置 spring-cloud-config，spring-boot-admin spring-zookeeper-disco">
+<meta itemprop="name" content="使线上 Spring 应用更好部署和调试">
+<meta itemprop="description" content="运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server">
 <meta itemprop="datePublished" content="2020-02-17T21:32:03&#43;08:00" />
 <meta itemprop="dateModified" content="2020-02-18T00:04:03&#43;08:00" />
-<meta itemprop="wordCount" content="3217">
+<meta itemprop="wordCount" content="3494">
 
 
 
-<meta itemprop="keywords" content="实操,spring,配置中心,spring boot," /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Spring Config"/>
-<meta name="twitter:description" content="主要涉及四个组件的配置 spring-cloud-config，spring-boot-admin spring-zookeeper-disco"/>
+<meta itemprop="keywords" content="实操,spring,配置中心,spring boot,服务发现," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="使线上 Spring 应用更好部署和调试"/>
+<meta name="twitter:description" content="运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -122,12 +122,12 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">Spring Config</h1>
+      <h1 class="post-title">使线上 Spring 应用更好部署和调试</h1>
 
       <div class="post-meta">
         <span class="post-time"> 2020-02-17 </span>
         
-          <span class="more-meta"> 约 3217 字 </span>
+          <span class="more-meta"> 约 3494 字 </span>
           <span class="more-meta"> 预计阅读 7 分钟 </span>
         <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
@@ -156,11 +156,17 @@
   </div>
 </div>
     <div class="post-content">
-      <p>主要涉及四个组件的配置</p>
-<p>spring-cloud-config，spring-boot-admin</p>
-<p>spring-zookeeper-discovery，spring-boot-actuator</p>
+      <p>运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server 地址，在 k8s 中部署也更自然。</p>
+<p>运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。</p>
+<p>要做到以上的事情，主要涉及四个组件的配置：</p>
+<ul>
+<li>spring-cloud-config</li>
+<li>spring-boot-admin</li>
+<li>spring-zookeeper-discovery</li>
+<li>spring-boot-actuator</li>
+</ul>
 <h2 id="heading">效果展示</h2>
-<p>配置完成后效果图如下</p>
+<p>配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。</p>
 <p><img src="/media/spring-config/figure-spring-config-1.png" alt="figure-1"></p>
 <p>一个美观页面，主要展示了三种信息：</p>
 <ul>
@@ -239,9 +245,13 @@
 <pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1">##################################### Spring Cloud Config Server Start ##################################################</span>
+<span class="c1"># 用户需要修改配置时，修改这个库中对应的文件，并提交&amp;push</span>
+<span class="c1"># 应用可以动态修改，如果没有生效或进入一种未知状态，可以重启应用，这时新修改的属性肯定就可以生效了</span>
 spring.cloud.config.server.git.uri<span class="o">=</span>file://<span class="si">${</span><span class="nv">user</span><span class="p">.home</span><span class="si">}</span>/config-repo
 <span class="c1">##################################### Spring Cloud Config Server End ####################################################</span>
 </code></pre></td></tr></table>
@@ -766,6 +776,7 @@ spring.cloud.zookeeper.discovery.metadata.configPath<span class="o">=</span>/con
           <a href="/tags/spring/">spring</a>
           <a href="/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/">配置中心</a>
           <a href="/tags/spring-boot/">spring boot</a>
+          <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/">服务发现</a>
           </div>
       <script src="https://utteranc.es/client.js"
           repo="kyon0304/kyon0304.github.io"
