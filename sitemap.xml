@@ -9,14 +9,63 @@
   </url>
   
   <url>
-    <loc>https://kyon.life/categories/</loc>
-    <lastmod>2020-02-14T12:48:48+08:00</lastmod>
+    <loc>https://kyon.life/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://kyon.life/</loc>
+    <loc>https://kyon.life/post/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/spring/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/spring-boot/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/post/spring-config/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E5%AE%9E%E6%93%8D/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/</loc>
+    <lastmod>2020-02-18T00:04:03+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/categories/</loc>
     <lastmod>2020-02-14T12:48:48+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -31,20 +80,6 @@
   
   <url>
     <loc>https://kyon.life/post/philosophy-of-software-design-11/</loc>
-    <lastmod>2020-02-14T12:48:48+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/post/</loc>
-    <lastmod>2020-02-14T12:48:48+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/</loc>
     <lastmod>2020-02-14T12:48:48+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -128,21 +163,7 @@
   </url>
   
   <url>
-    <loc>https://kyon.life/tags/spring-boot/</loc>
-    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</loc>
-    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/%E5%AE%9E%E6%93%8D/</loc>
     <lastmod>2019-11-03T13:01:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -151,13 +172,6 @@
   <url>
     <loc>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</loc>
     <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/</loc>
-    <lastmod>2019-11-03T13:01:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
