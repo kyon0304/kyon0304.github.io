@@ -6,10 +6,28 @@
     <description>Recent content in 学习笔记 on kyon&#39;s wonderland with ❤️</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 14 Feb 2020 10:47:48 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 19 Feb 2020 12:15:39 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Philosophy of Software Design 第二章 复杂度的天性</title>
+      <link>https://kyon.life/post/philosophy-of-software-design-2/</link>
+      <pubDate>Wed, 19 Feb 2020 12:15:39 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design-2/</guid>
+      <description>这本书是关于如何设计软件系统使得它们的复杂度最小化。第一步是了解敌人。到底什么是“复杂性”？你怎么知道一个系统是不必要的复杂？什么会导致系统</description>
+    </item>
+    
+    <item>
+      <title>Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）</title>
+      <link>https://kyon.life/post/philosophy-of-software-design-1/</link>
+      <pubDate>Wed, 19 Feb 2020 10:16:53 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/philosophy-of-software-design-1/</guid>
+      <description>编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世</description>
+    </item>
     
     <item>
       <title>Philosophy of Software Design 第十一章 设计两次</title>
