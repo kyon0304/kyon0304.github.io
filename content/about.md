@@ -1,7 +1,7 @@
 ---
 title: "关于"
 date: 2018-12-09T22:58:43+08:00
-menu: "main"
+#menu: "main"
 weight: 40
 
 ---

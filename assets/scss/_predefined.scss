@@ -1,0 +1,151 @@
+// Colors
+//
+$SHIRONEZUMI: #BDC0BA;
+$KUROTSURUBAMI: #0B1013;
+$SHIRONERI: #FCFAF2;
+$SUMI: #1C1C1C;
+$GINNEZUMI:#91989F;
+$GOFUN: #FFFFFB;
+$RO: #0C0C0C;
+$TORINOKO: #DAC9A6;
+
+$theme: #018574;
+$text: $SUMI;
+$light-grey: $SHIRONERI;
+$dark-grey: $GINNEZUMI;
+$highlight-grey: $RO;
+$midnightblue: #2c3e50;
+
+
+// Fonts
+//
+$fonts: "PingFang-SC-Thin", "Trebuchet MS", Verdana, "Verdana Ref", "Segoe UI", Candara, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+$code-fonts: Consolas, "Andale Mono WT", "Andale Mono", Menlo, Monaco, "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", "Courier New", Courier, "YaHei Consolas Hybrid", monospace, "Segoe UI Emoji", "PingFang SC", "Microsoft YaHei";
+
+// Mixins
+//
+@mixin dimmed {
+  opacity: .6;
+}
+
+@mixin aTag {
+  a {
+    word-wrap: break-word;
+    border: none;
+    box-shadow: inset 0 -4px 0 $theme;
+    transition-property: box-shadow;
+    transition-duration: .1s;
+
+    &:hover {
+      box-shadow: inset 0 -1em 0 $theme;
+    }
+  }
+}
+
+// ========== Theme Color ========== //
+// Config here to change theme color
+// Default | Mint Green | Cobalt Blue | Hot Pink | Dark Violet
+$theme-color-config: 'Mint Green';
+
+// Default theme color map
+$theme-color-map: (
+  'Default': #c05b4d #f8f5ec,
+  'Mint Green': #16982B #f5f5f5,
+  'Cobalt Blue': #0047AB #f0f2f5,
+  'Hot Pink': #FF69B4 #f8f5f5,
+  'Dark Violet': #9932CC #f5f4fa
+);
+
+// Check theme color config.
+// if it does not exist, use default theme color.
+@if not(map-has-key($theme-color-map, $theme-color-config)) {
+  $theme-color-config: 'Default';
+}
+$theme-color-list: map-get($theme-color-map, $theme-color-config);
+
+// Default theme color of the site.
+$theme-color: nth($theme-color-list, 1) !default;
+
+// Deputy theme color of the site.
+$deputy-color: nth($theme-color-list, 2) !default;
+
+// ========== Code ========== //
+// Color of the code.
+$code-color: #c7254e !default;
+
+// Font size of code.
+$code-font-size: 0.9em !default;
+
+// Font family of the code.
+$code-font-family: Consolas, Monaco, Menlo, "DejaVu Sans Mono",
+ "Bitstream Vera Sans Mono", "Courier New", monospace !default;
+
+// Color of code highlight, solarized.
+$code-highlight-color: (
+  comment: #93a1a1,
+  keyword: #859900,
+  number: #2aa198,
+  title: #268bd2,
+  attribute: #b58900,
+  symbol: #cb4b16,
+  built_in: #dc322f,
+  formula: #eee8d5
+) !default;
+
+// Code type list.
+$code-type-list: (
+  // Custom code type
+  language-bash: "Bash",
+  language-c: "C",
+  language-cs: "C#",
+  language-cpp: "C++",
+  language-css: "CSS",
+  language-coffeescript: "CoffeeScript",
+  language-html: "HTML",
+  language-xml: "XML",
+  language-http: "HTTP",
+  language-json: "JSON",
+  language-java: "Java",
+  language-js: "JavaScript",
+  language-javascript: "JavaScript",
+  language-makefile: "Makefile",
+  language-markdown: "Markdown",
+  language-objectivec: "Objective-C",
+  language-php: "PHP",
+  language-perl: "Perl",
+  language-python: "Python",
+  language-ruby: "Ruby",
+  language-sql: "SQL",
+  language-shell: "Shell",
+
+  language-erlang: "Erlang",
+  language-go: "Go",
+  language-go-html-template: "Go HTML Template",
+  language-groovy: "Groovy",
+  language-haskell: "Haskell",
+  language-kotlin: "Kotlin",
+  language-clojure: "Clojure",
+  language-less: "Less",
+  language-lisp: "Lisp",
+  language-lua: "Lua",
+  language-matlab: "Matlab",
+  language-rust: "Rust",
+  language-scss: "Scss",
+  language-scala: "Scala",
+  language-swift: "Swift",
+  language-typescript: "TypeScript",
+  language-yml: "YAML",
+  language-yaml: "YAML",
+  language-toml: "TOML",
+  language-diff: "Diff"
+) !default;
+
+// Color of the code background.
+$code-background: $deputy-color !default;
+
+// ========== Color ========== //
+$black: #0a0a0a !default;
+$white: #fefefe !default;
+$light-gray: #e6e6e6 !default;
+$gray: #cacaca !default;
+$dark-gray: #8a8a8a !default;
