@@ -5,8 +5,6 @@ lastMod: 2020-02-19T19:16:39+08:00
 tags: ["鹦鹉学舌", "学习笔记"]
 keywords: ["Philosophy of Software Design"]
 categories: ["Philosophy of Software Design"]
-enableRelated: false
-enableOutdatedInfoWarning: true
 ---
 
 这本书是关于如何设计软件系统使得它们的复杂度最小化。第一步是了解敌人。到底什么是“复杂性”？你怎么知道一个系统是不必要的复杂？什么会导致系统变复杂？这章会在较高层级解决这些问题；余下的章节会就具体结构特征向你展示如何在较低层级识别复杂度。
@@ -25,7 +23,7 @@ enableOutdatedInfoWarning: true
 
 复杂性由最常见的活动决定。如果系统中包括一些非常复杂的部分，但是这些基本不会用到，那它们对系统整体的复杂性几乎没影响。用粗略的数学方式来表示：
 
-$C = ∑c_pt_p$
+$$C = ∑c_pt_p$$
 
 系统整体复杂性（C）由每部分的复杂性 （$c_p$）加权开发者在这部分花费的时间（$t_p$）决定。把复杂性隔离在一个从不会被看到的地方基本就和完全消除了复杂性一样。
 
