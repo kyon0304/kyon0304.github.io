@@ -1,7 +1,7 @@
 ---
 title: "「常识」摘抄"
 date: 2018-12-17T15:17:22+08:00
-draft: false
+toc: false
 tags: ["读过", "蚂蚁搬山"]
 enableOutdatedInfoWarning: false
 ---

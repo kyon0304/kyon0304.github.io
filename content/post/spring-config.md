@@ -22,7 +22,7 @@ enableOutdatedInfoWarning: true
 
 配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。
 
-![figure-1](/media/spring-config/figure-spring-config-1.png)
+{{< figure src="/media/spring-config/figure-spring-config-1.png" alt="figure-1" >}}
 
 一个美观页面，主要展示了三种信息：
 - 服务运行了多长时间
@@ -30,11 +30,11 @@ enableOutdatedInfoWarning: true
 - 每个服务有几个实例，目前本地测试环境起的，都只有一个实例
 - 服务的版本信息，从 pom.xml 文件种读的 `<version>0.1.0</version>`
 
-![figure-5](/media/spring-config/figure-spring-config-5.png)
+{{< figure src="/media/spring-config/figure-spring-config-5.png" alt="figure-5" class="big" >}}
 
 右上角切换到 `Applications` 的页面，以数字+列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
 
-![figure-2](/media/spring-config/figure-spring-config-2.png)
+{{< figure src="/media/spring-config/figure-spring-config-2.png" alt="figure-2" class="big" >}}
 
 这里进入 `cloud-adapter-aws` 服务的一个实例页面，左侧导航栏有三部分，默认进入 `Details` 这一项。
 
@@ -47,13 +47,13 @@ enableOutdatedInfoWarning: true
 5. 使用了 spring cloud config 的话，会把 config 加载的地址展示出来
 
 
-![figure-3](/media/spring-config/figure-spring-config-3.png)
+{{< figure src="/media/spring-config/figure-spring-config-3.png" alt="figure-3" class="big" >}}
 
 这个页面展示了应用从各个地方加载的属性值，包括 application.properties, application-${PROFILE}.properties, bootstrap.properties, system properties 以及从 spring cloud config server 拉取下来的属性值。
 
 分成上下部分，可以先从下半部分搜索属性 key，看到原属性值，然后在上半部分选取要修改的属性 key，然后填入想要修改的目标值后，`Refresh Context`，就可以动态修改属性值。
 
-![figure-4](/media/spring-config/figure-spring-config-4.png)
+{{< figure src="/media/spring-config/figure-spring-config-4.png" alt="figure-4" class="big" >}}
 
 日志级别页面，可以非常方便而且精确地查看某个包的日志级别并动态修改，在定位线上问题时，非常好用。
 
