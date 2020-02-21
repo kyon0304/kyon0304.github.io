@@ -41,6 +41,7 @@ params:
     enable: true
 
   mathjax: true
+  mathjaxEnableSingleDollar: true
 
   dateform: '1 月 2 号, 2006'
   dateformShort: 1 月 2 号
