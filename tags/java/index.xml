@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>java on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/java/</link>
+    <description>Recent content in java on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Sun, 22 Dec 2019 18:24:10 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Threadlocal 梳理</title>
+      <link>https://kyon.life/post/threadlocal/</link>
+      <pubDate>Sun, 22 Dec 2019 18:24:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/threadlocal/</guid>
+      <description>使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见的使用场景，比如存储登录用户信息，同一个 request 的 trace id 等。
+实现 ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。
+如何存储 首先，用一张图来表示一下 threadlocal 是如何存储数据的：
+可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
+ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
+ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&amp;lt;T&amp;gt; { static class ThreadLocalMap {static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?</description>
+    </item>
+    
+  </channel>
+</rss>

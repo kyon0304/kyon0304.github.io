@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>工具 on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/%E5%B7%A5%E5%85%B7/</link>
+    <description>Recent content in 工具 on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Sun, 03 Nov 2019 13:01:01 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>基于 Spring Boot &#43; Disconf 的配置中心</title>
+      <link>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</link>
+      <pubDate>Sun, 03 Nov 2019 13:01:01 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/config-server-with-spring-boot-and-disconf/</guid>
+      <description>disconf 简介 disconf 是百度的某位员工开源的分布式配置中心，文档地址，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化查看/更新配置。相比于 spring boot admin 中提供的 refresh context 功能，优势在于可以一次更改，应用于所有同类机器配置，而 spring boot admin 需要对每个实例进行单独修改。除此之外，spring boot admin 在界面及交互上吊打 disconf。
+设计架构  server 端包含 springmvc 用于处理业务逻辑，mysql 用于存储配置文件，两个 redis 用于用户登录，zk 用于配置更新的通知， web 端用于用户登录后统一查看/更新配置 client 端以 pom 方式引入项目内即可（需要魔改一下，见后）  运行流程 启动事件A： 以下按顺序发生。
+ A3：扫描静态注解类数据，并注入到配置仓库里。 A4+A2：根据仓库里的配置文件、配置项，去 disconf-web 平台里下载配置数据。这里会有主备竞争 A5：将下载得到的配置数据值注入到仓库里。 A6：根据仓库里的配置文件、配置项，去ZK上监控结点。 A7+A2：根据XML配置定义，到 disconf-web 平台里下载配置文件，放在仓库里，并监控ZK结点。这里会有主备竞争。 A8：A1-A6均是处理静态类数据。A7是处理动态类数据，包括：实例化配置的回调函数类；将配置的值注入到配置实体里。  更新配置事件B： 以下按顺序发生。
+ B1：管理员在 Disconf-web 平台上更新配置。 B2：Disconf-web 平台发送配置更新消息给ZK指定的结点。 B3：ZK通知 Disconf-cient 模块。 B4：与A4一样。 B5：与A5一样。 B6：基本与A4一样，唯一的区别是，这里还会将配置的新值注入到配置实体里。  主备机切换事件C： 以下按顺序发生。</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch 学习记录</title>
+      <link>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</link>
+      <pubDate>Sun, 11 Nov 2018 15:51:10 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/</guid>
+      <description>ES 的基本概念  使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个 field field 类似于 sql 表中的一列，属性及其值 node/cluster es 可以在不同的机器（node）上运行不同的线程，组成 cluster 的形式提供服务 shard 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard  ES 的分布式架构  不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分 一个 shard 的 primary/replica 会在不同机器上，当一台机器挂掉后，可以从另一台机器的 shard 中读取/恢复数据 写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端 读 es 时，可以从 primary shard 读，也可以从 replica 读  ES 的写过程  客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用 协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点 shard A 接收到数据后，进行存储，并同步到 replica shard 协调节点等待 shard A 的写入和同步都完成后，向客户端发送写入成功回执  shard A 写数据过程详细   shard A 收到数据后，会先缓存到内存 buffer 中，并写入一份到 translog1 文件的系统缓存（os cache），此时，该条数据虽然写入完成，但是没有经过进一步处理，客户端进行查询的话，是查询不到的</description>
+    </item>
+    
+  </channel>
+</rss>

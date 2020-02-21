@@ -1,27 +1,44 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh-CN">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="HTTP/3 的过去、现在及将来">
-<meta itemprop="description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。 以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。 http/1 每">
+<meta itemprop="description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。
+以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。
+http/1 每个 tcp 连接只能承载一个 http 请求，而建立 tcp 的代价很高，三次握手、拥塞控制、加密协议握手，这就导致 http 通信成本很高。
+http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，可以将握手及慢启动耗费的时间平摊到多个请求中，但问题是，一个 tcp 连接中的多个 http 请求是串行的，所以对每个连接来说，客户端和服务端依旧只能处理单个请求，而现代的网站通常会并行的向同一个服务器请求多个文件，css、js 等，于是需要建立多个 tcp 连接，问题回到 http/1。
+http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。
+http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。">
 <meta itemprop="datePublished" content="2020-01-06T10:13:03&#43;08:00" />
-<meta itemprop="dateModified" content="2020-01-06T10:13:03&#43;08:00" />
-<meta itemprop="wordCount" content="1008">
+<meta itemprop="dateModified" content="2020-01-09T20:05:56&#43;08:00" />
+<meta itemprop="wordCount" content="131">
 
 
 
 <meta itemprop="keywords" content="http,学习笔记," /><meta property="og:title" content="HTTP/3 的过去、现在及将来" />
-<meta property="og:description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。 以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。 http/1 每" />
+<meta property="og:description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。
+以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。
+http/1 每个 tcp 连接只能承载一个 http 请求，而建立 tcp 的代价很高，三次握手、拥塞控制、加密协议握手，这就导致 http 通信成本很高。
+http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，可以将握手及慢启动耗费的时间平摊到多个请求中，但问题是，一个 tcp 连接中的多个 http 请求是串行的，所以对每个连接来说，客户端和服务端依旧只能处理单个请求，而现代的网站通常会并行的向同一个服务器请求多个文件，css、js 等，于是需要建立多个 tcp 连接，问题回到 http/1。
+http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。
+http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/http3/" />
 <meta property="article:published_time" content="2020-01-06T10:13:03+08:00" />
-<meta property="article:modified_time" content="2020-01-06T10:13:03+08:00" />
+<meta property="article:modified_time" content="2020-01-09T20:05:56+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="HTTP/3 的过去、现在及将来"/>
-<meta name="twitter:description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。 以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。 http/1 每"/>
+<meta name="twitter:description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。
+以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。
+http/1 每个 tcp 连接只能承载一个 http 请求，而建立 tcp 的代价很高，三次握手、拥塞控制、加密协议握手，这就导致 http 通信成本很高。
+http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，可以将握手及慢启动耗费的时间平摊到多个请求中，但问题是，一个 tcp 连接中的多个 http 请求是串行的，所以对每个连接来说，客户端和服务端依旧只能处理单个请求，而现代的网站通常会并行的向同一个服务器请求多个文件，css、js 等，于是需要建立多个 tcp 连接，问题回到 http/1。
+http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。
+http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。"/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -31,14 +48,128 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>HTTP/3 的过去、现在及将来</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.657bcb7af31123e4156b1a3d2ff60a636717e54ead74f882136b5114cf72b55e.css" integrity="sha256-ZXvLevMRI+QVaxo9L/YKY2cX5U6tdPiCE2tRFM9ytV4=" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://kyon.life/share.min.css">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.443b23788332c9ab69f53339ca18681191755ec4a88ae2a7cdd34c3a1d542188.css" integrity="sha256-RDsjeIMyyatp9TM5yhhoEZF1XsSoiuKnzdNMOh1UIYg=" crossorigin="anonymous">
+	
+	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 </head>
 
 <body id="page">
 	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://kyon.life/">kyon&#39;s wonderland with ❤️</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					
+				<a href="https://kyon.life/post/">博文</a>
+				<a href="https://kyon.life/about/">关于</a>
 
-	<script src="https://kyon.life/js/bundle.min.4a9a0ac3d2217822c7865b4161e6c2a71de1d70492264337755427898dd718f6.js" integrity="sha256-SpoKw9IheCLHhltBYebCpx3h1wSSJkM3dVQniY3XGPY=" crossorigin="anonymous"></script>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://instagram.com/kyon_wy" target="_blank" rel="noopener me" title="Instagram"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"></line></svg></a><a href="https://github.com/kyon0304" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="菜单"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://kyon.life/post/">博文</a></li>
+			<li><a href="https://kyon.life/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>1 月 6 号, 2020</span></div>
+				<h1>HTTP/3 的过去、现在及将来</h1>
+			</header>
+			<div class="content">
+				<p>看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。</p>
+<p>以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。</p>
+<p>http/1 每个 tcp 连接只能承载一个 http 请求，而建立 tcp 的代价很高，三次握手、拥塞控制、加密协议握手，这就导致 http 通信成本很高。</p>
+<p>http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，可以将握手及慢启动耗费的时间平摊到多个请求中，但问题是，一个 tcp 连接中的多个 http 请求是串行的，所以对每个连接来说，客户端和服务端依旧只能处理单个请求，而现代的网站通常会并行的向同一个服务器请求多个文件，css、js 等，于是需要建立多个 tcp 连接，问题回到 http/1。</p>
+<p><img src="/media/http3/http1.1vshttp2.jpg" alt="http1.1vshttp2"></p>
+<p>http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。</p>
+<p>http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。</p>
+<hr>
+<p>原文链接：https://blog.cloudflare.com/http3-the-past-present-and-future/</p>
+<p>cloudflare 对 quic 的一个 rust 实现：https://github.com/cloudflare/quiche</p>
+
+			</div>
+
+<div class="related-posts thin">
+	<h2>相关推荐</h2>
+	<ul>
+	
+	<li><a href="/post/threadlocal/">Threadlocal 梳理</a></li>
+	
+	<li><a href="/post/clean-architecture/">《架构整洁之道》读后</a></li>
+	
+	<li><a href="/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/">集合基数统计</a></li>
+	
+	<li><a href="/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/">ElasticSearch 学习记录</a></li>
+	
+	</ul>
+</div>
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://kyon.life/tags/http">http</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0">学习笔记</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>约 1249 字</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-01-06 10:13</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/c225a1c7044a037d15feb13e85d01c523b3c7fcf" target="_blank" rel="noopener">c225a1c</a> @ 2020-01-09</p>
+			</footer>
+
+			
+			<div class="social-share" data-initialized="true" data-wechat-qrcode-title="扫描分享">
+    <center>
+        <span style="font-size:16px;color:#c05b4d;">分享到：</span>
+        <a href="#" class="social-share-icon icon-weibo"></a>
+        <a href="#" class="social-share-icon icon-wechat"></a>
+        <a href="#" class="social-share-icon icon-twitter"></a>
+        <a href="#" class="social-share-icon icon-qq"></a>
+        <a href="#" class="social-share-icon icon-qzone"></a>
+    </center>
+</div>
+
+<script src="/js/social-share.min.js"></script>
+
+		
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://kyon.life/post/philosophy-of-software-design/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;新</span><br><span>Philosophy of Software Design - 第七章 不同层，不同抽象</span>
+			</a>
+			<a class="prev-post" href="https://kyon.life/post/threadlocal/">
+				<span class="post-nav-label">旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Threadlocal 梳理</span>
+			</a>
+		</div>
+		<script src="https://utteranc.es/client.js"
+			  repo="kyon0304/kyon0304.github.io"
+			  issue-term="pathname"
+			  label="Comment"
+			  theme="github-light"
+			  crossorigin="anonymous"
+			  async>
+		  </script>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+
+	<script src="https://kyon.life/js/bundle.min.cf66415905ed064d02902ca9138e49994c39dd714c91a4a12878e2777abc0fb6.js" integrity="sha256-z2ZBWQXtBk0CkCypE45JmUw53XFMkaShKHjid3q8D7Y=" crossorigin="anonymous"></script>
 	
 <script type="application/javascript">
 var doNotTrack = false;
@@ -50,6 +181,34 @@ if (!doNotTrack) {
 }
 </script>
 <script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+	
+  
+  
+  
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-131420074-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+<script src="/js/social-share.min.js"></script>
+
 
 
 </body>
