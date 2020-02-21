@@ -7,10 +7,27 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Wed, 19 Feb 2020 12:15:39 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 21 Feb 2020 18:39:03 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>修改博客主题</title>
+      <link>https://kyon.life/post/change-theme/</link>
+      <pubDate>Fri, 21 Feb 2020 18:39:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/change-theme/</guid>
+      <description>没有记录的就没有存在过。所以稍微记录一下。其实不是第一次折腾主题了，之前应 邹扒皮 之约，研究过一次的 Jekyll 的 Next 主题，当然是别人 port 到 Hugo 的版本，但是最终放弃了，因为各种细节都很粗糙，我也没有想要改的动力。
+这次是昨天看到 kubectl-debug 的作者的 博客，文章宽度更宽一些，超链接样式很可爱，图例也有专门的样式，文章的 meta 信息也不那么抢眼，总之就是撞到我心坎里了吧，然后看了下也是 hugo 主题，之前其实就想换主题来着，一直没找到心仪的，于是决定这次就把现在的主题换掉。
+哦对了，新主题是 Hermit。
+下面说一说替换主题都做了什么修改。
+之前用 even 的时候其实也做了一些定制化，比如分享啊，把目录从文章右侧挪到左边啊，根据文章 front Matter 里的 keyword 加推荐阅读啊，这种小小的修改。之前涉及到样式的修改，是先安装 node 和 yarn，然后在 even 目录里 yarn install/build 这样非常笨地在做，这次在 Hermit 的 ReadMe 里看到只要下载 extended 的 hugo 就可以编译 scss 了，之前要是知道的话能省不少事。
+不打算写成教程向的，纯粹随缘记录。
+遇到第一个麻烦的事情是，Hermit 的主题颜色只有一种，没有像 even 那样定义成不同主题一键切换，不过总的来说用到的颜色也不多，只是自己用，全局查找替换一下不是什么问题。问题是，要用什么颜色。。这个花了蛮久的，在这个网站上复制粘贴了很多色值，一个个试的，其实底部栏的颜色也不是特别满意，但实在已经试到心焦气燥了，就先这样。
+然后是解决目录不显示的问题，even 里是在全局和文章的 front matter 变量两个地方同时控制，并且文章的优先级高一些，hermit 是只能用文章的 front matter 变量。但是我现有的文章都没有显示指定，直接在全局变量设置的，于是想改成和 even 一样的逻辑。但是试来试去，目录就是不出现，后来发现 hermit 的目录有两个地方，一个是文章目录本录，另外一个是文章右下角的目录开关，即使有目录也要先按开关切换以后才会出现，很不爽啊，于是直接改了下目录 css 类，让它直接显示，后面修改是否出现目录的逻辑也就水到渠成了。
+想起来，第一个事情应该是修改配置文件，从 exampleSite 里拷贝出来的默认的配置文件是 toml 格式的，但是上次折腾推荐阅读的时候发现，其实对 yaml 的支持度更好，于是那时就换成了 yaml 格式。只是当时比较直愣愣，一行一行手动改的，今天突然想起了应该有 convert 工具啊，hugo 确实有个子命令是 convert，但可惜是转换文章 front matter 格式的，于是上网随便搜了个网站转了下，复制粘贴回来。然后照着之前 even 主题时候的配置增删改查一下。说到这里不得不提一下，even 的配置还是蛮良心的，量大，还有注释。这次修改去掉了不少配置，包括 busuanzi 的 PV/UV 统计，虽然之前一直看一直看，但它总是不变看着也闹心啊。留了一个 GgoogleAnalytics，以后想起来去看看就得了。</description>
+    </item>
     
     <item>
       <title>Philosophy of Software Design 第二章 复杂度的天性</title>
@@ -25,7 +42,7 @@
 也可以从成本和收益的角度考虑复杂性。在复杂系统中，哪怕是实现一个很小的改进都需要花费很多工作。在简单系统中，可以用更少的工作完成更大的改进。
 复杂性是开发者在尝试完成一个特定目标时在特定时间点的经历。并不一定和系统整体的大小或功能相关。人们经常用“复杂（complex）”一词来描述有着复杂（sophisticated）功能的大型系统，但是如果这样的系统开发很容易上手的话，那么，从本书的角度来看，并不复杂（complex）。当然，几乎所有大型和复杂（sophisticated）的软件系统实际上也难以开发，所以它们也符合我这里复杂的定义。但是这并不一定是事实。小型并不复杂（unsophisticated）的系统也有可能非常复杂（complex）。1
 复杂性由最常见的活动决定。如果系统中包括一些非常复杂的部分，但是这些基本不会用到，那它们对系统整体的复杂性几乎没影响。用粗略的数学方式来表示：
-$C = ∑c_pt_p$
+$$C = ∑c_pt_p$$
 系统整体复杂性（C）由每部分的复杂性 （$c_p$）加权开发者在这部分花费的时间（$t_p$）决定。把复杂性隔离在一个从不会被看到的地方基本就和完全消除了复杂性一样。
 相较于编写者，复杂性对阅读者来说更明显。如果你编写了一段对你来说似乎很简单的代码，但是其他人认为它复杂，那么它就是复杂的。当你发现你处于这样的境况中，请其他开发者来看一下为什么他们觉得代码很复杂就很值得一试；在你和他们不同的观点中很有可能学到有趣的东西。作为开发者的工作不仅仅是写出你觉得容易的代码，也要让其他人觉得容易。
 2.2 复杂性的征兆 复杂性通过三种一般的方式表现出来，下面的段落将会描述到。每一种都会使得完成研发任务变得困难。
@@ -182,21 +199,6 @@ http/1 每个 tcp 连接只能承载一个 http 请求，而建立 tcp 的代价
 http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，可以将握手及慢启动耗费的时间平摊到多个请求中，但问题是，一个 tcp 连接中的多个 http 请求是串行的，所以对每个连接来说，客户端和服务端依旧只能处理单个请求，而现代的网站通常会并行的向同一个服务器请求多个文件，css、js 等，于是需要建立多个 tcp 连接，问题回到 http/1。
 http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。
 http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。</description>
-    </item>
-    
-    <item>
-      <title>Threadlocal 梳理</title>
-      <link>https://kyon.life/post/threadlocal/</link>
-      <pubDate>Sun, 22 Dec 2019 18:24:10 +0800</pubDate>
-      
-      <guid>https://kyon.life/post/threadlocal/</guid>
-      <description>使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见的使用场景，比如存储登录用户信息，同一个 request 的 trace id 等。
-实现 ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。
-如何存储 首先，用一张图来表示一下 threadlocal 是如何存储数据的：
-可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
-ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
-ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&amp;lt;T&amp;gt; { static class ThreadLocalMap {static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?</description>
     </item>
     
   </channel>

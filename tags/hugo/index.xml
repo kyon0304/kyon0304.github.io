@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>hugo on kyon&#39;s wonderland with ❤️</title>
+    <link>https://kyon.life/tags/hugo/</link>
+    <description>Recent content in hugo on kyon&#39;s wonderland with ❤️</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 21 Feb 2020 18:39:03 +0800</lastBuildDate>
+    
+	<atom:link href="https://kyon.life/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>修改博客主题</title>
+      <link>https://kyon.life/post/change-theme/</link>
+      <pubDate>Fri, 21 Feb 2020 18:39:03 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/change-theme/</guid>
+      <description>没有记录的就没有存在过。所以稍微记录一下。其实不是第一次折腾主题了，之前应 邹扒皮 之约，研究过一次的 Jekyll 的 Next 主题，当然是别人 port 到 Hugo 的版本，但是最终放弃了，因为各种细节都很粗糙，我也没有想要改的动力。
+这次是昨天看到 kubectl-debug 的作者的 博客，文章宽度更宽一些，超链接样式很可爱，图例也有专门的样式，文章的 meta 信息也不那么抢眼，总之就是撞到我心坎里了吧，然后看了下也是 hugo 主题，之前其实就想换主题来着，一直没找到心仪的，于是决定这次就把现在的主题换掉。
+哦对了，新主题是 Hermit。
+下面说一说替换主题都做了什么修改。
+之前用 even 的时候其实也做了一些定制化，比如分享啊，把目录从文章右侧挪到左边啊，根据文章 front Matter 里的 keyword 加推荐阅读啊，这种小小的修改。之前涉及到样式的修改，是先安装 node 和 yarn，然后在 even 目录里 yarn install/build 这样非常笨地在做，这次在 Hermit 的 ReadMe 里看到只要下载 extended 的 hugo 就可以编译 scss 了，之前要是知道的话能省不少事。
+不打算写成教程向的，纯粹随缘记录。
+遇到第一个麻烦的事情是，Hermit 的主题颜色只有一种，没有像 even 那样定义成不同主题一键切换，不过总的来说用到的颜色也不多，只是自己用，全局查找替换一下不是什么问题。问题是，要用什么颜色。。这个花了蛮久的，在这个网站上复制粘贴了很多色值，一个个试的，其实底部栏的颜色也不是特别满意，但实在已经试到心焦气燥了，就先这样。
+然后是解决目录不显示的问题，even 里是在全局和文章的 front matter 变量两个地方同时控制，并且文章的优先级高一些，hermit 是只能用文章的 front matter 变量。但是我现有的文章都没有显示指定，直接在全局变量设置的，于是想改成和 even 一样的逻辑。但是试来试去，目录就是不出现，后来发现 hermit 的目录有两个地方，一个是文章目录本录，另外一个是文章右下角的目录开关，即使有目录也要先按开关切换以后才会出现，很不爽啊，于是直接改了下目录 css 类，让它直接显示，后面修改是否出现目录的逻辑也就水到渠成了。
+想起来，第一个事情应该是修改配置文件，从 exampleSite 里拷贝出来的默认的配置文件是 toml 格式的，但是上次折腾推荐阅读的时候发现，其实对 yaml 的支持度更好，于是那时就换成了 yaml 格式。只是当时比较直愣愣，一行一行手动改的，今天突然想起了应该有 convert 工具啊，hugo 确实有个子命令是 convert，但可惜是转换文章 front matter 格式的，于是上网随便搜了个网站转了下，复制粘贴回来。然后照着之前 even 主题时候的配置增删改查一下。说到这里不得不提一下，even 的配置还是蛮良心的，量大，还有注释。这次修改去掉了不少配置，包括 busuanzi 的 PV/UV 统计，虽然之前一直看一直看，但它总是不变看着也闹心啊。留了一个 GgoogleAnalytics，以后想起来去看看就得了。</description>
+    </item>
+    
+  </channel>
+</rss>
