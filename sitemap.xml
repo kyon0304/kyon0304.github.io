@@ -10,21 +10,42 @@
   </url>
   
   <url>
-    <loc>https://kyon.life/tags/hugo/</loc>
-    <lastmod>2020-02-21T22:29:46+08:00</lastmod>
+    <loc>https://kyon.life/post/philosophy-of-software-design-3/</loc>
+    <lastmod>2020-03-08T13:32:31+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/post/</loc>
-    <lastmod>2020-02-21T22:29:46+08:00</lastmod>
+    <lastmod>2020-03-08T13:32:31+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/tags/</loc>
+    <lastmod>2020-03-08T13:32:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2020-03-08T13:32:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</loc>
+    <lastmod>2020-03-08T13:32:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/hugo/</loc>
     <lastmod>2020-02-21T22:29:46+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -53,20 +74,6 @@
   
   <url>
     <loc>https://kyon.life/post/philosophy-of-software-design-2/</loc>
-    <lastmod>2020-02-21T22:29:46+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2020-02-21T22:29:46+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</loc>
     <lastmod>2020-02-21T22:29:46+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

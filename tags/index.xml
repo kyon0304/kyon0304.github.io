@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 21 Feb 2020 18:39:03 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 24 Feb 2020 11:45:01 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>学习笔记</title>
+      <link>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Mon, 24 Feb 2020 11:45:01 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>鹦鹉学舌</title>
+      <link>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</link>
+      <pubDate>Mon, 24 Feb 2020 11:45:01 +0800</pubDate>
+      
+      <guid>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>hugo</title>
@@ -36,24 +54,6 @@
       <pubDate>Fri, 21 Feb 2020 18:39:03 +0800</pubDate>
       
       <guid>https://kyon.life/tags/%E5%AE%9E%E6%93%8D/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>学习笔记</title>
-      <link>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
-      <pubDate>Wed, 19 Feb 2020 12:15:39 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>鹦鹉学舌</title>
-      <link>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</link>
-      <pubDate>Wed, 19 Feb 2020 12:15:39 +0800</pubDate>
-      
-      <guid>https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C/</guid>
       <description></description>
     </item>
     
