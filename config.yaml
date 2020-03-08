@@ -36,6 +36,7 @@ googleAnalytics: "UA-131420074-1"
 
 params:
   toc: true
+  comments: true
 
   publicCDN:
     enable: true
