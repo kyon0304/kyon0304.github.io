@@ -1,7 +1,7 @@
 ---
 title: "Philosophy of Software Design 第三章 仅仅能工作的代码是不够的（编程时的战略 vs 战术思维）"
 date: 2020-02-24T11:45:01+08:00
-lastMod: 2020-02-24T11:45:01+08:00
+lastMod: 2020-03-08T13:45:01+08:00
 tags:  ["鹦鹉学舌", "学习笔记"]
 keywords: ["Philosophy of Software Design"]
 categories: ["Philosophy of Software Design"]
