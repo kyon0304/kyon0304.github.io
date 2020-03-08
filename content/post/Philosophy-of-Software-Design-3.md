@@ -5,7 +5,6 @@ lastMod: 2020-02-24T11:45:01+08:00
 tags:  ["鹦鹉学舌", "学习笔记"]
 keywords: ["Philosophy of Software Design"]
 categories: ["Philosophy of Software Design"]
-comments: false
 ---
 
 好的系统设计最重要的元素之一是完成编程任务时所采取的思考方式。许多组织鼓励使用战术性思维，专注于尽快使功能上线工作。然而，如果想获得好设计，则必须采取战略思维，在简洁的设计和修复问题上投入更多时间。这章讨论了为什么采用战略思维可以获得更好的设计，而且从长远来看，实际上要比战术思维更节省时间。
