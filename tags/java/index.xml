@@ -24,7 +24,7 @@
 可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
 ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
 ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&amp;lt;T&amp;gt; { static class ThreadLocalMap {static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?</description>
+1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&amp;lt;T&amp;gt; { static class ThreadLocalMap { static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?</description>
     </item>
     
   </channel>

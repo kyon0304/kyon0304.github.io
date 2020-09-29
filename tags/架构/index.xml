@@ -18,7 +18,7 @@
       <pubDate>Tue, 17 Sep 2019 09:43:54 +0800</pubDate>
       
       <guid>https://kyon.life/post/dont-get-locked-up-into-avoiding-lock-in/</guid>
-      <description>翻译自 Don&amp;rsquo;t get locked up into avoiding lock-in
+      <description>翻译自 Don&#39;t get locked up into avoiding lock-in
  架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行之。然而，使用锁定并不是一件非对即错的事情：避免某一方面的使用锁定经常会使得你在另一方面的使用被锁定。流行的观念，比如开源软件魔法般地自动消除了使用锁定，也被证明是不完全正确的。是时候近距离看一下使用锁定了，这样你就不会为了避免使用锁定而被限制！
  作者介绍
 略

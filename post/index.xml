@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 24 Feb 2020 11:45:01 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 29 Sep 2020 15:40:36 +0800</lastBuildDate>
     
 	<atom:link href="https://kyon.life/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Spring 框架缓存故障自动切换</title>
+      <link>https://kyon.life/post/dynamic-switch-cache-in-spring/</link>
+      <pubDate>Tue, 29 Sep 2020 15:40:36 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/dynamic-switch-cache-in-spring/</guid>
+      <description>现状 缓存只是提高访问速度，应用本身没有很高的并发访问量，缓存不可用时，数据库也能顶住。但是缓存挂掉以后，Spring CacheManager 默认会抛出异常，方法直接就异常退出了。
+目标 缓存不可用时，不影响应用正常运行，不影响接口正常返回。
+解决方案 方案一 最直接的方案，Spring 定义的 error handler 默认是抛出异常，覆盖 handler 并 catch 住异常不要抛出就可以不影响正常处理流程。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29  public class CacheErrorLoggingHandler extends SimpleCacheErrorHandler { private Logger logger = LoggerFactory.getLogger(CacheErrorLoggingHandler.class); private ClientResources clientResources; public void setClientResources(ClientResources clientResources) { this.clientResources = clientResources; } @Override public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) { logger.</description>
+    </item>
     
     <item>
       <title>Philosophy of Software Design 第三章 仅仅能工作的代码是不够的（编程时的战略 vs 战术思维）</title>
@@ -166,7 +178,7 @@ $$C = ∑c_pt_p$$
 异常处理的代码天生比处理正常情况的代码更难编写。异常打断了代码正常的代码执行流程；而且通常意味着某些事情没有按预期进行。当异常发生时，程序可以通过两种方式处理它，每种方式都可能很复杂。第一种方式是不处理异常，继续前进完成进行中的工作。比如，如果出现了网络丢包，可以重新发送；如果数据损坏了，可以从冗余数据中恢复。第二种方式，中止当前的操作并上报异常。然而，中止操作可能会很复杂，因为异常发生时，系统可能处于不一致的状态（数据结构可能只被初始化了一部分）；异常处理代码必须恢复一致性，比如回滚所有异常发生前的改变。
 更进一步地，异常处理代码可能会引入更多的异常。考虑重发网络丢包的情况。可能数据包实际上并没有丢，只是简单地延迟了。在这个情景中，重发的数据包会导致重复的数据包到达对端；这就引入了新的对端必须处理的异常情况。或者，考虑从冗余数据中恢复丢失数据的情况：如果冗余数据也丢失了呢？在恢复期间再次发生的异常通常比第一个异常更加微妙和复杂。如果通过中止处理中的操作来处理异常，那么必须作为另外一个异常上报给调用者。为了防止产生无尽的异常链，开发者最终必须找到一种不引入更多异常的方式来处理异常。
 支持异常机制的语言通常是繁琐笨拙的，使得异常处理代码更加难以阅读。比如，参考下面的代码，使用 Java 的对象序列化和反序列化从一个文件中读出的推文：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27  try (FileInputStream fileStream =new FileInputStream(fileName);BufferedInputStream bufferedStream =new BufferedInputStream(fileStream);ObjectInputStream objectStream =new ObjectInputStream(bufferedStream);) {for (int i = 0; i &amp;lt; tweetsPerFile; i++) {tweets.</description>
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27  try ( FileInputStream fileStream = new FileInputStream(fileName); BufferedInputStream bufferedStream = new BufferedInputStream(fileStream); ObjectInputStream objectStream = new ObjectInputStream(bufferedStream); ) { for (int i = 0; i &amp;lt; tweetsPerFile; i++) { tweets.</description>
     </item>
     
     <item>
@@ -205,17 +217,6 @@ $$C = ∑c_pt_p$$
 8.3 过度实践 当要把复杂性拉低时需要谨慎考虑；这是一个容易过度实践的主意。一个极端的方式会是，将一整个应用的所有的功能都在单个类中实现，这明显是说不通的。拉低复杂性只在以下情况中说得通：(a)复杂性和类中存在的函数有密切关系时 (b) 拉低复杂性可以简化应用中其他许多地方的实现（c）拉低复杂性简化了类的接口。要记住真正的目标是最小化整个系统的复杂度。
 第六章描述了一些学生是如何在文本类中定义了会反映用户接口的方法，比如实现了回退健功能的方法。看上去这个实现好像是没问题的，因为它把复杂性拉低了。然而，将用户接口所需了解的知识强加到文本类中并不会大幅简化高层代码，而且用户接口相关的知识和文本类的核心功能关系也不大。在这种情况中，拉低复杂性只导致了信息泄漏。
 8.4 结论 当开发一个模块时，应当尽量将调用者的痛苦转移到自己身上。</description>
-    </item>
-    
-    <item>
-      <title>Philosophy of Software Design - 第七章 不同层，不同抽象</title>
-      <link>https://kyon.life/post/philosophy-of-software-design/</link>
-      <pubDate>Thu, 23 Jan 2020 16:37:33 +0800</pubDate>
-      
-      <guid>https://kyon.life/post/philosophy-of-software-design/</guid>
-      <description>软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不同层中的操作，就会发现每一层的抽象都会发生变化。比如：
- 在文件系统中，最上层实现了文件抽象。一个文件包含一个可变长的比特数组，并且支持不定长的读写更新。文件系统中低一层的抽象实现了固定大小硬盘块的内存缓存；调用者可以假设频繁使用的块会驻留在内存中以供快速获取。最底层是硬件驱动，负责在二级存储设备和内存之间搬运数据块。 在网络传输协议比如 TCP 中，最上层提供的抽象是机器之间可信赖的比特流传输。这是建立在低一层的尽力而为传输服务之上的：大部分数据包都可以成功送达，但是部分包会丢失或者乱序。  7.1 Pass-through 方法 当相邻的层具有相仿的抽象时，问题会以 pass-through 方法的方式表现出来。pass-through 方法的签名和它调用的方法一样或类似，除了调用其他方法基本没有实现别的功能。比如，一个学生项目实现的文本编辑界面中有个类基本都是 pass-through 方法。下面是这个类的摘要：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... {private TextArea textArea;private TextDocumentListener listener;...public Character getLastTypedCharacter() {return textArea.getLastTypedCharacter();}public int getCursorOffset() {return textArea.getCursorOffset();}public void insertString(String textToInsert, int offset) {textArea.</description>
     </item>
     
   </channel>
