@@ -60,7 +60,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>Philosophy of Software Design 第九章 - 合并还是拆分</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.657bcb7af31123e4156b1a3d2ff60a636717e54ead74f882136b5114cf72b55e.css" integrity="sha256-ZXvLevMRI+QVaxo9L/YKY2cX5U6tdPiCE2tRFM9ytV4=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.229072f95be80b386f0c6e55a5b66bb197aeb647259a9aa950f2ee1d01f01051.css" integrity="sha256-IpBy+VvoCzhvDG5VpbZrsZeutkclmpqpUPLuHQHwEFE=" crossorigin="anonymous">
 	
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 </head>
@@ -169,9 +169,9 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="k">try</span> <span class="o">{</span>
-      <span class="n">rpcConn</span> <span class="o">=</span> <span class="n">connectionPool</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">dest</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">rpcConn</span> <span class="o">=</span> <span class="n">connectionPool</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">dest</span><span class="o">);</span>
 <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">NetworkErrorLogger</span><span class="o">.</span><span class="na">logRpcOpenError</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">dest</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">NetworkErrorLogger</span><span class="o">.</span><span class="na">logRpcOpenError</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">dest</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
       <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -213,9 +213,9 @@
 </span><span class="cm">      */</span>
 
       <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">logRpcOpenError</span><span class="o">(</span><span class="n">RpcRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">AddrPortTuple</span> <span class="n">dest</span><span class="o">,</span> <span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-         <span class="n">logger</span><span class="o">.</span><span class="na">log</span><span class="o">(</span><span class="n">Level</span><span class="o">.</span><span class="na">WARNING</span><span class="o">,</span> <span class="s">&#34;Cannot send message: &#34;</span> <span class="o">+</span> <span class="n">req</span> <span class="o">+</span> <span class="s">&#34;. \n&#34;</span> <span class="o">+</span> <span class="s">&#34;Unable to find or open connection to &#34;</span> <span class="o">+</span> <span class="n">dest</span> <span class="o">+</span> <span class="s">&#34; :&#34;</span> <span class="o">+</span> <span class="n">e</span><span class="o">)</span><span class="o">;</span>
+         <span class="n">logger</span><span class="o">.</span><span class="na">log</span><span class="o">(</span><span class="n">Level</span><span class="o">.</span><span class="na">WARNING</span><span class="o">,</span> <span class="s">&#34;Cannot send message: &#34;</span> <span class="o">+</span> <span class="n">req</span> <span class="o">+</span> <span class="s">&#34;. \n&#34;</span> <span class="o">+</span> <span class="s">&#34;Unable to find or open connection to &#34;</span> <span class="o">+</span> <span class="n">dest</span> <span class="o">+</span> <span class="s">&#34; :&#34;</span> <span class="o">+</span> <span class="n">e</span><span class="o">);</span>
       <span class="o">}</span>
-<span class="o">.</span><span class="o">.</span><span class="o">.</span>
+<span class="o">...</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -249,17 +249,17 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">History</span> <span class="o">{</span>
         <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Action</span> <span class="o">{</span>
-               <span class="kd">public</span> <span class="kt">void</span> <span class="nf">redo</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-               <span class="kd">public</span> <span class="kt">void</span> <span class="nf">undo</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+               <span class="kd">public</span> <span class="kt">void</span> <span class="nf">redo</span><span class="o">();</span>
+               <span class="kd">public</span> <span class="kt">void</span> <span class="nf">undo</span><span class="o">();</span>
         <span class="o">}</span>
 
-        <span class="n">History</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span><span class="o">.</span><span class="o">.</span><span class="o">.</span><span class="o">}</span>
+        <span class="n">History</span><span class="o">()</span> <span class="o">{...}</span>
 
-        <span class="kt">void</span> <span class="nf">addAction</span><span class="o">(</span><span class="n">Action</span> <span class="n">action</span><span class="o">)</span> <span class="o">{</span><span class="o">.</span><span class="o">.</span><span class="o">.</span><span class="o">}</span>
-        <span class="kt">void</span> <span class="nf">addFence</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span><span class="o">.</span><span class="o">.</span><span class="o">.</span><span class="o">}</span>
+        <span class="kt">void</span> <span class="nf">addAction</span><span class="o">(</span><span class="n">Action</span> <span class="n">action</span><span class="o">)</span> <span class="o">{...}</span>
+        <span class="kt">void</span> <span class="nf">addFence</span><span class="o">()</span> <span class="o">{...}</span>
 
-        <span class="kt">void</span> <span class="nf">undo</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span><span class="o">.</span><span class="o">.</span><span class="o">.</span><span class="o">}</span>
-        <span class="kt">void</span> <span class="nf">redo</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span><span class="o">.</span><span class="o">.</span><span class="o">.</span><span class="o">}</span>
+        <span class="kt">void</span> <span class="nf">undo</span><span class="o">()</span> <span class="o">{...}</span>
+        <span class="kt">void</span> <span class="nf">redo</span><span class="o">()</span> <span class="o">{...}</span>
 
         <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;</span> <span class="n">actions</span><span class="o">;</span>
 <span class="o">}</span>
@@ -369,6 +369,14 @@
 				<span class="post-nav-label">旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Philosophy of Software Design - 第八章 降低复杂性</span>
 			</a>
 		</div>
+		<script src="https://utteranc.es/client.js"
+			  repo="kyon0304/kyon0304.github.io"
+			  issue-term="pathname"
+			  label="Comment"
+			  theme="github-light"
+			  crossorigin="anonymous"
+			  async>
+		</script>
 
 	</main>
 

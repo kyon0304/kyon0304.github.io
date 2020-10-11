@@ -19,7 +19,7 @@
  git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来   这个页面展示了应用从各个地方加载的属性值，包括 application.">
 <meta itemprop="datePublished" content="2020-02-17T21:32:03&#43;08:00" />
 <meta itemprop="dateModified" content="2020-02-21T17:13:32&#43;08:00" />
-<meta itemprop="wordCount" content="958">
+<meta itemprop="wordCount" content="965">
 
 
 
@@ -57,7 +57,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>使线上 Spring 应用更好部署和调试</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.657bcb7af31123e4156b1a3d2ff60a636717e54ead74f882136b5114cf72b55e.css" integrity="sha256-ZXvLevMRI+QVaxo9L/YKY2cX5U6tdPiCE2tRFM9ytV4=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.229072f95be80b386f0c6e55a5b66bb197aeb647259a9aa950f2ee1d01f01051.css" integrity="sha256-IpBy+VvoCzhvDG5VpbZrsZeutkclmpqpUPLuHQHwEFE=" crossorigin="anonymous">
 	
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 </head>
@@ -169,12 +169,12 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!--</span><span class="c"> pom.xml </span><span class="c">--&gt;</span>
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!-- pom.xml --&gt;</span>
 
-<span class="c">&lt;!--</span><span class="c"> Spring Cloud Config Server </span><span class="c">--&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-cloud-config-server<span class="nt">&lt;/artifactId&gt;</span>
+<span class="c">&lt;!-- Spring Cloud Config Server --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-config-server<span class="nt">&lt;/artifactId&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></td></tr></table>
 </div>
@@ -195,8 +195,8 @@
 <span class="nd">@SpringBootApplication</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdminApplication</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AdminApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AdminApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -247,26 +247,26 @@ spring.cloud.config.server.git.uri<span class="o">=</span>file://<span class="si
 </span><span class="lnt">23
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!--</span><span class="c"> Spring Cloud Zookeeper Discovery </span><span class="c">--&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-cloud-starter-zookeeper-discovery<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version</span><span class="nt">&gt;</span>${spring-cloud-zk-discovery.version}<span class="nt">&lt;/version&gt;</span>
-    <span class="nt">&lt;exclusions</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;exclusion</span><span class="nt">&gt;</span>
-            <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!-- Spring Cloud Zookeeper Discovery --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-zookeeper-discovery<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>${spring-cloud-zk-discovery.version}<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;exclusions&gt;</span>
+        <span class="nt">&lt;exclusion&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
         <span class="nt">&lt;/exclusion&gt;</span>
     <span class="nt">&lt;/exclusions&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version</span><span class="nt">&gt;</span>3.4.10<span class="nt">&lt;/version&gt;</span>
-    <span class="nt">&lt;exclusions</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;exclusion</span><span class="nt">&gt;</span>
-            <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>slf4j-log4j12<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>3.4.10<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;exclusions&gt;</span>
+        <span class="nt">&lt;exclusion&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>slf4j-log4j12<span class="nt">&lt;/artifactId&gt;</span>
         <span class="nt">&lt;/exclusion&gt;</span>
     <span class="nt">&lt;/exclusions&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
@@ -291,8 +291,8 @@ spring.cloud.config.server.git.uri<span class="o">=</span>file://<span class="si
 <span class="nd">@SpringBootApplication</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdminApplication</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AdminApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AdminApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -358,31 +358,31 @@ spring.cloud.inetutils.ignoredInterfaces<span class="o">=</span>VMware.*, Hyper-
 </span><span class="lnt">28
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!--</span><span class="c"> spring cloud config client</span><span class="c">--&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-cloud-starter-config<span class="nt">&lt;/artifactId&gt;</span>
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!-- spring cloud config client--&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-config<span class="nt">&lt;/artifactId&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
-<span class="c">&lt;!--</span><span class="c"> discovery client </span><span class="c">--&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-cloud-starter-zookeeper-discovery<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version</span><span class="nt">&gt;</span>${spring-cloud-zk-discovery.version}<span class="nt">&lt;/version&gt;</span>
-    <span class="nt">&lt;exclusions</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;exclusion</span><span class="nt">&gt;</span>
-            <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
+<span class="c">&lt;!-- discovery client --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-zookeeper-discovery<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>${spring-cloud-zk-discovery.version}<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;exclusions&gt;</span>
+        <span class="nt">&lt;exclusion&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
         <span class="nt">&lt;/exclusion&gt;</span>
     <span class="nt">&lt;/exclusions&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version</span><span class="nt">&gt;</span>3.4.10<span class="nt">&lt;/version&gt;</span>
-    <span class="nt">&lt;exclusions</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;exclusion</span><span class="nt">&gt;</span>
-            <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>slf4j-log4j12<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>3.4.10<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;exclusions&gt;</span>
+        <span class="nt">&lt;exclusion&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.slf4j<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>slf4j-log4j12<span class="nt">&lt;/artifactId&gt;</span>
         <span class="nt">&lt;/exclusion&gt;</span>
     <span class="nt">&lt;/exclusions&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
@@ -413,14 +413,14 @@ spring.cloud.inetutils.ignoredInterfaces<span class="o">=</span>VMware.*, Hyper-
 <span class="nd">@EnableDiscoveryClient</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">AwsApplication</span> <span class="kd">extends</span> <span class="n">SpringBootServletInitializer</span> <span class="o">{</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">AwsApplication</span><span class="o">.</span><span class="na">class</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">AwsApplication</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">ApplicationContext</span> <span class="n">application</span> <span class="o">=</span> <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AwsApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">logger</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">beanDefinitionNames</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="na">getBeanDefinitionNames</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ApplicationContext</span> <span class="n">application</span> <span class="o">=</span> <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AwsApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">logger</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">String</span><span class="o">[]</span> <span class="n">beanDefinitionNames</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="na">getBeanDefinitionNames</span><span class="o">();</span>
             <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">beanName</span> <span class="o">:</span> <span class="n">beanDefinitionNames</span><span class="o">)</span> <span class="o">{</span>
-                <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="n">beanName</span><span class="o">)</span><span class="o">;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="n">beanName</span><span class="o">);</span>
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -489,11 +489,11 @@ spring.cloud.config.label<span class="o">=</span>master
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!--</span><span class="c"> spring</span><span class="c">-</span><span class="c">boot</span><span class="c">-</span><span class="c">actuator</span><span class="c">--&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-boot-starter-actuator<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version</span><span class="nt">&gt;</span>2.1.6.RELEASE<span class="nt">&lt;/version&gt;</span>
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!-- spring-boot-actuator--&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-actuator<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>2.1.6.RELEASE<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></td></tr></table>
 </div>
@@ -577,36 +577,36 @@ management.endpoint.loggers.enabled<span class="o">=</span><span class="nb">true
 </span><span class="lnt">36
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="nt">&lt;build</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;finalName</span><span class="nt">&gt;</span>cloud-adapter-aws<span class="nt">&lt;/finalName&gt;</span>
-    <span class="nt">&lt;plugins</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;plugin</span><span class="nt">&gt;</span>
-            <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-boot-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
-            <span class="nt">&lt;executions</span><span class="nt">&gt;</span>
-                <span class="nt">&lt;execution</span><span class="nt">&gt;</span>
-                    <span class="nt">&lt;goals</span><span class="nt">&gt;</span>
-                        <span class="nt">&lt;goal</span><span class="nt">&gt;</span>build-info<span class="nt">&lt;/goal&gt;</span>
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="nt">&lt;build&gt;</span>
+    <span class="nt">&lt;finalName&gt;</span>cloud-adapter-aws<span class="nt">&lt;/finalName&gt;</span>
+    <span class="nt">&lt;plugins&gt;</span>
+        <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spring-boot-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;executions&gt;</span>
+                <span class="nt">&lt;execution&gt;</span>
+                    <span class="nt">&lt;goals&gt;</span>
+                        <span class="nt">&lt;goal&gt;</span>build-info<span class="nt">&lt;/goal&gt;</span>
                     <span class="nt">&lt;/goals&gt;</span>
-                    <span class="nt">&lt;phase</span><span class="nt">&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
+                    <span class="nt">&lt;phase&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
                 <span class="nt">&lt;/execution&gt;</span>
             <span class="nt">&lt;/executions&gt;</span>
         <span class="nt">&lt;/plugin&gt;</span>
-        <span class="nt">&lt;plugin</span><span class="nt">&gt;</span>
-            <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>pl.project13.maven<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>git-commit-id-plugin<span class="nt">&lt;/artifactId&gt;</span>
-            <span class="nt">&lt;executions</span><span class="nt">&gt;</span>
-                <span class="nt">&lt;execution</span><span class="nt">&gt;</span>
-                    <span class="nt">&lt;id</span><span class="nt">&gt;</span>get-id-info<span class="nt">&lt;/id&gt;</span>
-                    <span class="nt">&lt;goals</span><span class="nt">&gt;</span>
-                        <span class="nt">&lt;goal</span><span class="nt">&gt;</span>revision<span class="nt">&lt;/goal&gt;</span>
+        <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>pl.project13.maven<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>git-commit-id-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;executions&gt;</span>
+                <span class="nt">&lt;execution&gt;</span>
+                    <span class="nt">&lt;id&gt;</span>get-id-info<span class="nt">&lt;/id&gt;</span>
+                    <span class="nt">&lt;goals&gt;</span>
+                        <span class="nt">&lt;goal&gt;</span>revision<span class="nt">&lt;/goal&gt;</span>
                     <span class="nt">&lt;/goals&gt;</span>
-                    <span class="nt">&lt;phase</span><span class="nt">&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
+                    <span class="nt">&lt;phase&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
                 <span class="nt">&lt;/execution&gt;</span>
-                <span class="nt">&lt;execution</span><span class="nt">&gt;</span>
-                    <span class="nt">&lt;id</span><span class="nt">&gt;</span>validate-git-info<span class="nt">&lt;/id&gt;</span>
-                    <span class="nt">&lt;goals</span><span class="nt">&gt;</span>
-                        <span class="nt">&lt;goal</span><span class="nt">&gt;</span>validateRevision<span class="nt">&lt;/goal&gt;</span>
+                <span class="nt">&lt;execution&gt;</span>
+                    <span class="nt">&lt;id&gt;</span>validate-git-info<span class="nt">&lt;/id&gt;</span>
+                    <span class="nt">&lt;goals&gt;</span>
+                        <span class="nt">&lt;goal&gt;</span>validateRevision<span class="nt">&lt;/goal&gt;</span>
                     <span class="nt">&lt;/goals&gt;</span>
                 <span class="nt">&lt;/execution&gt;</span>
             <span class="nt">&lt;/executions&gt;</span>
@@ -635,15 +635,15 @@ management.endpoint.loggers.enabled<span class="o">=</span><span class="nb">true
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!--</span><span class="c"> Spring Boot Admin Server </span><span class="c">--&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>de.codecentric<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-boot-admin-starter-server<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version</span><span class="nt">&gt;</span>${spring-boot-admin.version}<span class="nt">&lt;/version&gt;</span>
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="c">&lt;!-- Spring Boot Admin Server --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>de.codecentric<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-admin-starter-server<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>${spring-boot-admin.version}<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
-<span class="nt">&lt;dependency</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;groupId</span><span class="nt">&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId</span><span class="nt">&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></td></tr></table>
 </div>
@@ -668,8 +668,8 @@ management.endpoint.loggers.enabled<span class="o">=</span><span class="nb">true
 <span class="nd">@SpringBootApplication</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdminApplication</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AdminApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">AdminApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -762,6 +762,14 @@ spring.cloud.zookeeper.discovery.metadata.configPath<span class="o">=</span>/con
 				<span class="post-nav-label">旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Philosophy of Software Design 第十一章 设计两次</span>
 			</a>
 		</div>
+		<script src="https://utteranc.es/client.js"
+			  repo="kyon0304/kyon0304.github.io"
+			  issue-term="pathname"
+			  label="Comment"
+			  theme="github-light"
+			  crossorigin="anonymous"
+			  async>
+		</script>
 
 	</main>
 

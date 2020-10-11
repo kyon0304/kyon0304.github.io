@@ -21,7 +21,7 @@
       <description>现状 缓存只是提高访问速度，应用本身没有很高的并发访问量，缓存不可用时，数据库也能顶住。但是缓存挂掉以后，Spring CacheManager 默认会抛出异常，方法直接就异常退出了。
 目标 缓存不可用时，不影响应用正常运行，不影响接口正常返回。
 解决方案 方案一 最直接的方案，Spring 定义的 error handler 默认是抛出异常，覆盖 handler 并 catch 住异常不要抛出就可以不影响正常处理流程。
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29  public class CacheErrorLoggingHandler extends SimpleCacheErrorHandler { private Logger logger = LoggerFactory.getLogger(CacheErrorLoggingHandler.class); private ClientResources clientResources; public void setClientResources(ClientResources clientResources) { this.clientResources = clientResources; } @Override public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) { logger.</description>
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29  public class CacheErrorLoggingHandler extends SimpleCacheErrorHandler {private Logger logger = LoggerFactory.getLogger(CacheErrorLoggingHandler.class);private ClientResources clientResources;public void setClientResources(ClientResources clientResources) {this.clientResources = clientResources;}@Overridepublic void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {logger.</description>
     </item>
     
     <item>
@@ -178,7 +178,7 @@ $$C = ∑c_pt_p$$
 异常处理的代码天生比处理正常情况的代码更难编写。异常打断了代码正常的代码执行流程；而且通常意味着某些事情没有按预期进行。当异常发生时，程序可以通过两种方式处理它，每种方式都可能很复杂。第一种方式是不处理异常，继续前进完成进行中的工作。比如，如果出现了网络丢包，可以重新发送；如果数据损坏了，可以从冗余数据中恢复。第二种方式，中止当前的操作并上报异常。然而，中止操作可能会很复杂，因为异常发生时，系统可能处于不一致的状态（数据结构可能只被初始化了一部分）；异常处理代码必须恢复一致性，比如回滚所有异常发生前的改变。
 更进一步地，异常处理代码可能会引入更多的异常。考虑重发网络丢包的情况。可能数据包实际上并没有丢，只是简单地延迟了。在这个情景中，重发的数据包会导致重复的数据包到达对端；这就引入了新的对端必须处理的异常情况。或者，考虑从冗余数据中恢复丢失数据的情况：如果冗余数据也丢失了呢？在恢复期间再次发生的异常通常比第一个异常更加微妙和复杂。如果通过中止处理中的操作来处理异常，那么必须作为另外一个异常上报给调用者。为了防止产生无尽的异常链，开发者最终必须找到一种不引入更多异常的方式来处理异常。
 支持异常机制的语言通常是繁琐笨拙的，使得异常处理代码更加难以阅读。比如，参考下面的代码，使用 Java 的对象序列化和反序列化从一个文件中读出的推文：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27  try ( FileInputStream fileStream = new FileInputStream(fileName); BufferedInputStream bufferedStream = new BufferedInputStream(fileStream); ObjectInputStream objectStream = new ObjectInputStream(bufferedStream); ) { for (int i = 0; i &amp;lt; tweetsPerFile; i++) { tweets.</description>
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27  try (FileInputStream fileStream =new FileInputStream(fileName);BufferedInputStream bufferedStream =new BufferedInputStream(fileStream);ObjectInputStream objectStream =new ObjectInputStream(bufferedStream);) {for (int i = 0; i &amp;lt; tweetsPerFile; i++) {tweets.</description>
     </item>
     
     <item>
