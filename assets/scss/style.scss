@@ -7,19 +7,19 @@
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background: $GOFUN;
+  background: $scroll-backgroud;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: $GINNEZUMI;
+  background: $scroll-bar-backgroud;
 
   &:hover {
-    background: $SHIRONEZUMI;
+    background: $scroll-bar-thumb;
   }
 }
 
 html {
-  background: $light-grey;
+  background: $backgound;
   line-height: 1.6;
   letter-spacing: .06em;
   scroll-behavior: smooth;
@@ -34,10 +34,18 @@ textarea {
   font-family: $fonts;
 }
 
+::selection {
+  background-color: $theme;
+}
+
 .utterances {
   max-width: 960px;
 }
 
+h1, h2, h3 {
+  color: $head;
+  font-weight: normal;
+}
 // pre,
 // // code,
 // pre tt {
@@ -65,7 +73,7 @@ textarea {
 
 // code {
 //   color: #eee;
-//   background: $highlight-grey;
+//   background: $theme;
 //   border-radius: 3px;
 //   padding: 0 3px;
 //   margin: 0 4px;
@@ -90,7 +98,7 @@ blockquote {
 }
 
 a {
-  color: $text;
+  color: $link-text;
   text-decoration: none;
   border: none;
   transition-property: color;
@@ -98,8 +106,7 @@ a {
   transition-timing-function: ease-out;
 
   &:hover {
-    color: $RO;
-    text-shadow: 0 0 1px $SUMI;
+    color: $link-text-highlight;
   }
 }
 
@@ -233,7 +240,7 @@ hr {
   width: 100%;
   box-sizing: border-box;
   box-shadow: -1px -2px 3px rgba(0, 0, 0, 0.45);
-  background-color: $dark-grey;
+  background-color: $theme;
 }
 
 .hdr-wrapper {
@@ -256,7 +263,7 @@ hr {
 
     .has-children {
       padding-right: .5em;
-      border-right: 2px solid $highlight-grey;
+      border-right: 2px solid $theme;
     }
 
     .sub-menu > a{
@@ -305,7 +312,7 @@ hr {
   z-index: 1;
   box-sizing: border-box;
   box-shadow: -1px -2px 3px 0px rgba(0, 0, 0, 0.45);
-  background-color: $dark-grey;
+  background-color: $theme;
 
   ul {
     list-style: none;
@@ -472,7 +479,7 @@ p.img-404 {
   }
 
   .post-item {
-    border-bottom: 1px $highlight-grey dashed;
+    border-bottom: 1px $theme dashed;
 
     a {
       display: flex;
@@ -647,7 +654,7 @@ hr.post-end {
   text-decoration: none;
   padding: 2px;
   border-radius: 2px;
-  background-color: $midnightblue;
+  background-color: $theme;
 }
 
 .post-info {
@@ -691,7 +698,7 @@ hr.post-end {
 }
 
 #TableOfContents {
-  font-size: .8em;
+  font-size: .9em;
   @include dimmed;
 
   ul {
@@ -718,7 +725,6 @@ hr.post-end {
   justify-content: space-between;
   margin-top: 1.5em;
   margin-bottom: 2.5em;
-  font-size: 1.2em;
 
   a {
     flex-basis: 50%;
