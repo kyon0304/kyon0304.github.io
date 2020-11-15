@@ -5,6 +5,7 @@ lastMod: 2020-09-29T15:40:36+08:00
 tags: [spring, cache, redis]
 enableRelated: false
 enableOutdatedInfoWarning: true
+description: 缓存只是提高访问速度，如何配置 Spring CacheManager，使得缓存不可用时，不影响应用正常运行，不影响接口正常返回。
 ---
 
 ## 现状

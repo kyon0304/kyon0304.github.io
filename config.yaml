@@ -51,6 +51,8 @@ params:
   themeColor: '#494f5c'
   homeSubtitle: 个人博客，技术学习笔记夹杂一些随笔
   footerCopyright: ' &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
+  images:
+    - /mstile-150x150.png
 
   justifyContent: true
 

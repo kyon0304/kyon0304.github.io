@@ -5,6 +5,8 @@ lastMod: 2020-02-18T00:04:03+08:00
 tags: ["实操", "spring", "配置中心", "spring boot", "服务发现"]
 enableRelated: false
 enableOutdatedInfoWarning: true
+images:
+- /media/spring-config/figure-spring-config-1.png
 ---
 
 运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server 地址，在 k8s 中部署也更自然。
