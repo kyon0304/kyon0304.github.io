@@ -15,6 +15,7 @@
 <meta itemprop="datePublished" content="2019-11-03T13:01:01&#43;08:00" />
 <meta itemprop="dateModified" content="2020-01-07T13:56:08&#43;08:00" />
 <meta itemprop="wordCount" content="445">
+<meta itemprop="image" content="https://kyon.life/static/mstile-150x150.png"/>
 
 
 
@@ -25,9 +26,12 @@
  B1：管理员在 Disconf-web 平台上更新配置。 B2：Disconf-web 平台发送配置更新消息给ZK指定的结点。 B3：ZK通知 Disconf-cient 模块。 B4：与A4一样。 B5：与A5一样。 B6：基本与A4一样，唯一的区别是，这里还会将配置的新值注入到配置实体里。  主备机切换事件C： 以下按顺序发生。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/config-server-with-spring-boot-and-disconf/" />
+<meta property="og:image" content="https://kyon.life/static/mstile-150x150.png"/>
 <meta property="article:published_time" content="2019-11-03T13:01:01+08:00" />
 <meta property="article:modified_time" content="2020-01-07T13:56:08+08:00" />
-<meta name="twitter:card" content="summary"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://kyon.life/static/mstile-150x150.png"/>
+
 <meta name="twitter:title" content="基于 Spring Boot &#43; Disconf 的配置中心"/>
 <meta name="twitter:description" content="disconf 简介 disconf 是百度的某位员工开源的分布式配置中心，文档地址，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化查看/更新配置。相比于 spring boot admin 中提供的 refresh context 功能，优势在于可以一次更改，应用于所有同类机器配置，而 spring boot admin 需要对每个实例进行单独修改。除此之外，spring boot admin 在界面及交互上吊打 disconf。
 设计架构  server 端包含 springmvc 用于处理业务逻辑，mysql 用于存储配置文件，两个 redis 用于用户登录，zk 用于配置更新的通知， web 端用于用户登录后统一查看/更新配置 client 端以 pom 方式引入项目内即可（需要魔改一下，见后）  运行流程 启动事件A： 以下按顺序发生。

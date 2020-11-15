@@ -17,6 +17,7 @@ http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层�
 <meta itemprop="datePublished" content="2020-01-06T10:13:03&#43;08:00" />
 <meta itemprop="dateModified" content="2020-01-09T20:05:56&#43;08:00" />
 <meta itemprop="wordCount" content="131">
+<meta itemprop="image" content="https://kyon.life/static/mstile-150x150.png"/>
 
 
 
@@ -29,9 +30,12 @@ http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http
 http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/http3/" />
+<meta property="og:image" content="https://kyon.life/static/mstile-150x150.png"/>
 <meta property="article:published_time" content="2020-01-06T10:13:03+08:00" />
 <meta property="article:modified_time" content="2020-01-09T20:05:56+08:00" />
-<meta name="twitter:card" content="summary"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://kyon.life/static/mstile-150x150.png"/>
+
 <meta name="twitter:title" content="HTTP/3 的过去、现在及将来"/>
 <meta name="twitter:description" content="看了一篇 cloudflare 讲 http/3 的文章，http/3 on quic，底层都不再依赖 tcp 协议了而是用 quic 协议。
 以下是三代 http 协议的对比，使用中遇到的问题以及解决方案。

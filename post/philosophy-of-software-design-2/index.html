@@ -34,6 +34,7 @@ $$C = ∑c_pt_p$$
 <meta itemprop="datePublished" content="2020-02-19T12:15:39&#43;08:00" />
 <meta itemprop="dateModified" content="2020-02-21T22:29:46&#43;08:00" />
 <meta itemprop="wordCount" content="83">
+<meta itemprop="image" content="https://kyon.life/static/mstile-150x150.png"/>
 
 
 
@@ -63,9 +64,12 @@ $$C = ∑c_pt_p$$
 复杂性的第二个原因是模糊。当重要信息不明显时，模糊就出现了。一个简单的例子是，变量名过于简单，无法携带很多有用信息（比如 时间）。或者，变量的文档可能没有它的单位，所以只能到使用这个变量的地方查看。当依赖的存在不明显时，模糊经常和依赖相关。比如，如果系统中要新增一个错误状态码，可能也需要在存储了每个状态码的文字消息的表中新增一条记录，但是对于看状态定义的程序员来说，消息表的存在可能不够明显。不一致也是模糊的一个重要来源：如果相同的变量名用于两种不同目的，对开发者来说，一个具体的变量服务于哪个目的就不明显了。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-2/" />
+<meta property="og:image" content="https://kyon.life/static/mstile-150x150.png"/>
 <meta property="article:published_time" content="2020-02-19T12:15:39+08:00" />
 <meta property="article:modified_time" content="2020-02-21T22:29:46+08:00" />
-<meta name="twitter:card" content="summary"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://kyon.life/static/mstile-150x150.png"/>
+
 <meta name="twitter:title" content="Philosophy of Software Design 第二章 复杂度的天性"/>
 <meta name="twitter:description" content="这本书是关于如何设计软件系统使得它们的复杂度最小化。第一步是了解敌人。到底什么是“复杂性”？你怎么知道一个系统是不必要的复杂？什么会导致系统变复杂？这章会在较高层级解决这些问题；余下的章节会就具体结构特征向你展示如何在较低层级识别复杂度。
 识别复杂性是设计技能中一项关键的能力。它使得你可以在投入大量精力前发现问题，并且在许多可选项中做出好选择。分辨出一个设计是否简洁要比创造一个简洁的设计容易，但是一旦你可以识别出一个系统过于复杂，你就可以使用这个能力来指导你的设计哲学向着简单性出发。如果一个设计看上去很复杂，尝试一种不同的方式然后看看是否变简单了。随着时间流逝，你会注意到一些特定的技术会得到更简单的设计，另外一些则和复杂性相关。这将使得你能更快地产出更简洁的设计。
