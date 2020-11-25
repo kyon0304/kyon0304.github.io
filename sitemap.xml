@@ -10,43 +10,78 @@
   </url>
   
   <url>
-    <loc>https://kyon.life/tags/cache/</loc>
-    <lastmod>2020-09-29T16:13:42+08:00</lastmod>
+    <loc>https://kyon.life/tags/java/</loc>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/jvm/</loc>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/post/</loc>
-    <lastmod>2020-09-29T16:13:42+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/redis/</loc>
-    <lastmod>2020-09-29T16:13:42+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/spring/</loc>
-    <lastmod>2020-09-29T16:13:42+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/post/dynamic-switch-cache-in-spring/</loc>
-    <lastmod>2020-09-29T16:13:42+08:00</lastmod>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/tags/</loc>
-    <lastmod>2020-09-29T16:13:42+08:00</lastmod>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/</loc>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/post/java-garbage-collector/</loc>
+    <lastmod>2020-11-25T23:07:05+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/cache/</loc>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/redis/</loc>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/tags/spring/</loc>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kyon.life/post/dynamic-switch-cache-in-spring/</loc>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -95,7 +130,7 @@
   
   <url>
     <loc>https://kyon.life/tags/%E5%AE%9E%E6%93%8D/</loc>
-    <lastmod>2020-02-21T22:29:46+08:00</lastmod>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -116,28 +151,28 @@
   
   <url>
     <loc>https://kyon.life/tags/spring-boot/</loc>
-    <lastmod>2020-02-21T17:13:32+08:00</lastmod>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/post/spring-config/</loc>
-    <lastmod>2020-02-21T17:13:32+08:00</lastmod>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/</loc>
-    <lastmod>2020-02-21T17:13:32+08:00</lastmod>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/</loc>
-    <lastmod>2020-02-21T17:13:32+08:00</lastmod>
+    <lastmod>2020-11-15T15:57:16+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -187,13 +222,6 @@
   <url>
     <loc>https://kyon.life/post/http3/</loc>
     <lastmod>2020-01-09T20:05:56+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kyon.life/tags/java/</loc>
-    <lastmod>2020-01-06T15:47:24+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
