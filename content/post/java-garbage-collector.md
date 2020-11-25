@@ -1,10 +1,13 @@
 ---
 title: "第三章 垃圾收集器与内存分配策略"
 date: 2020-11-23T21:53:51+08:00
-descritption: 深入理解 Java 虚拟机笔记，介绍了垃圾回收相关算法、技术及常见垃圾回收器
+description: 深入理解 Java 虚拟机笔记，介绍了垃圾回收相关算法、技术及常见垃圾回收器
 tags: [java, jvm, 笔记, 深入理解 Java 虚拟机]
+toc: true
 images:
 - https://res.craft.do/user/full/545d879d-d832-254a-24fe-4574365d504e/doc/1635AC17-01D4-4C40-A8E3-447A3820396A/98579203-1204-4AF6-9E86-462C1098D2E4_2
+- https://res.craft.do/user/full/545d879d-d832-254a-24fe-4574365d504e/doc/1635AC17-01D4-4C40-A8E3-447A3820396A/31B3A39D-585E-467F-BC12-C79AD01043C2_2
+- https://res.craft.do/user/full/545d879d-d832-254a-24fe-4574365d504e/doc/1635AC17-01D4-4C40-A8E3-447A3820396A/D33CF3A3-B2F0-40EE-B0FA-8072F19B264E_2
 ---
 
 ## 3.3 垃圾收集算法
