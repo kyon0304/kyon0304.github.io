@@ -9,8 +9,8 @@
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="第三章 垃圾收集器与内存分配策略">
 <meta itemprop="description" content="深入理解 Java 虚拟机笔记，介绍了垃圾回收相关算法、技术及常见垃圾回收器">
-<meta itemprop="datePublished" content="2020-11-23T21:53:51&#43;08:00" />
-<meta itemprop="dateModified" content="2020-11-25T23:07:05&#43;08:00" />
+<meta itemprop="datePublished" content="2020-11-23T21:53:51+08:00" />
+<meta itemprop="dateModified" content="2020-11-25T23:07:05+08:00" />
 <meta itemprop="wordCount" content="660">
 <meta itemprop="image" content="https://res.craft.do/user/full/545d879d-d832-254a-24fe-4574365d504e/doc/1635AC17-01D4-4C40-A8E3-447A3820396A/98579203-1204-4AF6-9E86-462C1098D2E4_2">
 <meta itemprop="image" content="https://res.craft.do/user/full/545d879d-d832-254a-24fe-4574365d504e/doc/1635AC17-01D4-4C40-A8E3-447A3820396A/31B3A39D-585E-467F-BC12-C79AD01043C2_2">
@@ -18,7 +18,8 @@
 
 
 
-<meta itemprop="keywords" content="java,jvm,笔记,深入理解 Java 虚拟机," /><meta property="og:title" content="第三章 垃圾收集器与内存分配策略" />
+<meta itemprop="keywords" content="java,jvm,笔记,深入理解 Java 虚拟机," />
+<meta property="og:title" content="第三章 垃圾收集器与内存分配策略" />
 <meta property="og:description" content="深入理解 Java 虚拟机笔记，介绍了垃圾回收相关算法、技术及常见垃圾回收器" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/java-garbage-collector/" />
@@ -424,6 +425,9 @@
 		</aside>
 	</main>
 	<div class="post-nav thin">
+		<a class="next-post" href="https://kyon.life/post/tricks-with-feign/">
+			<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;新</span><br><span>使用 spring cloud openfeign 的一些小技巧</span>
+		</a>
 		<a class="prev-post" href="https://kyon.life/post/dynamic-switch-cache-in-spring/">
 			<span class="post-nav-label">旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Spring 框架缓存故障自动切换</span>
 		</a>
@@ -440,7 +444,7 @@
 </div>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2021 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
 			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>

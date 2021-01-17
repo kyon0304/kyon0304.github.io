@@ -10,18 +10,19 @@
 <meta itemprop="name" content="Philosophy of Software Design - 第七章 不同层，不同抽象">
 <meta itemprop="description" content="软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不同层中的操作，就会发现每一层的抽象都会发生变化。比如：
  在文件系统中，最上层实现了文件抽象。一个文件包含一个可变长的比特数组，并且支持不定长的读写更新。文件系统中低一层的抽象实现了固定大小硬盘块的内存缓存；调用者可以假设频繁使用的块会驻留在内存中以供快速获取。最底层是硬件驱动，负责在二级存储设备和内存之间搬运数据块。 在网络传输协议比如 TCP 中，最上层提供的抽象是机器之间可信赖的比特流传输。这是建立在低一层的尽力而为传输服务之上的：大部分数据包都可以成功送达，但是部分包会丢失或者乱序。  7.1 Pass-through 方法 当相邻的层具有相仿的抽象时，问题会以 pass-through 方法的方式表现出来。pass-through 方法的签名和它调用的方法一样或类似，除了调用其他方法基本没有实现别的功能。比如，一个学生项目实现的文本编辑界面中有个类基本都是 pass-through 方法。下面是这个类的摘要：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... {private TextArea textArea;private TextDocumentListener listener;...public Character getLastTypedCharacter() {return textArea.getLastTypedCharacter();}public int getCursorOffset() {return textArea.getCursorOffset();}public void insertString(String textToInsert, int offset) {textArea.">
-<meta itemprop="datePublished" content="2020-01-23T16:37:33&#43;08:00" />
-<meta itemprop="dateModified" content="2020-02-21T17:13:32&#43;08:00" />
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... { private TextArea textArea; private TextDocumentListener listener; ... public Character getLastTypedCharacter() { return textArea.getLastTypedCharacter(); } public int getCursorOffset() { return textArea.getCursorOffset(); } public void insertString(String textToInsert, int offset) { textArea.">
+<meta itemprop="datePublished" content="2020-01-23T16:37:33+08:00" />
+<meta itemprop="dateModified" content="2020-02-21T17:13:32+08:00" />
 <meta itemprop="wordCount" content="308">
 <meta itemprop="image" content="https://kyon.life/mstile-150x150.png"/>
 
 
 
-<meta itemprop="keywords" content="鹦鹉学舌,学习笔记," /><meta property="og:title" content="Philosophy of Software Design - 第七章 不同层，不同抽象" />
+<meta itemprop="keywords" content="鹦鹉学舌,学习笔记," />
+<meta property="og:title" content="Philosophy of Software Design - 第七章 不同层，不同抽象" />
 <meta property="og:description" content="软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不同层中的操作，就会发现每一层的抽象都会发生变化。比如：
  在文件系统中，最上层实现了文件抽象。一个文件包含一个可变长的比特数组，并且支持不定长的读写更新。文件系统中低一层的抽象实现了固定大小硬盘块的内存缓存；调用者可以假设频繁使用的块会驻留在内存中以供快速获取。最底层是硬件驱动，负责在二级存储设备和内存之间搬运数据块。 在网络传输协议比如 TCP 中，最上层提供的抽象是机器之间可信赖的比特流传输。这是建立在低一层的尽力而为传输服务之上的：大部分数据包都可以成功送达，但是部分包会丢失或者乱序。  7.1 Pass-through 方法 当相邻的层具有相仿的抽象时，问题会以 pass-through 方法的方式表现出来。pass-through 方法的签名和它调用的方法一样或类似，除了调用其他方法基本没有实现别的功能。比如，一个学生项目实现的文本编辑界面中有个类基本都是 pass-through 方法。下面是这个类的摘要：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... {private TextArea textArea;private TextDocumentListener listener;...public Character getLastTypedCharacter() {return textArea.getLastTypedCharacter();}public int getCursorOffset() {return textArea.getCursorOffset();}public void insertString(String textToInsert, int offset) {textArea." />
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... { private TextArea textArea; private TextDocumentListener listener; ... public Character getLastTypedCharacter() { return textArea.getLastTypedCharacter(); } public int getCursorOffset() { return textArea.getCursorOffset(); } public void insertString(String textToInsert, int offset) { textArea." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design/" />
 <meta property="og:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -44,7 +45,7 @@
 <meta name="twitter:title" content="Philosophy of Software Design - 第七章 不同层，不同抽象"/>
 <meta name="twitter:description" content="软件系统是由不同层构成的，高层使用底层提供的功能。在一个设计良好的系统中，每一层都提供有别于其他层的抽象，如果你触发一个函数调用并跟踪它在不同层中的操作，就会发现每一层的抽象都会发生变化。比如：
  在文件系统中，最上层实现了文件抽象。一个文件包含一个可变长的比特数组，并且支持不定长的读写更新。文件系统中低一层的抽象实现了固定大小硬盘块的内存缓存；调用者可以假设频繁使用的块会驻留在内存中以供快速获取。最底层是硬件驱动，负责在二级存储设备和内存之间搬运数据块。 在网络传输协议比如 TCP 中，最上层提供的抽象是机器之间可信赖的比特流传输。这是建立在低一层的尽力而为传输服务之上的：大部分数据包都可以成功送达，但是部分包会丢失或者乱序。  7.1 Pass-through 方法 当相邻的层具有相仿的抽象时，问题会以 pass-through 方法的方式表现出来。pass-through 方法的签名和它调用的方法一样或类似，除了调用其他方法基本没有实现别的功能。比如，一个学生项目实现的文本编辑界面中有个类基本都是 pass-through 方法。下面是这个类的摘要：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... {private TextArea textArea;private TextDocumentListener listener;...public Character getLastTypedCharacter() {return textArea.getLastTypedCharacter();}public int getCursorOffset() {return textArea.getCursorOffset();}public void insertString(String textToInsert, int offset) {textArea."/>
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... { private TextArea textArea; private TextDocumentListener listener; ... public Character getLastTypedCharacter() { return textArea.getLastTypedCharacter(); } public int getCursorOffset() { return textArea.getCursorOffset(); } public void insertString(String textToInsert, int offset) { textArea."/>
 
 </head>
 
@@ -267,7 +268,7 @@
 </div>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2021 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
 			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>

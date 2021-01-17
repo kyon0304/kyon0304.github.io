@@ -18,14 +18,15 @@
 9.3 合并以删减重复 如果你发现相同模式的代码一再重复，找一找可以避免重复的代码。一种办法是将重复的代码重构到一个单独的方法中，并将重复代码片段替换为对这个方法的调用。当重复的代码片段很长而且替换方法的签名比较简单时，这种办法是最有效的。如果代码片段只有一两行，用方法调用替换可能带来不了什么收益。如果代码片段和它的上下文环境交互非常复杂（比如会读写大量的本地变量），那么替换方法可能需要一个复杂的签名（比如许多按引用传递的参数），这将降低它的价值。
   图 9.1：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，LOG 语句在几种不同的包类型中重复。
   另一种降低重复的办法是，重构代码使得有问题的代码只需要一个地方执行。假设你正在编写一个需要在几个地方返回错误的方法，而每个返回之前都需要执行相同的清理动作（见图 9.1）。如果你使用的编程语言支持 goto，你可以将清理代码放到方法的最后面，然后在每一处需要返回错误时使用 goto 进入。参见图 9.">
-<meta itemprop="datePublished" content="2020-02-06T10:53:42&#43;08:00" />
-<meta itemprop="dateModified" content="2020-02-21T17:13:32&#43;08:00" />
+<meta itemprop="datePublished" content="2020-02-06T10:53:42+08:00" />
+<meta itemprop="dateModified" content="2020-02-21T17:13:32+08:00" />
 <meta itemprop="wordCount" content="415">
 <meta itemprop="image" content="https://kyon.life/mstile-150x150.png"/>
 
 
 
-<meta itemprop="keywords" content="鹦鹉学舌,学习笔记," /><meta property="og:title" content="Philosophy of Software Design 第九章 - 合并还是拆分" />
+<meta itemprop="keywords" content="鹦鹉学舌,学习笔记," />
+<meta property="og:title" content="Philosophy of Software Design 第九章 - 合并还是拆分" />
 <meta property="og:description" content="软件设计中最基本的问题之一是：假定有两个不同的功能，应当在同一个地方实现它们，还是分开实现？这个问题存在于系统的各个层级：函数、方法、类和服务。比如，缓冲应该包含在提供基于流的文件 I/O 服务的类中，还是应该在单独的类中？HTTP 请求解析应该完全在同一个方法中实现，还是应该拆分到多个方法（甚至是多个类中）？这章讨论了做这些决定时需要考虑的因素。其中一些因素在前几章中已经讨论过，但是为了完整性，这里会再说一遍。
 当决定应该合并还是拆开时，目标是降低整个系统的复杂度并提高它的模块化程度。看上去最好的办法是，将系统拆分成许多小组件：组件越小，每个组件就可能越简单。然而，过度拆分会增加额外的复杂度：
  一些复杂性来自于组件的数量：组件越多，跟踪它们就越困难，而且也更难定位某个组件。过度拆分通常会导致更多的接口，而每一个新接口都会增加复杂度。 过度拆分会需要额外的代码来管理组件。比如，一段代码使用一个对象，在拆分后变为多个，这段代码就不得不由管理单个对象变为管理多个。 过度拆分会创造割裂：过度拆分的组件会远比拆分前更分散。比如，拆分前方法本来在单个类中，拆分后可能会散布在多个类里，还可能会在不同的文件。这种割裂使得开发者难以同时看到整个组件，甚至意识不到它们的存在。如果组件真的独立，那分离开是没问题的：这使得开发者每次专注于一个组件，而不会被其他组件分神。另一方面，如果组件间有依赖，那分离就有问题了：开发者将不得不在组件之间来回跳转。更糟的是，他们可能都意识不到有依赖，从而导致 bug 的产生。 过度拆分可能会导致重复：原来在同一个实例中出现的代码，拆分后就需要出现在每个拆分过的组件中。  最好将将密切关联的不同代码片段组合到。但如果不同片段之间没有关系，它们最好分开。下面是一些两段代码之间有关联的迹象：
@@ -384,7 +385,7 @@
 </div>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2021 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
 			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>

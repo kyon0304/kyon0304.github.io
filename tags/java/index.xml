@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 23 Nov 2020 21:53:51 +0800</lastBuildDate>
-    
-	<atom:link href="https://kyon.life/tags/java/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 17 Jan 2021 15:10:12 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用 spring cloud openfeign 的一些小技巧</title>
+      <link>https://kyon.life/post/tricks-with-feign/</link>
+      <pubDate>Sun, 17 Jan 2021 15:10:12 +0800</pubDate>
+      
+      <guid>https://kyon.life/post/tricks-with-feign/</guid>
+      <description>spring cloud openfeign（以下简称 feign） 通过一个额外定义的 interface 文件作为接口定义，可以将对外提供的 HTTP 接口转换为 API 接口，提供方和调用方需要共同依赖接口文件，将隐式的依赖关系显性表示出来。而且在这个接口文件上也可以大作文章，比如配置服务发现、接口拦截操作等。
+一个最简单的 feign 接口文件 DemoClient.java：
+1 2 3 4 5 6 7 8  package com.example.demo; @FeignClient(name=&amp;#34;demo&amp;#34;, url=&amp;#34;http://127.0.0.1:8081/&amp;#34;) public interface DemoClient { @GetMapping(&amp;#34;/hello&amp;#34;) String hello(@RequestParam String name); }   name 为全局唯一，是这个 FeignClient 的唯一标识，url 为提供方的接口地址。理论上 FeignClient 文件由接口提供方作为合约文件给到调用方，但是即使提供方未提供，只要提供方暴露了 HTTP 接口，那么调用方就可以通过定义 FeignClient 文件将 HTTP 接口调用转换为 API 调用。
+调用方使用 DemoClient 示例：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14  package com.</description>
+    </item>
     
     <item>
       <title>第三章 垃圾收集器与内存分配策略</title>
@@ -42,7 +51,7 @@
 可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
 ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
 ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&amp;lt;T&amp;gt; { static class ThreadLocalMap {static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?</description>
+1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&amp;lt;T&amp;gt; { static class ThreadLocalMap { static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?</description>
     </item>
     
   </channel>

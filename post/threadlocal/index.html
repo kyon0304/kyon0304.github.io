@@ -14,22 +14,23 @@
 可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
 ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
 ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&lt;T&gt; { static class ThreadLocalMap {static class Entry extends WeakReference&lt;ThreadLocal&lt;?">
-<meta itemprop="datePublished" content="2019-12-22T18:24:10&#43;08:00" />
-<meta itemprop="dateModified" content="2020-01-06T15:47:24&#43;08:00" />
+1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&lt;T&gt; { static class ThreadLocalMap { static class Entry extends WeakReference&lt;ThreadLocal&lt;?">
+<meta itemprop="datePublished" content="2019-12-22T18:24:10+08:00" />
+<meta itemprop="dateModified" content="2020-01-06T15:47:24+08:00" />
 <meta itemprop="wordCount" content="1151">
 <meta itemprop="image" content="https://kyon.life/mstile-150x150.png"/>
 
 
 
-<meta itemprop="keywords" content="java,学习笔记," /><meta property="og:title" content="Threadlocal 梳理" />
+<meta itemprop="keywords" content="java,学习笔记," />
+<meta property="og:title" content="Threadlocal 梳理" />
 <meta property="og:description" content="使用场景 用于同一线程中，不同类、不同方法间数据共享。没有 ThreadLocal 的帮助，这些需要共享的数据，就必须通过参数、返回值进行传递，将会变得非常繁琐。常见的使用场景，比如存储登录用户信息，同一个 request 的 trace id 等。
 实现 ThreadLocalMap 是 ThreadLocal 的静态内部类，Entry 是 ThreadLocalMap 的静态内部类，其中 Entry 是弱引用的子类，referent 指向 threadlocal 对象，value 成员变量则是真正存储用户设置的值的地方。
 如何存储 首先，用一张图来表示一下 threadlocal 是如何存储数据的：
 可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
 ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
 ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&lt;T&gt; { static class ThreadLocalMap {static class Entry extends WeakReference&lt;ThreadLocal&lt;?" />
+1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&lt;T&gt; { static class ThreadLocalMap { static class Entry extends WeakReference&lt;ThreadLocal&lt;?" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/threadlocal/" />
 <meta property="og:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -56,7 +57,7 @@ ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
 可以看到，用户关心的数据存储在 ThreadLocal 内部静态类 Entry 的 value 成员变量中，Entry 类型的变量有多个，组成数组 table，由 ThreadLocalMap 的实例所持有，而 ThreadLocalMap 实例则是线程的成员变量 threadlocals。因此，当多线程环境下访问同一个类实例的 ThreadLocal 变量时，其实每个线程都有各自的 ThreadLocalMap 变量 threadlocals，从而持有各自的 Entry 及其 value。这就是 ThreadLocal 如何做到线程安全的，不同线程使用的是不同副本。
 ThreadLocalMap 内部维护了一个 Entry[] 类型的数组变量 table，索引 Entry 的实例时，有两种方式，一种是通过 hashcode 计算快速定位，另外一种是快速定位失效时，使用 threadlocal 实例循环比对 entry 的 referant。
 ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&lt;T&gt; { static class ThreadLocalMap {static class Entry extends WeakReference&lt;ThreadLocal&lt;?"/>
+1 2 3 4 5 6 7 8 9 10 11 12 13  public class ThreadLocal&lt;T&gt; { static class ThreadLocalMap { static class Entry extends WeakReference&lt;ThreadLocal&lt;?"/>
 
 </head>
 
@@ -690,7 +691,7 @@ ThreadLocal, ThreadLocalMap, Entry 三者的套娃定义如下：
 </div>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2021 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
 			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>

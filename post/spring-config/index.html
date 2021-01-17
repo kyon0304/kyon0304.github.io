@@ -17,14 +17,15 @@
  这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
 页面上我会比较关注的部分，
  git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来   这个页面展示了应用从各个地方加载的属性值，包括 application.">
-<meta itemprop="datePublished" content="2020-02-17T21:32:03&#43;08:00" />
-<meta itemprop="dateModified" content="2020-11-15T15:57:16&#43;08:00" />
+<meta itemprop="datePublished" content="2020-02-17T21:32:03+08:00" />
+<meta itemprop="dateModified" content="2020-11-15T15:57:16+08:00" />
 <meta itemprop="wordCount" content="965">
 <meta itemprop="image" content="https://kyon.life/media/spring-config/figure-spring-config-1.png">
 
 
 
-<meta itemprop="keywords" content="实操,spring,配置中心,spring boot,服务发现," /><meta property="og:title" content="使线上 Spring 应用更好部署和调试" />
+<meta itemprop="keywords" content="实操,spring,配置中心,spring boot,服务发现," />
+<meta property="og:title" content="使线上 Spring 应用更好部署和调试" />
 <meta property="og:description" content="运行一个配置中心，可以方便快捷的更改线上服务多个实例的配置（通过 git commit&amp;git push），配置中心通过服务发现暴露自己的 IP，client 中无需写死 server 地址，在 k8s 中部署也更自然。
 运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。
 要做到以上的事情，主要涉及四个组件的配置：
@@ -315,7 +316,7 @@ spring.cloud.config.server.git.uri<span class="o">=</span>file://<span class="si
 <td class="lntd">
 <pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1">################################### Spring Cloud ZooKeeper Discovery Start ##############################################</span>
 spring.cloud.zookeeper.discovery.enabled<span class="o">=</span><span class="nb">true</span>
-<span class="c1">#当前服务在 zk 注册时，使用 IP 进行注册，不配置的话默认会取 hostname，对于设置了自己 hostname 但是调用方无法解析的情况不够友好</span>         
+<span class="c1">#当前服务在 zk 注册时，使用 IP 进行注册，不配置的话默认会取 hostname，对于设置了自己 hostname 但是调用方无法解析的情况不够友好         </span>
 spring.cloud.zookeeper.discovery.prefer-ip-address<span class="o">=</span><span class="nb">true</span> 
 <span class="c1">#配置 spring cloud zk discovery 使用的 zk 地址</span>
 spring.cloud.zookeeper.connect-string<span class="o">=</span>192.168.31.171:2181
@@ -688,8 +689,8 @@ management.endpoint.loggers.enabled<span class="o">=</span><span class="nb">true
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># spring-cloud-config server 对外提供服务的网址新增 /config。</span>
-<span class="c1"># 比如原来 cloud-adapter-aws client 获取 dev 环境属性的请求是 http://localhost:8888/cloud-adapter-aws/dev</span> 
-<span class="c1"># 配置这个属性后变为 http://localhost:8888/config/cloud-adapter-aws/dev</span> 
+<span class="c1"># 比如原来 cloud-adapter-aws client 获取 dev 环境属性的请求是 http://localhost:8888/cloud-adapter-aws/dev </span>
+<span class="c1"># 配置这个属性后变为 http://localhost:8888/config/cloud-adapter-aws/dev </span>
 spring.cloud.config.server.prefix<span class="o">=</span>/config
 <span class="c1"># 告知 client 从 server 拉取配置时，需要在 uri /config 下，否则 client 就会从根目录去拉取</span>
 spring.cloud.zookeeper.discovery.metadata.configPath<span class="o">=</span>/config
@@ -777,7 +778,7 @@ spring.cloud.zookeeper.discovery.metadata.configPath<span class="o">=</span>/con
 </div>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2021 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
 			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>

@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 23 Nov 2020 21:53:51 +0800</lastBuildDate>
-    
-	<atom:link href="https://kyon.life/tags/jvm/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 23 Nov 2020 21:53:51 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/jvm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>第三章 垃圾收集器与内存分配策略</title>
       <link>https://kyon.life/post/java-garbage-collector/</link>

@@ -19,14 +19,15 @@
 这样巨大的便利和效率提升也带来了全新的使用锁定。混合/多云配置，看上去最近吸引了很多架构师的注意，是一个考虑使用锁定时的好例子。假设你有一个应用想上云，非常容易办到。但是从架构师的角度来说，有许多选择和更多的权衡，尤其是和使用锁定有关时。
 你可能想把应用部署到容器中。这听起来不错，但是要用 AWS 的 Elastic Container Service(ECS) 吗？毕竟，这是亚马逊云专有的。倾向于 Kubernetes？它是开源的并且可以运行在大多数环境中，包括自有环境 (on premises)。问题解决了吗？并没有完全解决 —— 你现在和 Kubernetes 绑定了 —— 想想那些至关重要的 YAML 文件吧！所以你从一个使用锁定跳到了另外一个，不是吗？而且如果你使用了托管的 Kubernetes 服务，比如 Google 的 GKE 或 Amazon 的 EKS，你可能还被限制到 Kubernetes 的一个特定版本和这些云服务商的专有扩展中。
 如果你想在自有环境中运行应用，你也可以选择 AWS Outposts，这样你就会有一些选择权。但是这说到底还是专有的。它和 VMWare 集成，这就导致你可能已经被锁定到只能使用 VMWare 了，所以这真的有什么过人之处吗？Google 最新推出的竞品 Anthos 虽然是使用开源组件构建的，但仍然是一个专有产品：你可以将应用在不同的云提供商之间迁移 —— 前提是你要一直使用 Anthos。这不就正是使用锁定的定义吗？">
-<meta itemprop="datePublished" content="2019-09-17T09:43:54&#43;08:00" />
-<meta itemprop="dateModified" content="2020-01-29T10:35:12&#43;08:00" />
+<meta itemprop="datePublished" content="2019-09-17T09:43:54+08:00" />
+<meta itemprop="dateModified" content="2020-01-29T10:35:12+08:00" />
 <meta itemprop="wordCount" content="359">
 <meta itemprop="image" content="https://kyon.life/mstile-150x150.png"/>
 
 
 
-<meta itemprop="keywords" content="鹦鹉学舌,架构," /><meta property="og:title" content="不要为了避免使用锁定而被限制" />
+<meta itemprop="keywords" content="鹦鹉学舌,架构," />
+<meta property="og:title" content="不要为了避免使用锁定而被限制" />
 <meta property="og:description" content="翻译自 Don&rsquo;t get locked up into avoiding lock-in
  架构的很大一部分精力用于减少或避免使用锁定。这是一个非常高尚的目标：架构意味着为我们提供选择，而使用锁定显然是反其道而行之。然而，使用锁定并不是一件非对即错的事情：避免某一方面的使用锁定经常会使得你在另一方面的使用被锁定。流行的观念，比如开源软件魔法般地自动消除了使用锁定，也被证明是不完全正确的。是时候近距离看一下使用锁定了，这样你就不会为了避免使用锁定而被限制！
  作者介绍
@@ -336,7 +337,7 @@
 </div>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2020 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2021 <a href="https://kyon.life/">kyon</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
 			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://kyon.life/sitemap.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
