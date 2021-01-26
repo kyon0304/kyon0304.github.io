@@ -37,7 +37,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>Philosophy of Software Design - 第七章 不同层，不同抽象</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -47,11 +47,16 @@
  在文件系统中，最上层实现了文件抽象。一个文件包含一个可变长的比特数组，并且支持不定长的读写更新。文件系统中低一层的抽象实现了固定大小硬盘块的内存缓存；调用者可以假设频繁使用的块会驻留在内存中以供快速获取。最底层是硬件驱动，负责在二级存储设备和内存之间搬运数据块。 在网络传输协议比如 TCP 中，最上层提供的抽象是机器之间可信赖的比特流传输。这是建立在低一层的尽力而为传输服务之上的：大部分数据包都可以成功送达，但是部分包会丢失或者乱序。  7.1 Pass-through 方法 当相邻的层具有相仿的抽象时，问题会以 pass-through 方法的方式表现出来。pass-through 方法的签名和它调用的方法一样或类似，除了调用其他方法基本没有实现别的功能。比如，一个学生项目实现的文本编辑界面中有个类基本都是 pass-through 方法。下面是这个类的摘要：
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20  public class TextDocument ... { private TextArea textArea; private TextDocumentListener listener; ... public Character getLastTypedCharacter() { return textArea.getLastTypedCharacter(); } public int getCursorOffset() { return textArea.getCursorOffset(); } public void insertString(String textToInsert, int offset) { textArea."/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -76,7 +81,7 @@
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>1 月 23 号, 2020</span></div>
@@ -144,11 +149,16 @@
 <p>pass-through 方法使把类变浅：它们增加了类接口的复杂度，也就是增加了复杂度，对系统整体来说却没有新增任何功能。上面例子中的四个方法，只有最后一个实现了一点功能：检查了参数的有效性。pass-through 方法还会制造类之间的依赖：如果 <code>TextArea</code> 类中的 <code>insertString</code> 签名发生变化，<code>TextDocument</code> 中的 <code>insertString</code> 方法也必须跟着修改。</p>
 <p>pass-through 方法意味着类之间的责任划分不明确。在上面的例子中，<code>TextDocumnet</code> 提供了 <code>insertString</code> 方法，但是插入文本的功能完全是在 <code>TextArea</code> 这个类中实现的。这通常是个坏主意：因为一个功能的实现和接口应该在同一个类当中。当你遇到 pass-through 方法时，考虑一下：“这些功能和抽象应该如何由各个类分工实现？”可能就会注意到，这些类之间有重叠。</p>
 <p>解决方案是重构类，使它们的实现划分明确且逻辑连贯。图 7.1 展示了几种解决办法。一种办法是，如 7.1(b) 所示，将更低一层类的方法直接暴露给高一层类的调用者，删掉对高一层类中相关实现的依赖。另一种方法是重新分布类中的方法，如图 7.1(c) 所示。最后，如果类无法解耦，最好的办法是像 7.1(d) 中那样将它们合并。</p>
-<figure>
-    <img src="/media/software-design/figure-7-1.jpg"
-         alt="图 7.1"/> <figcaption>
-            <p><strong>图 7.1</strong> pass-through 方法。在 (a) 中，类 C1 包含 3 个 pass-through 方法，除了调用 C2 中相同签名的函数（每个不同的符号代表一个特定的方法签名）外什么都不做。pass-through 方法可以有像下面这样被消除，(b)：让 C1 的调用者直接调用 C2 中的方法。(c)：重新分布 C1 和 C2 中的方法避免两个类之间互相调用。(d)：将两个类合并。</p>
-        </figcaption>
+<figure >
+    <img 
+        
+         
+         src = /media/software-design/figure-7-1.jpg 
+         alt = 图&#32;7.1 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>__图 7.1__ pass-through 方法。在 (a) 中，类 C1 包含 3 个 pass-through 方法，除了调用 C2 中相同签名的函数（每个不同的符号代表一个特定的方法签名）外什么都不做。pass-through 方法可以有像下面这样被消除，(b)：让 C1 的调用者直接调用 C2 中的方法。(c)：重新分布 C1 和 C2 中的方法避免两个类之间互相调用。(d)：将两个类合并。</p></figcaption>
 </figure>
 
 <h2 id="什么时候重复的接口是可以接受的">什么时候重复的接口是可以接受的<a href="#什么时候重复的接口是可以接受的" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
@@ -176,11 +186,16 @@
 <p>另外的办法是，将信息存在一个全局变量中，如图 7.2(c) 所示。这样就避免了将信息在方法间传递的麻烦，但是全局变量几乎总是制造其他的麻烦。比如，由于访问全局变量时会冲突，使得在同一个进程中为系统创建两个独立的实例变得不可能。可能在生产环境不需要多个实例，但是在测试环境却是很有用的。</p>
 <p>我经常使用的解决方案是像图 7.2(d)那样引入上下文（<code>context</code>）对象。一个上下文对象存储了应用中所有的全局状态（任何其他情况下可能是 pass-through 变量或全局变量的东西）。大多数应用的全局状态都会有多个变量，代表了配置选项、共享子系统以及性能计数器等。系统的每个实例都有各自的上下文对象。上下文对象使得系统的多个实例在同一个线程中得以共存。</p>
 <p>不幸的是，可能很多地方都需要用到上下文对象，这使得它可能变成 pass-through 变量。为了减少需要知道上下文对象存在的函数的数量，上下文对象的引用可以存储在系统的大多数主要对象中。在图 7.2(d) 的例子中，<code>m3</code> 方法所在的类，在它生成的对象中以实例变量的方式存储了指向上下文对象的引用。当创建新对象时，创建方法会从它的对象中获取引用并传递给新对象的构造函数。通过这种方法，上下文对象只在构造函数的参数中显式出现，却是随处可得的。</p>
-<figure>
-    <img src="/media/software-design/Figure-7.2.jpg"
-         alt="图 7.2"/> <figcaption>
-            <p><strong>图 7.2</strong> 处理 pass-through 变量可能的技术方案。(a) <code>cert</code> 在函数<code>m1</code> <code>m2</code> 间传递，即使它们使用不到。 (b) 将<code>cert</code> 变量存储在 <code>main</code> 和 <code>m3</code> 的共享对象中，这样变量就不需要通过 <code>m1</code> 和 <code>m2</code> 传递了。(c) 将 <code>cert</code> 变量存储为全局变量 (d) 将 <code>cert</code> 变量和其他系统级变量比如超时时间 <code>timeout</code> 性能计数器 <code>performance counters</code> 一起存储在上下文对象中。所有需要用到这些变量的对象都会存储一份上下文对象的引用。</p>
-        </figcaption>
+<figure >
+    <img 
+        
+         
+         src = /media/software-design/Figure-7.2.jpg 
+         alt = 图&#32;7.2 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>__图 7.2__ 处理 pass-through 变量可能的技术方案。(a) `cert` 在函数`m1` `m2` 间传递，即使它们使用不到。 (b) 将`cert` 变量存储在 `main` 和 `m3` 的共享对象中，这样变量就不需要通过 `m1` 和 `m2` 传递了。(c) 将 `cert` 变量存储为全局变量 (d) 将 `cert` 变量和其他系统级变量比如超时时间 `timeout` 性能计数器 `performance counters` 一起存储在上下文对象中。所有需要用到这些变量的对象都会存储一份上下文对象的引用。</p></figcaption>
 </figure>
 
 <p>上下文对象使得所有对系统级可见的信息的处理变得方便，并且消除了 pass-through 变量。如果需要新增一个变量，可以将它放入上下文对象中；除了上下文对象的构造和析造函数，现有的代码不会受影响。上下文对象使得鉴别和管理全局状态变得容易，因为它们都在同一个地方。使用上下文对象也为测试带来了方便：测试代码可以通过修改上下文对象中的属性改变全局配置。在使用 pass-through 变量的系统中这是非常难以做到的。</p>
@@ -213,7 +228,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C">鹦鹉学舌</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0">学习笔记</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>约 5391 字</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>约 5423 字</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-01-23 16:37</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/33755fe4e1897f991c07afdf5b018a390da94d30" target="_blank" rel="noopener">33755fe</a> @ 2020-02-21</p>
 			</footer>

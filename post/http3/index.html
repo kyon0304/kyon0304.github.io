@@ -43,7 +43,7 @@ http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层�
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>HTTP/3 的过去、现在及将来</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -56,11 +56,16 @@ http/1.1 通过 connection:keep-alive 多个请求复用同一个 tcp 连接，�
 http/2 解决方案是可以在一个 tcp 连接中可以并行传输多个 http 请求，但是依然存在的问题是，tcp 的责任是以正确的顺序传输数据，出现丢包时，tcp 协议会进行重发，由于 tcp 对承载的 http 请求是没有解析的，这时丢包数据后面的字节就无法被正常发送到客户端，即使他们本身并没有丢失数据而且和丢包所包含的数据是独立的 http 请求。最终结果是，这些请求被无意义地延迟，因为 tcp 协议无法得知丢包会不会对客户端的数据重建产生影响，这被称作 head-of-line blocking。
 http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层协议不再 tcp 协议而是 quic，quic 将 stream 当作一等公民对待，quic streams 共享一个连接，因此减少了额外的握手和慢启动所使用的时间。http/3 可以简单的将 http 请求映射到 quic 的 stream 上。quic 的 stream 是独立传输的，所以在大多数丢包的场景中，只会影响一个 stream 而不会产生连锁效应，这可能是 quic 协议是基于 udp 报文的缘故。而专门再设计一个 http3 协议而不复用之前的 http2，是因为 http2 的 header 中的压缩 scheme HPACK 设计上，会严重依赖 http 请求的顺序，这是 quic 协议传输中所不能满足的，quic 只能保证单个 stream 中的字节是有序的，而不同 stream 的到达顺序则不保证。这就导致需要重新设计 http 协议中的 header 压缩 scheme，新的叫做 QPACK。而且一些 http/2 协议中的功能比如 per-stream 流控制已经由 quic 协议所实现，http/3 就将这些功能去掉了，减少协议中无意义的复杂度。使用 udp 协议还有一个好处是， quic 协议完全可以在用户空间实现，不再像 tcp 那样与操作系统绑定，这就给了 quic 协议实现极大的自由度。"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -85,7 +90,7 @@ http/3 on quic 就是为了解决这个问题而诞生，它依赖的传输层�
 	</div>
 
 
-	<main class="site-main section-inner animated fadeIn faster">
+	<main class="site-main section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>1 月 6 号, 2020</span></div>

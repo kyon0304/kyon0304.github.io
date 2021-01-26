@@ -18,11 +18,14 @@
 运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。
 要做到以上的事情，主要涉及四个组件的配置：
  spring-cloud-config spring-boot-admin spring-zookeeper-discovery spring-boot-actuator  效果展示 配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。
+ 
   一个美观页面，主要展示了三种信息：
- 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &amp;lt;version&amp;gt;0.1.0&amp;lt;/version&amp;gt;   右上角切换到 Applications 的页面，以数字+列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
- 这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
+ 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &amp;lt;version&amp;gt;0.1.0&amp;lt;/version&amp;gt;   
+  右上角切换到 Applications 的页面，以数字+列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
+ 
+  这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
 页面上我会比较关注的部分，
- git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来   这个页面展示了应用从各个地方加载的属性值，包括 application.</description>
+ git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来</description>
     </item>
     
   </channel>

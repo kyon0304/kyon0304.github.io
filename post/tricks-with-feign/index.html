@@ -41,7 +41,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>使用 spring cloud openfeign 的一些小技巧</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -53,11 +53,16 @@
 调用方使用 DemoClient 示例：
 1 2 3 4 5 6 7 8 9 10 11 12 13 14  package com."/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -82,7 +87,7 @@
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>1 月 17 号, 2021</span></div>
@@ -387,6 +392,9 @@ logging.level.com.example.demo.DemoClient=DEBUG
 		</aside>
 	</main>
 	<div class="post-nav thin">
+		<a class="next-post" href="https://kyon.life/post/xdg-open-tips/">
+			<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;新</span><br><span>禁用烦人的网页弹框 Xdg Open</span>
+		</a>
 		<a class="prev-post" href="https://kyon.life/post/java-garbage-collector/">
 			<span class="post-nav-label">旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>第三章 垃圾收集器与内存分配策略</span>
 		</a>

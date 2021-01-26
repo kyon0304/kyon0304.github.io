@@ -49,7 +49,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>修改博客主题</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -65,11 +65,16 @@
 然后是解决目录不显示的问题，even 里是在全局和文章的 front matter 变量两个地方同时控制，并且文章的优先级高一些，hermit 是只能用文章的 front matter 变量。但是我现有的文章都没有显示指定，直接在全局变量设置的，于是想改成和 even 一样的逻辑。但是试来试去，目录就是不出现，后来发现 hermit 的目录有两个地方，一个是文章目录本录，另外一个是文章右下角的目录开关，即使有目录也要先按开关切换以后才会出现，很不爽啊，于是直接改了下目录 css 类，让它直接显示，后面修改是否出现目录的逻辑也就水到渠成了。
 想起来，第一个事情应该是修改配置文件，从 exampleSite 里拷贝出来的默认的配置文件是 toml 格式的，但是上次折腾推荐阅读的时候发现，其实对 yaml 的支持度更好，于是那时就换成了 yaml 格式。只是当时比较直愣愣，一行一行手动改的，今天突然想起了应该有 convert 工具啊，hugo 确实有个子命令是 convert，但可惜是转换文章 front matter 格式的，于是上网随便搜了个网站转了下，复制粘贴回来。然后照着之前 even 主题时候的配置增删改查一下。说到这里不得不提一下，even 的配置还是蛮良心的，量大，还有注释。这次修改去掉了不少配置，包括 busuanzi 的 PV/UV 统计，虽然之前一直看一直看，但它总是不变看着也闹心啊。留了一个 GgoogleAnalytics，以后想起来去看看就得了。"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -94,7 +99,7 @@
 	</div>
 
 
-	<main class="site-main section-inner animated fadeIn faster">
+	<main class="site-main section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>2 月 21 号, 2020</span></div>
@@ -114,11 +119,16 @@
 <p>修改代码的样式，这个也花了不少功夫，不过因为也是从 even 里拿过来的，也没什么有创意的东西就是了，主要就是找到对应的 scss 文件和它控制的类，对应的来回改就好了。Hermit 这边多提供了一个复制代码的功能，在我来回杂交的过程中被搞坏了，纠结了下要不要直接去掉算了，不过凭着我这一股犟劲，最后还是还是花了一点时间调好了，两个问题，一个是样式上 absolute 直接按整个页面的坐标来了，找到它的父元素并且加上 <code>position: relative;</code> 就修好了。另外一个问题是，改完样式后代码块里多显示了行数，拷贝的时候会多出行数来，本来以为盲改就得了，最后还是得用 chrome 的 debug 去看下到底是哪个元素，还蛮幸运，js 没有混淆。</p>
 <p>Hermit 的 RSS 地址是 /post/index.xml，和我之前的不一样，改成了到 /sitemap.xml。</p>
 <p>把之前 even 的一溜分享按钮移过来，就是这个：</p>
-<figure>
-    <img src="/media/theme/1.png"
-         alt="figure-1"/> <figcaption>
-            <p>我觉得很好看的一溜分享</p>
-        </figcaption>
+<figure >
+    <img 
+        
+         
+         src = /media/theme/1.png 
+         alt = figure-1 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>我觉得很好看的一溜分享</p></figcaption>
 </figure>
 
 <p>原生评论是 disqus，但是最近喜欢基于 GitHub issue 的 <a href="https://utteranc.es/">utterances</a>，同样，也是从之前主题里拿过来就好，是 iframe 做的，插入一段 js 即可。由于这边文章变宽了，在 scss 里稍微做了下调整，让评论框和文本宽度保持一致。</p>

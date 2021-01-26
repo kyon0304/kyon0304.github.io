@@ -53,7 +53,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>不要为了避免使用锁定而被限制</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -71,11 +71,16 @@
 你可能想把应用部署到容器中。这听起来不错，但是要用 AWS 的 Elastic Container Service(ECS) 吗？毕竟，这是亚马逊云专有的。倾向于 Kubernetes？它是开源的并且可以运行在大多数环境中，包括自有环境 (on premises)。问题解决了吗？并没有完全解决 —— 你现在和 Kubernetes 绑定了 —— 想想那些至关重要的 YAML 文件吧！所以你从一个使用锁定跳到了另外一个，不是吗？而且如果你使用了托管的 Kubernetes 服务，比如 Google 的 GKE 或 Amazon 的 EKS，你可能还被限制到 Kubernetes 的一个特定版本和这些云服务商的专有扩展中。
 如果你想在自有环境中运行应用，你也可以选择 AWS Outposts，这样你就会有一些选择权。但是这说到底还是专有的。它和 VMWare 集成，这就导致你可能已经被锁定到只能使用 VMWare 了，所以这真的有什么过人之处吗？Google 最新推出的竞品 Anthos 虽然是使用开源组件构建的，但仍然是一个专有产品：你可以将应用在不同的云提供商之间迁移 —— 前提是你要一直使用 Anthos。这不就正是使用锁定的定义吗？"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -100,7 +105,7 @@
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>9 月 17 号, 2019</span></div>

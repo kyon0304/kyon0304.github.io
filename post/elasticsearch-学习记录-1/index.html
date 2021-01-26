@@ -33,7 +33,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>ElasticSearch 学习记录</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -41,11 +41,16 @@
 <meta name="twitter:title" content="ElasticSearch 学习记录"/>
 <meta name="twitter:description" content="ES 的基本概念  使用 lucene 作为核心搜索库，倒排索引 index 索引，类似于 sql 中的一张表，具有相似数据结构的 document 构成一个 index document 文档，类似于 sql 表中的一条数据，含有多个 field field 类似于 sql 表中的一列，属性及其值 node/cluster es 可以在不同的机器（node）上运行不同的线程，组成 cluster 的形式提供服务 shard 每个 es 进程中可以有多个 shard，每个 index 可以切分到多个 shard 中保存，为了防止数据丢失，shard 可以有一个 primary shard 和多个 replica shard  ES 的分布式架构  不同的 shard 不会保存 index 的全部数据，而是每个 shard 会保存一部分 一个 shard 的 primary/replica 会在不同机器上，当一台机器挂掉后，可以从另一台机器的 shard 中读取/恢复数据 写入 es 时，会向 primary shard 写，primary shard 同步到 replica shard，同步成功后返回写入成功到客户端 读 es 时，可以从 primary shard 读，也可以从 replica 读  ES 的写过程  客户端发起一条数据的写请求，到随意一个机器比如机器 02，02 此时便作为协调节点（coordinating node）发挥作用 协调节点对数据进行哈希，根据结果将数据路由到对应的 primary shard （称为 shard A）所在的节点 shard A 接收到数据后，进行存储，并同步到 replica shard 协调节点等待 shard A 的写入和同步都完成后，向客户端发送写入成功回执  shard A 写数据过程详细   shard A 收到数据后，会先缓存到内存 buffer 中，并写入一份到 translog1 文件的系统缓存（os cache），此时，该条数据虽然写入完成，但是没有经过进一步处理，客户端进行查询的话，是查询不到的"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -70,7 +75,7 @@
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>11 月 11 号, 2018</span></div>

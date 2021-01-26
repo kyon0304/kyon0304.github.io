@@ -16,7 +16,7 @@
 9.2 可以简化接口时合并 当两个或更多个模块合并成一个模块时，为这个新模块定义一个比原来更简单和易用的接口成为可能。当原来的模块实现的是同一个问题的解决方案的不同部分时，这种情况可能会发生。在前一个部分中 HTTP 服务器的例子中，原始的方法的接口需要第一个方法返回 HTTP 请求的 string 并将它传递给第二个方法。当这两个方法合并后，这个接口可以删减掉。
 而且，当两个或更多类被合并后，可能可以自动的执行某些功能，这样大多数使用者就不必知道它们的存在。Java 的 I/O 库展示了这种机会。如果 FileInputStream 和 BufferedInputStream 类合并并默认提供缓冲，绝大多数用户甚至不必知道缓冲的存在。合并后的 FileInputStream 类可以提供禁用或替换默认缓冲的机制，但是大多数用户不需要学习这些知识。
 9.3 合并以删减重复 如果你发现相同模式的代码一再重复，找一找可以避免重复的代码。一种办法是将重复的代码重构到一个单独的方法中，并将重复代码片段替换为对这个方法的调用。当重复的代码片段很长而且替换方法的签名比较简单时，这种办法是最有效的。如果代码片段只有一两行，用方法调用替换可能带来不了什么收益。如果代码片段和它的上下文环境交互非常复杂（比如会读写大量的本地变量），那么替换方法可能需要一个复杂的签名（比如许多按引用传递的参数），这将降低它的价值。
-  图 9.1：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，LOG 语句在几种不同的包类型中重复。
+ __图 9.1__：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，`LOG` 语句在几种不同的包类型中重复。
   另一种降低重复的办法是，重构代码使得有问题的代码只需要一个地方执行。假设你正在编写一个需要在几个地方返回错误的方法，而每个返回之前都需要执行相同的清理动作（见图 9.1）。如果你使用的编程语言支持 goto，你可以将清理代码放到方法的最后面，然后在每一处需要返回错误时使用 goto 进入。参见图 9.">
 <meta itemprop="datePublished" content="2020-02-06T10:53:42+08:00" />
 <meta itemprop="dateModified" content="2020-02-21T17:13:32+08:00" />
@@ -35,7 +35,7 @@
 9.2 可以简化接口时合并 当两个或更多个模块合并成一个模块时，为这个新模块定义一个比原来更简单和易用的接口成为可能。当原来的模块实现的是同一个问题的解决方案的不同部分时，这种情况可能会发生。在前一个部分中 HTTP 服务器的例子中，原始的方法的接口需要第一个方法返回 HTTP 请求的 string 并将它传递给第二个方法。当这两个方法合并后，这个接口可以删减掉。
 而且，当两个或更多类被合并后，可能可以自动的执行某些功能，这样大多数使用者就不必知道它们的存在。Java 的 I/O 库展示了这种机会。如果 FileInputStream 和 BufferedInputStream 类合并并默认提供缓冲，绝大多数用户甚至不必知道缓冲的存在。合并后的 FileInputStream 类可以提供禁用或替换默认缓冲的机制，但是大多数用户不需要学习这些知识。
 9.3 合并以删减重复 如果你发现相同模式的代码一再重复，找一找可以避免重复的代码。一种办法是将重复的代码重构到一个单独的方法中，并将重复代码片段替换为对这个方法的调用。当重复的代码片段很长而且替换方法的签名比较简单时，这种办法是最有效的。如果代码片段只有一两行，用方法调用替换可能带来不了什么收益。如果代码片段和它的上下文环境交互非常复杂（比如会读写大量的本地变量），那么替换方法可能需要一个复杂的签名（比如许多按引用传递的参数），这将降低它的价值。
-  图 9.1：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，LOG 语句在几种不同的包类型中重复。
+ __图 9.1__：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，`LOG` 语句在几种不同的包类型中重复。
   另一种降低重复的办法是，重构代码使得有问题的代码只需要一个地方执行。假设你正在编写一个需要在几个地方返回错误的方法，而每个返回之前都需要执行相同的清理动作（见图 9.1）。如果你使用的编程语言支持 goto，你可以将清理代码放到方法的最后面，然后在每一处需要返回错误时使用 goto 进入。参见图 9." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-9/" />
@@ -51,7 +51,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>Philosophy of Software Design 第九章 - 合并还是拆分</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -65,14 +65,19 @@
 9.2 可以简化接口时合并 当两个或更多个模块合并成一个模块时，为这个新模块定义一个比原来更简单和易用的接口成为可能。当原来的模块实现的是同一个问题的解决方案的不同部分时，这种情况可能会发生。在前一个部分中 HTTP 服务器的例子中，原始的方法的接口需要第一个方法返回 HTTP 请求的 string 并将它传递给第二个方法。当这两个方法合并后，这个接口可以删减掉。
 而且，当两个或更多类被合并后，可能可以自动的执行某些功能，这样大多数使用者就不必知道它们的存在。Java 的 I/O 库展示了这种机会。如果 FileInputStream 和 BufferedInputStream 类合并并默认提供缓冲，绝大多数用户甚至不必知道缓冲的存在。合并后的 FileInputStream 类可以提供禁用或替换默认缓冲的机制，但是大多数用户不需要学习这些知识。
 9.3 合并以删减重复 如果你发现相同模式的代码一再重复，找一找可以避免重复的代码。一种办法是将重复的代码重构到一个单独的方法中，并将重复代码片段替换为对这个方法的调用。当重复的代码片段很长而且替换方法的签名比较简单时，这种办法是最有效的。如果代码片段只有一两行，用方法调用替换可能带来不了什么收益。如果代码片段和它的上下文环境交互非常复杂（比如会读写大量的本地变量），那么替换方法可能需要一个复杂的签名（比如许多按引用传递的参数），这将降低它的价值。
-  图 9.1：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，LOG 语句在几种不同的包类型中重复。
+ __图 9.1__：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，`LOG` 语句在几种不同的包类型中重复。
   另一种降低重复的办法是，重构代码使得有问题的代码只需要一个地方执行。假设你正在编写一个需要在几个地方返回错误的方法，而每个返回之前都需要执行相同的清理动作（见图 9.1）。如果你使用的编程语言支持 goto，你可以将清理代码放到方法的最后面，然后在每一处需要返回错误时使用 goto 进入。参见图 9."/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -97,7 +102,7 @@
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>2 月 6 号, 2020</span></div>
@@ -127,19 +132,29 @@
 <p>而且，当两个或更多类被合并后，可能可以自动的执行某些功能，这样大多数使用者就不必知道它们的存在。Java 的 I/O 库展示了这种机会。如果 <code>FileInputStream</code> 和 <code>BufferedInputStream</code> 类合并并默认提供缓冲，绝大多数用户甚至不必知道缓冲的存在。合并后的 <code>FileInputStream</code> 类可以提供禁用或替换默认缓冲的机制，但是大多数用户不需要学习这些知识。</p>
 <h2 id="93-合并以删减重复">9.3 合并以删减重复<a href="#93-合并以删减重复" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <p>如果你发现相同模式的代码一再重复，找一找可以避免重复的代码。一种办法是将重复的代码重构到一个单独的方法中，并将重复代码片段替换为对这个方法的调用。当重复的代码片段很长而且替换方法的签名比较简单时，这种办法是最有效的。如果代码片段只有一两行，用方法调用替换可能带来不了什么收益。如果代码片段和它的上下文环境交互非常复杂（比如会读写大量的本地变量），那么替换方法可能需要一个复杂的签名（比如许多按引用传递的参数），这将降低它的价值。</p>
-<figure>
-    <img src="/media/software-design/figure-9-1.jpg"
-         alt="图 9.1"/> <figcaption>
-            <p><strong>图 9.1</strong>：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，<code>LOG</code> 语句在几种不同的包类型中重复。</p>
-        </figcaption>
+<figure >
+    <img 
+        
+         
+         src = /media/software-design/figure-9-1.jpg 
+         alt = 图&#32;9.1 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>__图 9.1__：这段代码以几种不同方式处理接收到的网络包；对每一种类型，如果包长度对这种类型来说太短，就会打印一条消息。在这个版本的代码中，`LOG` 语句在几种不同的包类型中重复。</p></figcaption>
 </figure>
 
 <p>另一种降低重复的办法是，重构代码使得有问题的代码只需要一个地方执行。假设你正在编写一个需要在几个地方返回错误的方法，而每个返回之前都需要执行相同的清理动作（见图 9.1）。如果你使用的编程语言支持 <code>goto</code>，你可以将清理代码放到方法的最后面，然后在每一处需要返回错误时使用 <code>goto</code> 进入。参见图 9.2 。一般认为 <code>goto</code> 是一种糟糕的用法，不当使用时，可能会编写出无法理解的代码，但是在这种情况下用来从嵌套代码中跳出很方便。</p>
-<figure>
-    <img src="/media/software-design/figure-9-2.jpg"
-         alt="图 9.2"/> <figcaption>
-            <p><strong>图 9.</strong>：对图 9.1 代码的重新组织，这样只有一份 <code>LOG</code> 语句。</p>
-        </figcaption>
+<figure >
+    <img 
+        
+         
+         src = /media/software-design/figure-9-2.jpg 
+         alt = 图&#32;9.2 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>__图 9.__：对图 9.1 代码的重新组织，这样只有一份 `LOG` 语句。</p></figcaption>
 </figure>
 
 <h2 id="94-区分通用和专用的代码">9.4 区分通用和专用的代码<a href="#94-区分通用和专用的代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
@@ -286,11 +301,16 @@
 <p>长方法并不总是错的。比如，有一个顺序执行的方法包含 5 个 20 行的代码块。如果这些代码块之间是相对独立的，那么这个方法可以每次阅读一块；把这些代码块移动并拆分到不同的方法中并没有带来很大好处。如果这些代码块之间有复杂的交互，把它们放到一起就更重要了，这样使用者可以一次看到所有代码；如果每一块在不同的方法中，那么使用者为了弄明白这些代码块是怎么工作的，就得在这些分散的方法中来回查看。如果签名简单并且容易看懂，那么有着上百行代码的方法也是没什么问题的。这些方法有深度（实现了非常多功能，接口简单），这很好。</p>
 <p>当设计方法时，最重要的目标是提供简洁明了的抽象。<strong>每个方法都应该完成一件事情，并且彻底地完成它。</strong> 这个方法应该有简洁明了的接口，这样使用者不用知道太多就可以正确地使用。这个方法应该有深度：它的接口应该比它的实现简单的多。如果一个方法具有所有这些属性，那么它是长是短就无关紧要了。</p>
 <p>只有在可以产生更简洁的抽象时，方法拆分才说得通。有两种方式进行拆分，如图 9.3 所示。最好的方式是，在单独的类中重构实现一个子任务，如图 9.3(b)。拆分后，子方法中包含子任务，父方法中包含原来方法中其余部分；父方法调用子方法。新的父方法的签名和原方法保持一致。这种形式适用于子任务和原方法的其余部分完全可分离的情况，这意味着 (a) 查看子方法时不需要知道父方法中任何信息 (b) 查看父方法时不需要了解子方法是如何实现的。通常这说明子方法相对通用：父方法以外的方法也可以使用。如果你按这种方式拆分以后，发现需要来回切换父子方法才能弄懂它们是怎么一起工作的，那就说明拆分可能是个坏主意（“连体方法”）。</p>
-<figure>
-    <img src="/media/software-design/figure-9-3.png"
-         alt="图 9.3"/> <figcaption>
-            <p><strong>图 9.3</strong></p>
-        </figcaption>
+<figure >
+    <img 
+        
+         
+         src = /media/software-design/figure-9-3.png 
+         alt = 图&#32;9.3 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>__图 9.3__</p></figcaption>
 </figure>
 
 <p>方法的第二种拆分方式是将其拆分为两个单独的方法，每一个都对原方法的调用者可见，如图 9.3(c) 所示。当由于原方法要做多个不相关的事情而导致接口过度复杂时，可以采用这种方式进行拆分。在这种情况下，可能可以将方法的功能拆分到两个或更多的小方法中，每一个只有原方法的一部分功能。如果你像这样做了拆分，每个拆分后的方法接口都应该比原方法接口更简单。理想情况下，大多数调用者应该只需要调用两个新方法中的一个；如果两个新方法调用者都必须调用，就会增加复杂度，这说明拆分很可能不是一个好主意。新方法将会更关注于它们完成的事情。如果新方法比原方法更通用（也就是说，你可以想象在不同的场景中使用它们），就是一个好兆头。</p>
@@ -327,7 +347,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C">鹦鹉学舌</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0">学习笔记</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>约 8635 字</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>约 8651 字</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-02-06 10:53</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/33755fe4e1897f991c07afdf5b018a390da94d30" target="_blank" rel="noopener">33755fe</a> @ 2020-02-21</p>
 			</footer>

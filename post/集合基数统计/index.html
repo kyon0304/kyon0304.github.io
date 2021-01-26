@@ -49,7 +49,7 @@ Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一�
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>集合基数统计</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -65,11 +65,16 @@ Bitmap 原理：每一位 bit 代表一个集合中的元素，举例：00101011
 Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。 经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$
 合并：和 bitmap 相同"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -94,7 +99,7 @@ Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一�
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>12 月 1 号, 2018</span></div>

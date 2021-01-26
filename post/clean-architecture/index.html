@@ -61,7 +61,7 @@ GUI 只是一种展现方式，而 Web 只是一种 GUI方式，因此设计系�
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>《架构整洁之道》读后</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary"/>
 <meta name="twitter:image" content="https://kyon.life/mstile-150x150.png"/>
@@ -83,11 +83,16 @@ GUI 只是一种展现方式，而 Web 只是一种 GUI方式，因此设计系�
 在系统全周期（开发、部署、运行、维护）中，好的架构都发挥着作用。开发时，系统架构应当和开发团队相匹配，方便系统开发；部署时，保持不同组件的独立性，修改其中一个不需要全部重新部署；运行时，好的架构应该可以起到解释系统运行过程的作用；维护包括系统的捉虫以及新需求的 patch，是整个周期中成本最高的，好的架构通过遵循开闭原则以及接口隔离原则，使得 debug 可以尽量少的影响原来代码，并方便扩展新加功能。
 好的架构应当使得系统的可选项尽可能久的尽可能多。"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -112,7 +117,7 @@ GUI 只是一种展现方式，而 Web 只是一种 GUI方式，因此设计系�
 	</div>
 
 
-	<main class="site-main section-inner animated fadeIn faster">
+	<main class="site-main section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>1 月 13 号, 2019</span></div>

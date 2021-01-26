@@ -12,11 +12,14 @@
 运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。
 要做到以上的事情，主要涉及四个组件的配置：
  spring-cloud-config spring-boot-admin spring-zookeeper-discovery spring-boot-actuator  效果展示 配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。
+ 
   一个美观页面，主要展示了三种信息：
- 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &lt;version&gt;0.1.0&lt;/version&gt;   右上角切换到 Applications 的页面，以数字&#43;列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
- 这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
+ 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &lt;version&gt;0.1.0&lt;/version&gt;   
+  右上角切换到 Applications 的页面，以数字&#43;列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
+ 
+  这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
 页面上我会比较关注的部分，
- git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来   这个页面展示了应用从各个地方加载的属性值，包括 application.">
+ git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来">
 <meta itemprop="datePublished" content="2020-02-17T21:32:03+08:00" />
 <meta itemprop="dateModified" content="2020-11-15T15:57:16+08:00" />
 <meta itemprop="wordCount" content="965">
@@ -30,11 +33,14 @@
 运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。
 要做到以上的事情，主要涉及四个组件的配置：
  spring-cloud-config spring-boot-admin spring-zookeeper-discovery spring-boot-actuator  效果展示 配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。
+ 
   一个美观页面，主要展示了三种信息：
- 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &lt;version&gt;0.1.0&lt;/version&gt;   右上角切换到 Applications 的页面，以数字&#43;列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
- 这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
+ 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &lt;version&gt;0.1.0&lt;/version&gt;   
+  右上角切换到 Applications 的页面，以数字&#43;列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
+ 
+  这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
 页面上我会比较关注的部分，
- git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来   这个页面展示了应用从各个地方加载的属性值，包括 application." />
+ git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://kyon.life/post/spring-config/" />
 <meta property="og:image" content="https://kyon.life/media/spring-config/figure-spring-config-1.png" />
@@ -49,7 +55,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>使线上 Spring 应用更好部署和调试</title>
-	<link rel="stylesheet" href="https://kyon.life/css/style.min.73441172299c3de12096278ebeac34da639127b3ac4901f385053e1a7cbd77d2.css" integrity="sha256-c0QRcimcPeEglieOvqw02mORJ7OsSQHzhQU+Gny9d9I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css" integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://kyon.life/css/share.min.css">
 	<meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://kyon.life/media/spring-config/figure-spring-config-1.png"/>
@@ -59,17 +65,25 @@
 运行一个可视化的应用详情 server，可以直观的看到应用健康监控、应用运行的包的构建时间及代码 commit id，应用当前生效的属性并可以动态修改，应用精确到类的日志级别，并可以动态修改。
 要做到以上的事情，主要涉及四个组件的配置：
  spring-cloud-config spring-boot-admin spring-zookeeper-discovery spring-boot-actuator  效果展示 配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。
+ 
   一个美观页面，主要展示了三种信息：
- 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &lt;version&gt;0.1.0&lt;/version&gt;   右上角切换到 Applications 的页面，以数字&#43;列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
- 这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
+ 服务运行了多长时间 当前起的服务: configserver 和 cloud-adapter-aws，是从服务的 spring.application.name 取值 每个服务有几个实例，目前本地测试环境起的，都只有一个实例 服务的版本信息，从 pom.xml 文件种读的 &lt;version&gt;0.1.0&lt;/version&gt;   
+  右上角切换到 Applications 的页面，以数字&#43;列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。
+ 
+  这里进入 cloud-adapter-aws 服务的一个实例页面，左侧导航栏有三部分，默认进入 Details 这一项。
 页面上我会比较关注的部分，
- git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来   这个页面展示了应用从各个地方加载的属性值，包括 application."/>
+ git 信息，包括 commit id，时间，分支 build 信息，包括版本号，构建时间，当线上出现问题时，可以通过 1，2 这两条信息快速定位到部署对应的包以及代码 健康状态监控，由 /actuator/health 返回的信息稍微规整了一下，可以快速看到依赖的第三方应用比如 mq、zk、db（如果使用了的话） 等组件的健康状态展示出来。另外也可以通过配置包含一些详细信息比如下面的 4 和 5 使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来 使用了 spring cloud config 的话，会把 config 加载的地址展示出来"/>
 
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<link href="/css/zoom.css" rel="stylesheet">
+	<script src="/js/zoom.js"></script>
+	<script src="/js/transition.js"></script>
 </head>
 
 <body id="page">
 	
-	<header id="site-header" class="animated slideInUp faster">
+	<header id="site-header" class="animated slideInUp">
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
@@ -94,7 +108,7 @@
 	</div>
 
 
-	<main class="site-main main-content section-inner animated fadeIn faster">
+	<main class="site-main main-content section-inner animated fadeIn faster" id = "site-main">
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>2 月 17 号, 2020</span></div>
@@ -112,9 +126,16 @@
 </ul>
 <h2 id="效果展示">效果展示<a href="#效果展示" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <p>配置完成后效果图如下，主要是可视化的应用详情部分的展示，关于配置中心的使用方式的话，目前没有界面，主要就是对 spring-cloud-config server 后端数据的修改，然后 spring 有机制可以让它们动态生效，至少应用重启后可以覆盖 jar 包中的属性配置。</p>
-<figure>
-    <img src="/media/spring-config/figure-spring-config-1.png"
-         alt="figure-1"/> 
+<figure >
+    <img 
+        
+         
+         src = /media/spring-config/figure-spring-config-1.png 
+         alt = figure-1 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p></p></figcaption>
 </figure>
 
 <p>一个美观页面，主要展示了三种信息：</p>
@@ -124,15 +145,29 @@
 <li>每个服务有几个实例，目前本地测试环境起的，都只有一个实例</li>
 <li>服务的版本信息，从 pom.xml 文件种读的 <code>&lt;version&gt;0.1.0&lt;/version&gt;</code></li>
 </ul>
-<figure class="big">
-    <img src="/media/spring-config/figure-spring-config-5.png"
-         alt="figure-5"/> 
+<figure >
+    <img 
+         class=big 
+         
+         src = /media/spring-config/figure-spring-config-5.png 
+         alt = figure-5 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p></p></figcaption>
 </figure>
 
 <p>右上角切换到 <code>Applications</code> 的页面，以数字+列表形式展示了服务统计信息，当服务比较多的时候这个页面会更直观一些，另外当一个服务有多个实例时，可以从这个页面区分不同实例进入到详情页面。</p>
-<figure class="big">
-    <img src="/media/spring-config/figure-spring-config-2.png"
-         alt="figure-2"/> 
+<figure >
+    <img 
+         class=big 
+         
+         src = /media/spring-config/figure-spring-config-2.png 
+         alt = figure-2 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p></p></figcaption>
 </figure>
 
 <p>这里进入 <code>cloud-adapter-aws</code> 服务的一个实例页面，左侧导航栏有三部分，默认进入 <code>Details</code> 这一项。</p>
@@ -144,16 +179,30 @@
 <li>使用了 spring cloud discovery 的话，会把可以看到的 client 也展示出来</li>
 <li>使用了 spring cloud config 的话，会把 config 加载的地址展示出来</li>
 </ol>
-<figure class="big">
-    <img src="/media/spring-config/figure-spring-config-3.png"
-         alt="figure-3"/> 
+<figure >
+    <img 
+         class=big 
+         
+         src = /media/spring-config/figure-spring-config-3.png 
+         alt = figure-3 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p></p></figcaption>
 </figure>
 
 <p>这个页面展示了应用从各个地方加载的属性值，包括 application.properties, application-${PROFILE}.properties, bootstrap.properties, system properties 以及从 spring cloud config server 拉取下来的属性值。</p>
 <p>分成上下部分，可以先从下半部分搜索属性 key，看到原属性值，然后在上半部分选取要修改的属性 key，然后填入想要修改的目标值后，<code>Refresh Context</code>，就可以动态修改属性值。</p>
-<figure class="big">
-    <img src="/media/spring-config/figure-spring-config-4.png"
-         alt="figure-4"/> 
+<figure >
+    <img 
+         class=big 
+         
+         src = /media/spring-config/figure-spring-config-4.png 
+         alt = figure-4 
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p></p></figcaption>
 </figure>
 
 <p>日志级别页面，可以非常方便而且精确地查看某个包的日志级别并动态修改，在定位线上问题时，非常好用。</p>
