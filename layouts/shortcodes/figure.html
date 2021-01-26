@@ -1,0 +1,11 @@
+<figure >
+    <img 
+        {{ with .Get "class" }} class={{ . }} {{ end }}
+        {{ with .Get "id" }} id = {{ . }} {{ end }} 
+        {{ with .Get "src" }} src = {{ . }} {{ end }}
+        {{ with .Get "alt" }} alt = {{ . }} {{ end }}
+        data-action = "zoom"
+    >
+    </img>
+    <figcaption><p>{{ with .Get "caption" }}{{ . }}{{ end }}</p></figcaption>
+</figure>
