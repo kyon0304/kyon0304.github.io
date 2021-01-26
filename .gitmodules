@@ -6,4 +6,4 @@
 	url = git@github.com:kyon0304/kyon0304.github.io.git
 [submodule "themes/hermit"]
 	path = themes/hermit
-	url = https://github.com/Track3/hermit.git
+	url = git@github.com:kyon0304/hermit.git
