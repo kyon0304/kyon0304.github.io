@@ -2,7 +2,7 @@
 title: "使线上 Spring 应用更好部署和调试"
 date: 2020-02-17T21:32:03+08:00
 lastMod: 2020-02-18T00:04:03+08:00
-tags: ["实操", "spring", "配置中心", "spring boot", "服务发现"]
+tags: ['分享', "spring", "配置中心", "spring boot", "服务发现"]
 enableRelated: false
 enableOutdatedInfoWarning: true
 images:

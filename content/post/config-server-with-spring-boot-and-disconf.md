@@ -1,7 +1,7 @@
 ---
 title: "基于 Spring Boot + Disconf 的配置中心"
 date: 2019-11-03T13:01:01+08:00
-tags: ["spring-boot", "disconf", "配置中心", "工具", "实操"]
+tags: ["spring-boot", "disconf", "配置中心", "工具", '分享']
 ---
 
 

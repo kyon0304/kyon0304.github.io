@@ -2,7 +2,7 @@
 title: "Spring 框架缓存故障自动切换"
 date: 2020-09-29T15:40:36+08:00
 lastMod: 2020-09-29T15:40:36+08:00
-tags: [spring, cache, redis]
+tags: [spring, cache, redis, '分享']
 enableRelated: false
 enableOutdatedInfoWarning: true
 description: 缓存只是提高访问速度，如何配置 Spring CacheManager，使得缓存不可用时，不影响应用正常运行，不影响接口正常返回。
