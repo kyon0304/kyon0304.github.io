@@ -3,7 +3,7 @@ title: "禁用烦人的网页弹框 Xdg Open"
 date: 2021-01-26T12:14:58+08:00
 lastMod: 2021-01-26T12:14:58+08:00
 tags: [tips, manjaro, chrome, xdg-open]
-comments: false
+comments: true
 description: 禁用 chrome 中烦人的网页弹框
 images:
     - /media/xdg-open-tips/popup.png
