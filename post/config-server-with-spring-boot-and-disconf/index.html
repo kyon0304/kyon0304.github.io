@@ -13,13 +13,13 @@
  A3：扫描静态注解类数据，并注入到配置仓库里。 A4&#43;A2：根据仓库里的配置文件、配置项，去 disconf-web 平台里下载配置数据。这里会有主备竞争 A5：将下载得到的配置数据值注入到仓库里。 A6：根据仓库里的配置文件、配置项，去ZK上监控结点。 A7&#43;A2：根据XML配置定义，到 disconf-web 平台里下载配置文件，放在仓库里，并监控ZK结点。这里会有主备竞争。 A8：A1-A6均是处理静态类数据。A7是处理动态类数据，包括：实例化配置的回调函数类；将配置的值注入到配置实体里。  更新配置事件B： 以下按顺序发生。
  B1：管理员在 Disconf-web 平台上更新配置。 B2：Disconf-web 平台发送配置更新消息给ZK指定的结点。 B3：ZK通知 Disconf-cient 模块。 B4：与A4一样。 B5：与A5一样。 B6：基本与A4一样，唯一的区别是，这里还会将配置的新值注入到配置实体里。  主备机切换事件C： 以下按顺序发生。">
 <meta itemprop="datePublished" content="2019-11-03T13:01:01+08:00" />
-<meta itemprop="dateModified" content="2020-01-07T13:56:08+08:00" />
+<meta itemprop="dateModified" content="2021-02-26T20:26:39+08:00" />
 <meta itemprop="wordCount" content="445">
 <meta itemprop="image" content="https://kyon.life/mstile-150x150.png"/>
 
 
 
-<meta itemprop="keywords" content="spring-boot,disconf,配置中心,工具,实操," />
+<meta itemprop="keywords" content="spring-boot,disconf,配置中心,工具,分享," />
 <meta property="og:title" content="基于 Spring Boot &#43; Disconf 的配置中心" />
 <meta property="og:description" content="disconf 简介 disconf 是百度的某位员工开源的分布式配置中心，文档地址，C/S 架构，客户端通过监听 zookeeper 中更新触发配置拉取，服务端自带一个简陋前端可以用于图形化查看/更新配置。相比于 spring boot admin 中提供的 refresh context 功能，优势在于可以一次更改，应用于所有同类机器配置，而 spring boot admin 需要对每个实例进行单独修改。除此之外，spring boot admin 在界面及交互上吊打 disconf。
 设计架构  server 端包含 springmvc 用于处理业务逻辑，mysql 用于存储配置文件，两个 redis 用于用户登录，zk 用于配置更新的通知， web 端用于用户登录后统一查看/更新配置 client 端以 pom 方式引入项目内即可（需要魔改一下，见后）  运行流程 启动事件A： 以下按顺序发生。
@@ -29,7 +29,7 @@
 <meta property="og:url" content="https://kyon.life/post/config-server-with-spring-boot-and-disconf/" />
 <meta property="og:image" content="https://kyon.life/mstile-150x150.png"/>
 <meta property="article:published_time" content="2019-11-03T13:01:01+08:00" />
-<meta property="article:modified_time" content="2020-01-07T13:56:08+08:00" />
+<meta property="article:modified_time" content="2021-02-26T20:26:39+08:00" />
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -318,11 +318,11 @@ index fc62fef0..dd203736 100644
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://kyon.life/tags/spring-boot">spring-boot</a></span><span class="tag"><a href="https://kyon.life/tags/disconf">disconf</a></span><span class="tag"><a href="https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83">配置中心</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%B7%A5%E5%85%B7">工具</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%AE%9E%E6%93%8D">实操</a></span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://kyon.life/tags/spring-boot">spring-boot</a></span><span class="tag"><a href="https://kyon.life/tags/disconf">disconf</a></span><span class="tag"><a href="https://kyon.life/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83">配置中心</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%B7%A5%E5%85%B7">工具</a></span><span class="tag"><a href="https://kyon.life/tags/%E5%88%86%E4%BA%AB">分享</a></span>
 				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>约 4755 字</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-11-03 13:01</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/92fd9319e41ed1533180ac60bc3d34a7b199f5ac" target="_blank" rel="noopener">92fd931</a> @ 2020-01-07</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/a7666d216953621da5cea4c3710181cdfe449773" target="_blank" rel="noopener">a7666d2</a> @ 2021-02-26</p>
 			</footer>
 			
 			
