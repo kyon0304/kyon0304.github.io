@@ -1,0 +1,43 @@
+name: GitHubPages
+
+on:
+  push:
+    branches:
+      - blog  # 指定了用于部署的源码所在的分支
+    paths-ignore:
+      - 'README.md'
+      - '.env'
+      - '.gitignore'
+      - '.gitmodules'
+      - 'bin'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2 # 上文提到了第一步必须使用 checkout Action
+        with:
+          submodules: recursive  # 获取 Hugo 的主题，主题放在 submodule 中 (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Read .env
+        id: hugo-version
+        run: | # 从 .env 文件中读取 HUGO 的版本号
+          . ./.env
+          echo "::set-output name=HUGO_VERSION::${HUGO_VERSION}"
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2 # 使用第三方 Action 进行构建
+        with:
+          hugo-version: '${{ steps.hugo-version.outputs.HUGO_VERSION }}'
+          # extended: true
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3 # 使用第三方 Action 把构建完成的 Artifact 部署到指定分支
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: master
+          cname: kyon.life
