@@ -1,0 +1,210 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="集合基数统计">
+<meta itemprop=description content="集合基数：对于非无限集合，基数是指集合中元素的个数。
+合并：将两个集合合并后，如何求新集合的基数。
+Bitmap &ndash;> Linear Count &ndash;> LogLog Count &ndash;> Adaptive Count &ndash;> HyperLogLog Count
+假设集合的基数为 n
+Bitmap 原理：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。
+合并：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合
+内存占用：需要 n bit，空间复杂度 O(n)
+Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。 经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$
+合并：和 bitmap 相同"><meta itemprop=datePublished content="2018-12-01T21:30:25+08:00">
+<meta itemprop=dateModified content="2018-12-01T21:30:25+08:00">
+<meta itemprop=wordCount content="303"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="统计,学习笔记,"><meta property="og:title" content="集合基数统计">
+<meta property="og:description" content="集合基数：对于非无限集合，基数是指集合中元素的个数。
+合并：将两个集合合并后，如何求新集合的基数。
+Bitmap &ndash;> Linear Count &ndash;> LogLog Count &ndash;> Adaptive Count &ndash;> HyperLogLog Count
+假设集合的基数为 n
+Bitmap 原理：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。
+合并：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合
+内存占用：需要 n bit，空间复杂度 O(n)
+Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。 经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$
+合并：和 bitmap 相同">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2018-12-01T21:30:25+08:00">
+<meta property="article:modified_time" content="2018-12-01T21:30:25+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>集合基数统计</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="集合基数统计">
+<meta name=twitter:description content="集合基数：对于非无限集合，基数是指集合中元素的个数。
+合并：将两个集合合并后，如何求新集合的基数。
+Bitmap &ndash;> Linear Count &ndash;> LogLog Count &ndash;> Adaptive Count &ndash;> HyperLogLog Count
+假设集合的基数为 n
+Bitmap 原理：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。
+合并：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合
+内存占用：需要 n bit，空间复杂度 O(n)
+Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。 经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$
+合并：和 bitmap 相同">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>12 月 1 号, 2018</span></div>
+<h1>集合基数统计</h1>
+</header>
+<div class=content>
+<p><strong>集合基数</strong>：对于非无限集合，基数是指集合中元素的个数。</p>
+<p><strong>合并</strong>：将两个集合合并后，如何求新集合的基数。</p>
+<p>Bitmap &ndash;> Linear Count &ndash;> LogLog Count &ndash;> Adaptive Count &ndash;> HyperLogLog Count</p>
+<p><strong><em>假设集合的基数为 n</em></strong></p>
+<h2 id=bitmap>Bitmap<a href=#bitmap class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><strong>原理</strong>：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。</p>
+<p><strong>合并</strong>：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合</p>
+<p><strong>内存占用</strong>：需要 n bit，空间复杂度 O(n)</p>
+<h2 id=linear-count>Linear Count<a href=#linear-count class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><strong>原理</strong>：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。
+<img src=/media/15436750409657/15436750409657.jpg alt="LC 将集合元素存入 bitmap 示意图"></p>
+<p>经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$</p>
+<p><strong>合并</strong>：和 bitmap 相同</p>
+<p><strong>内存占用</strong>：由于当桶满的情况（即所有 bit 都为 1）下，u=0，公式得到的值趋近无穷，不再生效，因此需要控制满桶出现的概率足够小，并且需要控制误差在可接受范围内，经过一系列计算，可以得出 m 和 n 的一个表格，表示不同集合基数 n 时，需要控制满桶概率的 m 的值，可以总结出一个规律，m 大约为 n/10，即只需要 bitmap 方式占用空间的十分之一。但是从渐进复杂性的角度看，空间复杂度仍为 O(n)</p>
+<p><strong>误差</strong>：由 n 的量级和 m 的量级共同决定，当可以容忍的误差为 ∆ 则可以推导得到 $m > \frac {e^t-t-1}{(∆t)^2}$ 其中 t = n/m</p>
+<h2 id=loglog-count>LogLog Count<a href=#loglog-count class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><strong>前置要求</strong>：</p>
+<ol>
+<li>哈希的结果分布近似均匀</li>
+<li>哈希结果碰撞的概率足够小</li>
+<li>哈希的结果表示为二进制后长度固定</li>
+</ol>
+<p><strong>原理</strong>：
+将集合中一个元素进行哈希后，表示为 m 位二进制存入 bitmap，存入时与原 bitmap 中的值做 或(or) 操作，由前置要求的第 x 条可知，每一 bit 为 0 或为 1 是互相独立的，各有 1/2 的概率，因此将集合中所有元素全部存入 bitmap 的过程可以看作是 <code>伯努利过程</code>，那么第 k 位第一次出现 1 的概率为 $P_n(x=k) = \frac {1}{2^k}$。接下来用反证法证明，集合的基数 $n ≈ 2^k$</p>
+<ol>
+<li>bitmap 中 1 第一次出现在 k 位之前的概率 $P_n(x≤k) = (1-P_n(x=k))^n = (1 - \frac {1}{2^k})^n$</li>
+<li>那么 bitmap 中 1 第一次出现在 k 之后的概率 $P_n(x>k) = (1 - P_n(x≤k)) = (1 - (1 - \frac {1}{2^k})^n)$</li>
+</ol>
+<p>首先，假设 $n » 2^k$ 那么 $P_n(x>k)$ 趋近于 0，而当 $n « 2^k$ 时，$P_n(x≤k)$ 则趋近于 0，于是 n 可以近似由 $2^k$ 求得。</p>
+<p>此时已经可以得到集合的基数为 $$n ≈ 2^k$$ 其中 k 为 bitmap 中从高位数起，1 第一次出现的位数。</p>
+<p><strong>桶平均</strong></p>
+<p>接下来，为了抵消一些偶然因素，LLC 引入了桶分组，类似于物理实验中的多次实验求平均值。</p>
+<p>将元素哈希后的 m 位二进制表示，拆分为两部分，前 p 位表示桶序号，后面的 m-p 位作为真正用于估计基数的比特串。桶序号相同的元素被分配到同一个桶，估计基数时，首先计算桶内比特串 1 第一次出现的位置，记为 P[i]，然后对 p 个桶加和取平均后再进行估算，此时 n 的估计值变为
+$$n ≈ 2^{\frac {∑P[i]}{p}}$$</p>
+<p><strong>合并</strong>：以桶为合并的最小单位，桶序号相同的比特串进行 bitmap 的合并
+<strong>内存占用</strong>：内存使用与分桶数及哈希后的二进制位长度相关，假设哈希后数值表示为二进制为 32 位，则每个桶需要 5bit 内存来存当前桶第一个 1 出现的位置，内存占用即为 $$\frac {5*p}8 byte$$
+<strong>误差</strong>：误差主要由分桶的数目决定，如果要将误差控制在 ∆ 之内，则分桶数 p 的取值为 $$p > (\frac {1.30}{∆})^2$$</p>
+<p>假设基数为一亿的集合（约为 $2^27$），分桶数为 p=1024，那么需要占用的内存为 5*1024/8=640 字节，误差由 $1024 > (\frac {1.30}∆)^2$ 可算得 $∆ &lt; 0.040625$ 即小于 4%</p>
+<h2 id=adaptive-count>Adaptive Count<a href=#adaptive-count class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>基数比较小时，用 LC，比较大时用 LLC</p>
+<h2 id=hyperloglog-count>HyperLogLog Count<a href=#hyperloglog-count class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<blockquote>
+<p>注意，这里的分桶数，使用 m 来表示，而不是 p</p>
+</blockquote>
+<p>将 LLC 中桶分组的几何平均替换为调和平均，使用调和平均数代替几何平均数后，估计公式变为如下</p>
+<p>$$\hat{n}=\frac{\alpha_m m^2}{\sum{2^{-M}}}$$</p>
+<p>其中</p>
+<p>$$\alpha_m=(m\int _0^\infty (log_2(\frac{2+u}{1+u}))^m du)^{-1}$$
+替换求平均方式的原因是，几何平均对离群值非常敏感，导致有空桶出现时，估计结果有较大扰动</p>
+<hr>
+<p>参考：</p>
+<p>[1]. <a href=http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-ii.html>解读Cardinality Estimation算法（第二部分：Linear Counting）</a></p>
+<p>[2]. <a href=http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-iii.html>解读Cardinality Estimation算法（第三部分：LogLog Counting）</a></p>
+<p>[3]. <a href=http://blog.codinglabs.org/articles/algorithms-for-cardinality-estimation-part-iv.html>解读Cardinality Estimation算法（第四部分：HyperLogLog Counting及Adaptive Counting）</a></p>
+<p>[4]. <a href=https://djhworld.github.io/hyperloglog/>HyperLogLog</a></p>
+<p>[5]. <a href=https://www.soasme.com/techshack.weekly/verses/a4335a0c-7b1f-4b0e-9f79-15201ed79998.html>Hyperloglog 算法简介</a></p>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/>ElasticSearch 学习记录</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/%E7%BB%9F%E8%AE%A1>统计</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2207 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2018-12-01 13:30</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#bitmap>Bitmap</a></li>
+<li><a href=#linear-count>Linear Count</a></li>
+<li><a href=#loglog-count>LogLog Count</a></li>
+<li><a href=#adaptive-count>Adaptive Count</a></li>
+<li><a href=#hyperloglog-count>HyperLogLog Count</a></li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=next-post href=https://kyon.life/post/common-sense/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>「常识」摘抄</span>
+</a>
+<a class=prev-post href=https://kyon.life/post/elasticsearch-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95-1/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>ElasticSearch 学习记录</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>

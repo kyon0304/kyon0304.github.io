@@ -1,0 +1,209 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="操作系统导论学习笔记（一）">
+<meta itemprop=description content="为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)
+设计和实现操作系统的目标  提供高性能，尽可能降低操作系统的性能开销 minimize the overhead 在应用程序之间以及操作系统和应用系统之间提供保护 protection 让进程间彼此隔离是实现保护的关键 isolation 保证高可靠性 reliability 能源效率 energy efficiency, 安全性 security, 移动性 mobility  操作系统的 3 个“简单”部分  虚拟化 virtualizing 持久性 persistence 并行 concurrency  虚拟化 virtualizing 虚拟化又分为虚拟化 CPU 和虚拟化内存。
+虚拟化 CPU
+在硬件的一些帮助下，操作系统负责提供这种假象（illusion），即系统拥有非常多的虚拟CPU的假象。将单个CPU（或其中一小部分）转换为看似无限数量的CPU，从而让许多程序看似同时运行，这就是所谓的虚拟化CPU（virtualizing the CPU）
+虚拟化内存
+每个进程访问自己的私有虚拟地址空间（virtual address space）（有时称为地址空间，address space），操作系统以某种方式映射到机器的物理内存上。一个正在运行的程序中的内存引用不会影响其他进程（或操作系统本身）的地址空间。对于正在运行的程序，它完全拥有自己的物理内存。但实际情况是，物理内存是由操作系统管理的共享资源。
+持久化 persistence 内存 DRAM 中的数据是易失的，如果断电或系统崩溃，内存中的数据都会丢失。因此我们需要硬件和软件支持来持久地存储数据。
+硬件以某种输入/输出设备（Input/Output, I/O）的形式出现。
+操作系统中管理磁盘的软件通常称为文件系统（file system）。因此它负责以可靠和高效的方式，将用户创建的任何文件（file）存储在系统的磁盘上。
+关键问题：如何持久地存储数据
+文件系统是操作系统的一部分，负责管理持久的数据。持久性需要哪些技术才能正确地实现？需要哪些机制和策略才能高性能地实现？面对硬件和软件故障，可靠性如何实现？
+并行 concurrency 关键问题：如何构建正确的并发程序
+如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？
+操作系统的简单历史  早期操作系统：只是一些库 引入保护机制：借助硬件的帮助，区分用户模式和内核模式 多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix 摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。  "><meta itemprop=datePublished content="2021-08-31T22:45:12+08:00">
+<meta itemprop=dateModified content="2021-08-31T23:16:34+08:00">
+<meta itemprop=wordCount content="74"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="ostep,virtualization,笔记,"><meta property="og:title" content="操作系统导论学习笔记（一）">
+<meta property="og:description" content="为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)
+设计和实现操作系统的目标  提供高性能，尽可能降低操作系统的性能开销 minimize the overhead 在应用程序之间以及操作系统和应用系统之间提供保护 protection 让进程间彼此隔离是实现保护的关键 isolation 保证高可靠性 reliability 能源效率 energy efficiency, 安全性 security, 移动性 mobility  操作系统的 3 个“简单”部分  虚拟化 virtualizing 持久性 persistence 并行 concurrency  虚拟化 virtualizing 虚拟化又分为虚拟化 CPU 和虚拟化内存。
+虚拟化 CPU
+在硬件的一些帮助下，操作系统负责提供这种假象（illusion），即系统拥有非常多的虚拟CPU的假象。将单个CPU（或其中一小部分）转换为看似无限数量的CPU，从而让许多程序看似同时运行，这就是所谓的虚拟化CPU（virtualizing the CPU）
+虚拟化内存
+每个进程访问自己的私有虚拟地址空间（virtual address space）（有时称为地址空间，address space），操作系统以某种方式映射到机器的物理内存上。一个正在运行的程序中的内存引用不会影响其他进程（或操作系统本身）的地址空间。对于正在运行的程序，它完全拥有自己的物理内存。但实际情况是，物理内存是由操作系统管理的共享资源。
+持久化 persistence 内存 DRAM 中的数据是易失的，如果断电或系统崩溃，内存中的数据都会丢失。因此我们需要硬件和软件支持来持久地存储数据。
+硬件以某种输入/输出设备（Input/Output, I/O）的形式出现。
+操作系统中管理磁盘的软件通常称为文件系统（file system）。因此它负责以可靠和高效的方式，将用户创建的任何文件（file）存储在系统的磁盘上。
+关键问题：如何持久地存储数据
+文件系统是操作系统的一部分，负责管理持久的数据。持久性需要哪些技术才能正确地实现？需要哪些机制和策略才能高性能地实现？面对硬件和软件故障，可靠性如何实现？
+并行 concurrency 关键问题：如何构建正确的并发程序
+如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？
+操作系统的简单历史  早期操作系统：只是一些库 引入保护机制：借助硬件的帮助，区分用户模式和内核模式 多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix 摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。  ">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/ostep-1/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-08-31T22:45:12+08:00">
+<meta property="article:modified_time" content="2021-08-31T23:16:34+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>操作系统导论学习笔记（一）</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="操作系统导论学习笔记（一）">
+<meta name=twitter:description content="为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)
+设计和实现操作系统的目标  提供高性能，尽可能降低操作系统的性能开销 minimize the overhead 在应用程序之间以及操作系统和应用系统之间提供保护 protection 让进程间彼此隔离是实现保护的关键 isolation 保证高可靠性 reliability 能源效率 energy efficiency, 安全性 security, 移动性 mobility  操作系统的 3 个“简单”部分  虚拟化 virtualizing 持久性 persistence 并行 concurrency  虚拟化 virtualizing 虚拟化又分为虚拟化 CPU 和虚拟化内存。
+虚拟化 CPU
+在硬件的一些帮助下，操作系统负责提供这种假象（illusion），即系统拥有非常多的虚拟CPU的假象。将单个CPU（或其中一小部分）转换为看似无限数量的CPU，从而让许多程序看似同时运行，这就是所谓的虚拟化CPU（virtualizing the CPU）
+虚拟化内存
+每个进程访问自己的私有虚拟地址空间（virtual address space）（有时称为地址空间，address space），操作系统以某种方式映射到机器的物理内存上。一个正在运行的程序中的内存引用不会影响其他进程（或操作系统本身）的地址空间。对于正在运行的程序，它完全拥有自己的物理内存。但实际情况是，物理内存是由操作系统管理的共享资源。
+持久化 persistence 内存 DRAM 中的数据是易失的，如果断电或系统崩溃，内存中的数据都会丢失。因此我们需要硬件和软件支持来持久地存储数据。
+硬件以某种输入/输出设备（Input/Output, I/O）的形式出现。
+操作系统中管理磁盘的软件通常称为文件系统（file system）。因此它负责以可靠和高效的方式，将用户创建的任何文件（file）存储在系统的磁盘上。
+关键问题：如何持久地存储数据
+文件系统是操作系统的一部分，负责管理持久的数据。持久性需要哪些技术才能正确地实现？需要哪些机制和策略才能高性能地实现？面对硬件和软件故障，可靠性如何实现？
+并行 concurrency 关键问题：如何构建正确的并发程序
+如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？
+操作系统的简单历史  早期操作系统：只是一些库 引入保护机制：借助硬件的帮助，区分用户模式和内核模式 多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix 摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。  ">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>8 月 31 号, 2021</span></div>
+<h1>操作系统导论学习笔记（一）</h1>
+</header>
+<div class=content>
+<p>为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)</p>
+<h2 id=设计和实现操作系统的目标>设计和实现操作系统的目标<a href=#设计和实现操作系统的目标 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ol>
+<li>提供高性能，尽可能降低操作系统的性能开销 minimize the overhead</li>
+<li>在应用程序之间以及操作系统和应用系统之间提供保护 protection</li>
+<li>让进程间彼此隔离是实现保护的关键 isolation</li>
+<li>保证高可靠性 reliability</li>
+<li>能源效率 energy efficiency, 安全性 security, 移动性 mobility</li>
+</ol>
+<h2 id=操作系统的-3-个简单部分>操作系统的 3 个“简单”部分<a href=#操作系统的-3-个简单部分 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ol>
+<li>虚拟化 virtualizing</li>
+<li>持久性 persistence</li>
+<li>并行 concurrency</li>
+</ol>
+<p><img src=/media/ostep-1/ostep.jpg alt="Operating System: three easy pieces"></p>
+<h3 id=虚拟化-virtualizing>虚拟化 virtualizing<a href=#虚拟化-virtualizing class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>虚拟化又分为虚拟化 CPU 和虚拟化内存。</p>
+<p><strong>虚拟化 CPU</strong></p>
+<p>在硬件的一些帮助下，操作系统负责提供这种假象（illusion），即系统拥有非常多的虚拟CPU的假象。将单个CPU（或其中一小部分）转换为看似无限数量的CPU，从而让许多程序看似同时运行，这就是所谓的虚拟化CPU（virtualizing the CPU）</p>
+<p><strong>虚拟化内存</strong></p>
+<p>每个进程访问自己的私有虚拟地址空间（virtual address space）（有时称为地址空间，address space），操作系统以某种方式映射到机器的物理内存上。一个正在运行的程序中的内存引用不会影响其他进程（或操作系统本身）的地址空间。对于正在运行的程序，它完全拥有自己的物理内存。但实际情况是，物理内存是由操作系统管理的共享资源。</p>
+<h3 id=持久化-persistence>持久化 persistence<a href=#持久化-persistence class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>内存 DRAM 中的数据是易失的，如果断电或系统崩溃，内存中的数据都会丢失。因此我们需要硬件和软件支持来持久地存储数据。</p>
+<p>硬件以某种输入/输出设备（Input/Output, I/O）的形式出现。</p>
+<p>操作系统中管理磁盘的软件通常称为文件系统（file system）。因此它负责以可靠和高效的方式，将用户创建的任何文件（file）存储在系统的磁盘上。</p>
+<p>关键问题：如何持久地存储数据</p>
+<p>文件系统是操作系统的一部分，负责管理持久的数据。持久性需要哪些技术才能正确地实现？需要哪些机制和策略才能高性能地实现？面对硬件和软件故障，可靠性如何实现？</p>
+<h3 id=并行-concurrency>并行 concurrency<a href=#并行-concurrency class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>关键问题：如何构建正确的并发程序</p>
+<p>如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？</p>
+<h2 id=操作系统的简单历史>操作系统的简单历史<a href=#操作系统的简单历史 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ol>
+<li>早期操作系统：只是一些库</li>
+<li>引入保护机制：借助硬件的帮助，区分用户模式和内核模式</li>
+<li>多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix</li>
+<li>摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。</li>
+</ol>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/java-garbage-collector/>第三章 垃圾收集器与内存分配策略</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/ostep>ostep</a></span><span class=tag><a href=https://kyon.life/tags/virtualization>virtualization</a></span><span class=tag><a href=https://kyon.life/tags/%E7%AC%94%E8%AE%B0>笔记</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 1341 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-08-31 14:45</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/5337464d00c04b19476cd538e3ed081bb59aaf0f target=_blank rel=noopener>5337464</a> @ 2021-08-31</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#设计和实现操作系统的目标>设计和实现操作系统的目标</a></li>
+<li><a href=#操作系统的-3-个简单部分>操作系统的 3 个“简单”部分</a>
+<ul>
+<li><a href=#虚拟化-virtualizing>虚拟化 virtualizing</a></li>
+<li><a href=#持久化-persistence>持久化 persistence</a></li>
+<li><a href=#并行-concurrency>并行 concurrency</a></li>
+</ul>
+</li>
+<li><a href=#操作系统的简单历史>操作系统的简单历史</a></li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=prev-post href=https://kyon.life/post/mvn-bom/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>更科学地使用 maven 管理项目版本</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>

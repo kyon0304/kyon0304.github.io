@@ -1,0 +1,387 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="使用 spring cloud openfeign 的一些小技巧">
+<meta itemprop=description content="spring cloud openfeign（以下简称 feign） 通过一个额外定义的 interface 文件作为接口定义，可以将对外提供的 HTTP 接口转换为 API 接口，提供方和调用方需要共同依赖接口文件，将隐式的依赖关系显性表示出来。而且在这个接口文件上也可以大作文章，比如配置服务发现、接口拦截操作等。
+一个最简单的 feign 接口文件 DemoClient.java：
+1 2 3 4 5 6 7 8  package com.example.demo; @FeignClient(name=&#34;demo&#34;, url=&#34;http://127.0.0.1:8081/&#34;) public interface DemoClient { @GetMapping(&#34;/hello&#34;) String hello(@RequestParam String name); }   name 为全局唯一，是这个 FeignClient 的唯一标识，url 为提供方的接口地址。理论上 FeignClient 文件由接口提供方作为合约文件给到调用方，但是即使提供方未提供，只要提供方暴露了 HTTP 接口，那么调用方就可以通过定义 FeignClient 文件将 HTTP 接口调用转换为 API 调用。
+调用方使用 DemoClient 示例：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14  package com."><meta itemprop=datePublished content="2021-01-17T15:10:12+08:00">
+<meta itemprop=dateModified content="2021-01-17T15:20:46+08:00">
+<meta itemprop=wordCount content="355"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="spring cloud openfeign,分享,java,spring,"><meta property="og:title" content="使用 spring cloud openfeign 的一些小技巧">
+<meta property="og:description" content="spring cloud openfeign（以下简称 feign） 通过一个额外定义的 interface 文件作为接口定义，可以将对外提供的 HTTP 接口转换为 API 接口，提供方和调用方需要共同依赖接口文件，将隐式的依赖关系显性表示出来。而且在这个接口文件上也可以大作文章，比如配置服务发现、接口拦截操作等。
+一个最简单的 feign 接口文件 DemoClient.java：
+1 2 3 4 5 6 7 8  package com.example.demo; @FeignClient(name=&#34;demo&#34;, url=&#34;http://127.0.0.1:8081/&#34;) public interface DemoClient { @GetMapping(&#34;/hello&#34;) String hello(@RequestParam String name); }   name 为全局唯一，是这个 FeignClient 的唯一标识，url 为提供方的接口地址。理论上 FeignClient 文件由接口提供方作为合约文件给到调用方，但是即使提供方未提供，只要提供方暴露了 HTTP 接口，那么调用方就可以通过定义 FeignClient 文件将 HTTP 接口调用转换为 API 调用。
+调用方使用 DemoClient 示例：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14  package com.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/tricks-with-feign/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-01-17T15:10:12+08:00">
+<meta property="article:modified_time" content="2021-01-17T15:20:46+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>使用 spring cloud openfeign 的一些小技巧</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="使用 spring cloud openfeign 的一些小技巧">
+<meta name=twitter:description content="spring cloud openfeign（以下简称 feign） 通过一个额外定义的 interface 文件作为接口定义，可以将对外提供的 HTTP 接口转换为 API 接口，提供方和调用方需要共同依赖接口文件，将隐式的依赖关系显性表示出来。而且在这个接口文件上也可以大作文章，比如配置服务发现、接口拦截操作等。
+一个最简单的 feign 接口文件 DemoClient.java：
+1 2 3 4 5 6 7 8  package com.example.demo; @FeignClient(name=&#34;demo&#34;, url=&#34;http://127.0.0.1:8081/&#34;) public interface DemoClient { @GetMapping(&#34;/hello&#34;) String hello(@RequestParam String name); }   name 为全局唯一，是这个 FeignClient 的唯一标识，url 为提供方的接口地址。理论上 FeignClient 文件由接口提供方作为合约文件给到调用方，但是即使提供方未提供，只要提供方暴露了 HTTP 接口，那么调用方就可以通过定义 FeignClient 文件将 HTTP 接口调用转换为 API 调用。
+调用方使用 DemoClient 示例：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14  package com.">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>1 月 17 号, 2021</span></div>
+<h1>使用 spring cloud openfeign 的一些小技巧</h1>
+</header>
+<div class=content>
+<p>spring cloud openfeign（以下简称 feign） 通过一个额外定义的 interface 文件作为接口定义，可以将对外提供的 HTTP 接口转换为 API 接口，提供方和调用方需要共同依赖接口文件，将隐式的依赖关系显性表示出来。而且在这个接口文件上也可以大作文章，比如配置服务发现、接口拦截操作等。</p>
+<p>一个最简单的 feign 接口文件 <code>DemoClient.java</code>：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=nd>@FeignClient</span><span class=o>(</span><span class=n>name</span><span class=o>=</span><span class=s>&#34;demo&#34;</span><span class=o>,</span> <span class=n>url</span><span class=o>=</span><span class=s>&#34;http://127.0.0.1:8081/&#34;</span><span class=o>)</span>
+<span class=kd>public</span> <span class=kd>interface</span> <span class=nc>DemoClient</span> <span class=o>{</span>
+
+	<span class=nd>@GetMapping</span><span class=o>(</span><span class=s>&#34;/hello&#34;</span><span class=o>)</span>
+	<span class=n>String</span> <span class=nf>hello</span><span class=o>(</span><span class=nd>@RequestParam</span> <span class=n>String</span> <span class=n>name</span><span class=o>);</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>name</code> 为全局唯一，是这个 FeignClient 的唯一标识，<code>url</code> 为提供方的接口地址。理论上 FeignClient 文件由接口提供方作为合约文件给到调用方，但是即使提供方未提供，只要提供方暴露了 HTTP 接口，那么调用方就可以通过定义 FeignClient 文件将 HTTP 接口调用转换为 API 调用。</p>
+<p>调用方使用 DemoClient 示例：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=nd>@Service</span>
+<span class=kd>public</span> <span class=kd>class</span> <span class=nc>DemoService</span> <span class=o>{</span>
+
+	<span class=nd>@Autowired</span>
+	<span class=kd>private</span> <span class=n>DemoClient</span> <span class=n>client</span><span class=o>;</span>
+	
+	<span class=kd>public</span> <span class=n>String</span> <span class=nf>getHelloMessage</span><span class=o>()</span> <span class=o>{</span>
+		<span class=n>String</span> <span class=n>name</span> <span class=o>=</span> <span class=s>&#34;kyon&#34;</span><span class=o>;</span>
+		<span class=n>String</span> <span class=n>msg</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=na>hello</span><span class=o>(</span><span class=n>name</span><span class=o>);</span>
+		<span class=k>return</span> <span class=n>msg</span><span class=o>;</span>
+	<span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>怎么样，是不是完全不会意识到 <code>client.hello(name)</code> 居然是在调用 HTTP 接口！</p>
+<h2 id=配置服务发现>配置服务发现<a href=#配置服务发现 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>除了通过 url 获取到调用方的地址，在微服务以及 k8s 如此横行的当下，提供方服务随时会更换 ip，那么引入服务发现机制就很有必要了，这样只要服务名称不变，就可以拿到提供方地址，而不需要再指定 url。更进一步地说，如果提供方有水平部署了多个，feign 还（通过 ribbon）顺便帮忙做了负载。</p>
+<p>假设提供方通过引入依赖包 <code>spring-cloud-starter-zookeeper-discovery</code> 开启了基于 zookeeper 的服务发现，那么如下所示将 <code>DemoClient.java</code> 中的 <code>name</code> 设置为提供方的应用名(假设 <code>spring.application.name=demo-app</code>)，就可以通过服务发现机制自动获得提供方地址，不再需要配置 <code>url</code> 属性（如果配置了 <code>url</code> 属性的话，就会覆盖掉服务发现提供的地址）：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=nd>@FeignClient</span><span class=o>(</span><span class=n>name</span><span class=o>=</span><span class=s>&#34;demo-app&#34;</span><span class=o>)</span>
+<span class=kd>public</span> <span class=kd>interface</span> <span class=nc>DemoClient</span> <span class=o>{</span>
+	<span class=nd>@GetMapping</span><span class=o>(</span><span class=s>&#34;/hello&#34;</span><span class=o>)</span>
+	<span class=n>String</span> <span class=nf>hello</span><span class=o>(</span><span class=nd>@RequestParam</span> <span class=n>String</span> <span class=n>name</span><span class=o>);</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果提供方需要提供不同的 FeignCliet, 该如何区分呢？可以通过设置不同的 ContextId 做到，如下所示：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=cm>/*DemoClient1.java*/</span>
+<span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=nd>@FeignClient</span><span class=o>(</span><span class=n>name</span><span class=o>=</span><span class=s>&#34;demo-app&#34;</span><span class=o>,</span> <span class=n>contextId</span><span class=o>=</span><span class=s>&#34;demo1&#34;</span><span class=o>)</span>
+<span class=kd>public</span> <span class=kd>interface</span> <span class=nc>DemoClient1</span> <span class=o>{</span>
+	<span class=nd>@GetMapping</span><span class=o>(</span><span class=s>&#34;/hello&#34;</span><span class=o>)</span>
+	<span class=n>String</span> <span class=nf>hello</span><span class=o>(</span><span class=nd>@RequestParam</span> <span class=n>String</span> <span class=n>name</span><span class=o>);</span>
+<span class=o>}</span>
+
+<span class=cm>/*DemoClient2.java*/</span>
+<span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=nd>@FeignClient</span><span class=o>(</span><span class=n>name</span><span class=o>=</span><span class=s>&#34;demo-app&#34;</span><span class=o>,</span> <span class=n>contextId</span><span class=o>=</span><span class=s>&#34;demo2&#34;</span><span class=o>)</span>
+<span class=kd>public</span> <span class=kd>interface</span> <span class=nc>DemoClient2</span> <span class=o>{</span>
+	<span class=nd>@GetMapping</span><span class=o>(</span><span class=s>&#34;/hello&#34;</span><span class=o>)</span>
+	<span class=n>String</span> <span class=nf>hello</span><span class=o>(</span><span class=nd>@RequestParam</span> <span class=n>String</span> <span class=n>name</span><span class=o>);</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>目前这边的使用场景是，对于不同的调用方，提供不同的 client 进行隔离。</p>
+<h2 id=配置-feignclient>配置 FeignClient<a href=#配置-feignclient class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>有两种配置方式，一种是在配置文件比如 properties 文件中配置，另外一种是通过类文件配置。最开始我是倾向于配置文件中单独配置，因为比较简洁，但是后来遇到不同版本代码共用一个配置中心导致的问题，现在倾向于在代码中通过类文件配置。</p>
+<h3 id=通过配置文件配置>通过配置文件配置<a href=#通过配置文件配置 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>首先，需要定义好自定义类比如设置登录校验头的 <code>CustomRequestInterceptor.java</code>：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=kd>public</span> <span class=kd>class</span> <span class=nc>CustomRequestInterceptor</span> <span class=kd>implements</span> <span class=n>RequestInterceptor</span> <span class=o>{</span>  
+
+	<span class=nd>@Override</span>  
+	<span class=kd>public</span> <span class=kt>void</span> <span class=nf>apply</span><span class=o>(</span><span class=n>RequestTemplate</span> <span class=n>template</span><span class=o>)</span> <span class=o>{</span>
+		<span class=n>String</span> <span class=n>headerValue</span> <span class=o>=</span> <span class=s>&#34;Bearer-token:xxx&#34;</span><span class=o>;</span>  
+		<span class=n>template</span><span class=o>.</span><span class=na>header</span><span class=o>(</span><span class=s>&#34;Authorization&#34;</span><span class=o>,</span> <span class=n>headerValue</span><span class=o>);</span>  
+	<span class=o>}</span>  
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>配置方式</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>## 对于所有 feign client 生效
+feign.client.config.default.read-timeout=60000
+
+## 仅对于 demo-app feign client 生效
+feign.client.config.demo-app.requestInterceptors=com.example.demo.CustomRequestInterceptor
+</code></pre></td></tr></table>
+</div>
+</div><p>除了 <code>requestInterceptors</code> 外，feign 还有各种配置项，比如 decoder 等，可以自行上网搜索。</p>
+<h3 id=通过类文件配置>通过类文件配置<a href=#通过类文件配置 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>新增一个配置文件：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=kd>public</span> <span class=kd>class</span> <span class=nc>FeignConfig</span> <span class=o>{</span>
+	<span class=nd>@Bean</span>  
+	<span class=kd>public</span> <span class=n>RequestInterceptor</span> <span class=nf>interceptor</span><span class=o>()</span> <span class=o>{</span>  
+		<span class=k>return</span> <span class=k>new</span> <span class=n>CustomRequestInterceptor</span><span class=o>();</span>  
+	<span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>把 demo-app 的 feign client 拷贝过来，并加上 config 配置：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kn>package</span> <span class=nn>com.example.demo</span><span class=o>;</span>
+
+<span class=nd>@FeignClient</span><span class=o>(</span><span class=n>name</span><span class=o>=</span><span class=s>&#34;demo-app&#34;</span><span class=o>,</span> <span class=n>configuration</span> <span class=o>=</span> <span class=n>FeignConfig</span><span class=o>.</span><span class=na>class</span><span class=o>)</span>
+<span class=kd>public</span> <span class=kd>interface</span> <span class=nc>DemoClient</span> <span class=o>{</span>
+	<span class=nd>@GetMapping</span><span class=o>(</span><span class=s>&#34;/hello&#34;</span><span class=o>)</span>
+	<span class=n>String</span> <span class=nf>hello</span><span class=o>(</span><span class=nd>@RequestParam</span> <span class=n>String</span> <span class=n>name</span><span class=o>);</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这就成了。</p>
+<h2 id=打开调试日志>打开调试日志<a href=#打开调试日志 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>将第三方提供的 HTTP 接口通过 feign client 方式转换为 API 接口进行调用时，比较常见的问题是，可能参数没有传对或者什么，导致接口调用报错，但是 HTTP 原始的报错被 feign 给吞掉了，给调试带来了麻烦，这时候，只要把 feign 的 debug 日志打开，这个问题就迎刃而解了！打开方式如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>feign.client.config.demo-app.loggerLevel=FULL
+
+logging.level.com.example.demo.DemoClient=DEBUG
+</code></pre></td></tr></table>
+</div>
+</div><h2 id=总结>总结<a href=#总结 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>目前来说，这边认为 feign 使用起来还是比较顺手的，可能多了一步 FeignClient 接口定义，但是考虑到在调用时省下的代码，强制表明依赖，支持服务发现以及负载均衡等好处，还是可以回本的，而且可以自定义接口拦截，这样即使有登录验证也没问题了。而调试的时候可以打开完整的 trace 日志，可以看到清晰的 HTTP 交谈信息，不会因为包了一层而变得不透明。日常使用起来足够了。</p>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/dynamic-switch-cache-in-spring/>Spring 框架缓存故障自动切换</a></li>
+<li><a href=/post/spring-config/>使线上 Spring 应用更好部署和调试</a></li>
+<li><a href=/post/java-garbage-collector/>第三章 垃圾收集器与内存分配策略</a></li>
+<li><a href=/post/threadlocal/>Threadlocal 梳理</a></li>
+<li><a href=/post/config-server-with-spring-boot-and-disconf/>基于 Spring Boot + Disconf 的配置中心</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/spring-cloud-openfeign>spring cloud openfeign</a></span><span class=tag><a href=https://kyon.life/tags/%E5%88%86%E4%BA%AB>分享</a></span><span class=tag><a href=https://kyon.life/tags/java>java</a></span><span class=tag><a href=https://kyon.life/tags/spring>spring</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 3329 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-01-17 07:10</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/f486ad67596d8c04787810d585d3349b2bd3b4c4 target=_blank rel=noopener>f486ad6</a> @ 2021-01-17</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#配置服务发现>配置服务发现</a></li>
+<li><a href=#配置-feignclient>配置 FeignClient</a>
+<ul>
+<li><a href=#通过配置文件配置>通过配置文件配置</a></li>
+<li><a href=#通过类文件配置>通过类文件配置</a></li>
+</ul>
+</li>
+<li><a href=#打开调试日志>打开调试日志</a></li>
+<li><a href=#总结>总结</a></li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=next-post href=https://kyon.life/post/xdg-open-tips/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>禁用烦人的网页弹框 Xdg Open</span>
+</a>
+<a class=prev-post href=https://kyon.life/post/java-garbage-collector/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>第三章 垃圾收集器与内存分配策略</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>

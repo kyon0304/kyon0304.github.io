@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>统计 on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/%E7%BB%9F%E8%AE%A1/</link><description>Recent content in 统计 on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sat, 01 Dec 2018 21:30:25 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/%E7%BB%9F%E8%AE%A1/index.xml" rel="self" type="application/rss+xml"/><item><title>集合基数统计</title><link>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</link><pubDate>Sat, 01 Dec 2018 21:30:25 +0800</pubDate><guid>https://kyon.life/post/%E9%9B%86%E5%90%88%E5%9F%BA%E6%95%B0%E7%BB%9F%E8%AE%A1/</guid><description>集合基数：对于非无限集合，基数是指集合中元素的个数。
+合并：将两个集合合并后，如何求新集合的基数。
+Bitmap &amp;ndash;&amp;gt; Linear Count &amp;ndash;&amp;gt; LogLog Count &amp;ndash;&amp;gt; Adaptive Count &amp;ndash;&amp;gt; HyperLogLog Count
+假设集合的基数为 n
+Bitmap 原理：每一位 bit 代表一个集合中的元素，举例：00101011 可以代表自然数的集合（3, 5, 7, 8），通过数 bitmap 中 1 的个数可以得知集合的基数。
+合并：将代表两个集合的 bitmap 按 bit 或（or）得到新的 bitmap 即可代表新的集合
+内存占用：需要 n bit，空间复杂度 O(n)
+Linear Count 原理：已知哈希函数的结果空间为 1～m，则申请一个 m 位的 bitmap，并将每一位的初始值设置为 0。对集合中的每个元素作哈希得到值为 k，则将 bitmap 中第 k 位置为 1。 经过公式推导可以得到基数 n 和 值为 0 的 bit 个数 u 以及总位数 m 的关系： $n=-mlog \frac um$
+合并：和 bitmap 相同</description></item></channel></rss>

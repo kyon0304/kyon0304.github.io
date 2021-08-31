@@ -1,0 +1,539 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="Spring 框架缓存故障自动切换">
+<meta itemprop=description content="缓存只是提高访问速度，如何配置 Spring CacheManager，使得缓存不可用时，不影响应用正常运行，不影响接口正常返回。"><meta itemprop=datePublished content="2020-09-29T15:40:36+08:00">
+<meta itemprop=dateModified content="2021-02-26T20:26:39+08:00">
+<meta itemprop=wordCount content="769"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="spring,cache,redis,分享,"><meta property="og:title" content="Spring 框架缓存故障自动切换">
+<meta property="og:description" content="缓存只是提高访问速度，如何配置 Spring CacheManager，使得缓存不可用时，不影响应用正常运行，不影响接口正常返回。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/dynamic-switch-cache-in-spring/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2020-09-29T15:40:36+08:00">
+<meta property="article:modified_time" content="2021-02-26T20:26:39+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>Spring 框架缓存故障自动切换</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="Spring 框架缓存故障自动切换">
+<meta name=twitter:description content="缓存只是提高访问速度，如何配置 Spring CacheManager，使得缓存不可用时，不影响应用正常运行，不影响接口正常返回。">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>9 月 29 号, 2020</span></div>
+<h1>Spring 框架缓存故障自动切换</h1>
+</header>
+<div class=content>
+<h2 id=现状>现状<a href=#现状 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>缓存只是提高访问速度，应用本身没有很高的并发访问量，缓存不可用时，数据库也能顶住。但是缓存挂掉以后，Spring CacheManager 默认会抛出异常，方法直接就异常退出了。</p>
+<h2 id=目标>目标<a href=#目标 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>缓存不可用时，不影响应用正常运行，不影响接口正常返回。</p>
+<h2 id=解决方案>解决方案<a href=#解决方案 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<h3 id=方案一>方案一<a href=#方案一 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>最直接的方案，Spring 定义的 error handler 默认是抛出异常，覆盖 handler 并 catch 住异常不要抛出就可以不影响正常处理流程。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>class</span> <span class=nc>CacheErrorLoggingHandler</span> <span class=kd>extends</span> <span class=n>SimpleCacheErrorHandler</span> <span class=o>{</span>
+    <span class=kd>private</span> <span class=n>Logger</span> <span class=n>logger</span> <span class=o>=</span> <span class=n>LoggerFactory</span><span class=o>.</span><span class=na>getLogger</span><span class=o>(</span><span class=n>CacheErrorLoggingHandler</span><span class=o>.</span><span class=na>class</span><span class=o>);</span>
+
+    <span class=kd>private</span> <span class=n>ClientResources</span> <span class=n>clientResources</span><span class=o>;</span>
+
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>setClientResources</span><span class=o>(</span><span class=n>ClientResources</span> <span class=n>clientResources</span><span class=o>)</span> <span class=o>{</span>
+        <span class=k>this</span><span class=o>.</span><span class=na>clientResources</span> <span class=o>=</span> <span class=n>clientResources</span><span class=o>;</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>handleCacheGetError</span><span class=o>(</span><span class=n>RuntimeException</span> <span class=n>exception</span><span class=o>,</span> <span class=n>Cache</span> <span class=n>cache</span><span class=o>,</span> <span class=n>Object</span> <span class=n>key</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>logger</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;Fail to get cache with key [{}]&#34;</span><span class=o>,</span> <span class=n>key</span><span class=o>,</span> <span class=n>exception</span><span class=o>);</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>handleCachePutError</span><span class=o>(</span><span class=n>RuntimeException</span> <span class=n>exception</span><span class=o>,</span> <span class=n>Cache</span> <span class=n>cache</span><span class=o>,</span> <span class=n>Object</span> <span class=n>key</span><span class=o>,</span> <span class=n>Object</span> <span class=n>value</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>logger</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;Fail to put cache with key [{}]&#34;</span><span class=o>,</span> <span class=n>key</span><span class=o>,</span> <span class=n>exception</span><span class=o>);</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>handleCacheEvictError</span><span class=o>(</span><span class=n>RuntimeException</span> <span class=n>exception</span><span class=o>,</span> <span class=n>Cache</span> <span class=n>cache</span><span class=o>,</span> <span class=n>Object</span> <span class=n>key</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>logger</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;Fail to evict cache with key [{}]&#34;</span><span class=o>,</span> <span class=n>key</span><span class=o>,</span> <span class=n>exception</span><span class=o>);</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>handleCacheClearError</span><span class=o>(</span><span class=n>RuntimeException</span> <span class=n>exception</span><span class=o>,</span> <span class=n>Cache</span> <span class=n>cache</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>logger</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;Fail to clear cache&#34;</span><span class=o>,</span> <span class=n>exception</span><span class=o>);</span>
+    <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>另外需要注意，不是直接 <code>@Component</code> 的方式注入 Spring 容器，而是需要在缓存配置类中配置：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=nd>@EnableCaching</span>
+<span class=nd>@PropertySource</span><span class=o>(</span><span class=s>&#34;classpath:cache-${spring.profiles.active}.properties&#34;</span><span class=o>)</span>
+<span class=nd>@Configuration</span>
+<span class=kd>public</span> <span class=kd>class</span> <span class=nc>CacheConfig</span> <span class=kd>extends</span> <span class=n>CachingConfigurerSupport</span> <span class=o>{</span>
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=n>CacheErrorHandler</span> <span class=nf>errorHandler</span><span class=o>()</span> <span class=o>{</span>
+        <span class=k>return</span> <span class=k>new</span> <span class=n>CacheErrorLoggingHandler</span><span class=o>();;</span>
+    <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>但是这样处理有个问题，就是请求会很慢，每次都要等 redis 连接超时时间x2，因为 CacheManager 的实现是，如果缓存 get 失败了，会从比如数据库里取，那么还会做 put 操作尝试更新缓存，这样 get 等一遍，put 再等一遍。</p>
+<p>于是考虑可不可以在缓存不可用的时候，就直接请求比如数据库，不要再在挂掉的缓存这里绕一道弯子。</p>
+<h3 id=方案二>方案二<a href=#方案二 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>首先考虑不用缓存的情况如何处理，Spring 提供了 NoOpCacheManager，提供没有缓存时 CacheManager 相关操作的 pass on，这个比较简单直接了，直接使用就好。</p>
+<p>然后考虑如何做切换，Spring 中给提供了一个 CompositeCacheManager，内部有一个 ArrayList 类型的 cacheManagers 变量，可以存储多个不同的 CacheManager，给切换提供了可能。</p>
+<p>不过实际跟了下 CompositeCacheManager 的行为，跟我的意图并不一致，它虽然会遍历所有的 CacheManager，但是只要这个 CacheManager 有相应的 CacheName 就会返回，并不会判断这个 CacheManager 的 backstore 是否可用。换句话说，CompositeCacheManager 的使用场景是这样的：不同的 CacheManager 管理不同 CacheName 的缓存，根据 CacheName 获取缓存时，如果当前 CacheManager 下没有，就返回 null，CompositeCacheManager 就会去下一个 CacheManager 寻找这个 CacheName。</p>
+<p>而我的需求是，根据缓存状态动态增添 CompositeCacheManager 中的 cacheManagers 变量，比如当 Redis 正常运行时，它就是第一顺位被使用的，而当 Redis 挂掉以后，可以将它从 cacheManagers 中去掉，避免每次请求带缓存的接口都需要等待连接超时。</p>
+<p>然而，CompositeCacheManager 中 cacheManagers 变量定义是 final 的，不允许修改，暴露的方法也是只允许赋值，不允许修改，于是自己照猫画虎写了一个 CustomCompositeCacheManager，实现可以动态增添 CacheManager 的功能，代码如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>class</span> <span class=nc>CustomCompositeCacheManager</span> <span class=kd>implements</span> <span class=n>CacheManager</span><span class=o>,</span> <span class=n>InitializingBean</span> <span class=o>{</span>
+    <span class=kd>private</span> <span class=kd>final</span> <span class=n>Logger</span> <span class=n>logger</span> <span class=o>=</span> <span class=n>LoggerFactory</span><span class=o>.</span><span class=na>getLogger</span><span class=o>(</span><span class=n>CustomCompositeCacheManager</span><span class=o>.</span><span class=na>class</span><span class=o>);</span>
+
+    <span class=kd>private</span> <span class=n>LinkedList</span><span class=o>&lt;</span><span class=n>CacheManager</span><span class=o>&gt;</span> <span class=n>cacheManagers</span> <span class=o>=</span> <span class=k>new</span> <span class=n>LinkedList</span><span class=o>&lt;&gt;();</span>
+
+    <span class=kd>private</span> <span class=n>CacheManager</span> <span class=n>redisCacheManager</span><span class=o>;</span>
+
+    <span class=kd>private</span> <span class=kt>boolean</span> <span class=n>fallbackToNoOpCache</span> <span class=o>=</span> <span class=kc>false</span><span class=o>;</span>
+
+    <span class=kd>public</span> <span class=nf>CustomCompositeCacheManager</span><span class=o>()</span> <span class=o>{</span>
+    <span class=o>}</span>
+
+    <span class=kd>public</span> <span class=nf>CustomCompositeCacheManager</span><span class=o>(</span><span class=n>CacheManager</span><span class=o>...</span> <span class=n>cacheManagers</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>addCacheManagers</span><span class=o>(</span><span class=n>Arrays</span><span class=o>.</span><span class=na>asList</span><span class=o>(</span><span class=n>cacheManagers</span><span class=o>));</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=nd>@Nullable</span>
+    <span class=kd>public</span> <span class=n>Cache</span> <span class=nf>getCache</span><span class=o>(</span><span class=n>String</span> <span class=n>name</span><span class=o>)</span> <span class=o>{</span>
+        <span class=k>for</span> <span class=o>(</span><span class=n>CacheManager</span> <span class=n>cacheManager</span> <span class=o>:</span> <span class=k>this</span><span class=o>.</span><span class=na>cacheManagers</span><span class=o>)</span> <span class=o>{</span>
+            <span class=n>Cache</span> <span class=n>cache</span> <span class=o>=</span> <span class=n>cacheManager</span><span class=o>.</span><span class=na>getCache</span><span class=o>(</span><span class=n>name</span><span class=o>);</span>
+            <span class=k>if</span> <span class=o>(</span><span class=n>cache</span> <span class=o>!=</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+                <span class=k>return</span> <span class=n>cache</span><span class=o>;</span>
+            <span class=o>}</span>
+        <span class=o>}</span>
+        <span class=k>return</span> <span class=kc>null</span><span class=o>;</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=n>Collection</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span> <span class=nf>getCacheNames</span><span class=o>()</span> <span class=o>{</span>
+        <span class=n>Set</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span> <span class=n>names</span> <span class=o>=</span> <span class=k>new</span> <span class=n>LinkedHashSet</span><span class=o>&lt;&gt;();</span>
+        <span class=k>for</span> <span class=o>(</span><span class=n>CacheManager</span> <span class=n>manager</span> <span class=o>:</span> <span class=k>this</span><span class=o>.</span><span class=na>cacheManagers</span><span class=o>)</span> <span class=o>{</span>
+            <span class=n>names</span><span class=o>.</span><span class=na>addAll</span><span class=o>(</span><span class=n>manager</span><span class=o>.</span><span class=na>getCacheNames</span><span class=o>());</span>
+        <span class=o>}</span>
+        <span class=k>return</span> <span class=n>Collections</span><span class=o>.</span><span class=na>unmodifiableSet</span><span class=o>(</span><span class=n>names</span><span class=o>);</span>
+    <span class=o>}</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>afterPropertiesSet</span><span class=o>()</span> <span class=kd>throws</span> <span class=n>Exception</span> <span class=o>{</span>
+        <span class=k>if</span> <span class=o>(</span><span class=k>this</span><span class=o>.</span><span class=na>fallbackToNoOpCache</span><span class=o>)</span> <span class=o>{</span>
+            <span class=k>this</span><span class=o>.</span><span class=na>cacheManagers</span><span class=o>.</span><span class=na>add</span><span class=o>(</span><span class=k>new</span> <span class=n>NoOpCacheManager</span><span class=o>());</span>
+        <span class=o>}</span>
+    <span class=o>}</span>
+
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>setFallbackToNoOpCache</span><span class=o>(</span><span class=kt>boolean</span> <span class=n>fallbackToNoOpCache</span><span class=o>)</span> <span class=o>{</span>
+        <span class=k>this</span><span class=o>.</span><span class=na>fallbackToNoOpCache</span> <span class=o>=</span> <span class=n>fallbackToNoOpCache</span><span class=o>;</span>
+    <span class=o>}</span>
+
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>addCacheManagers</span><span class=o>(</span><span class=n>Collection</span><span class=o>&lt;</span><span class=n>CacheManager</span><span class=o>&gt;</span> <span class=n>cacheManagers</span><span class=o>)</span> <span class=o>{</span>
+        <span class=k>this</span><span class=o>.</span><span class=na>cacheManagers</span><span class=o>.</span><span class=na>addAll</span><span class=o>(</span><span class=n>cacheManagers</span><span class=o>);</span>
+        <span class=n>redisCacheManager</span> <span class=o>=</span> <span class=k>this</span><span class=o>.</span><span class=na>cacheManagers</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>0</span><span class=o>);</span>
+    <span class=o>}</span>
+
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>deactivateRedisCacheManager</span><span class=o>()</span> <span class=o>{</span>
+        <span class=k>if</span> <span class=o>(!</span><span class=n>cacheManagers</span><span class=o>.</span><span class=na>getFirst</span><span class=o>().</span><span class=na>equals</span><span class=o>(</span><span class=n>redisCacheManager</span><span class=o>))</span> <span class=o>{</span>
+            <span class=n>logger</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;First cache manager is not redis cache manager&#34;</span><span class=o>);</span>
+            <span class=k>return</span><span class=o>;</span>
+        <span class=o>}</span>
+        <span class=n>cacheManagers</span><span class=o>.</span><span class=na>removeFirst</span><span class=o>();</span>
+    <span class=o>}</span>
+
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>activateRedisCacheManager</span><span class=o>()</span> <span class=o>{</span>
+        <span class=k>if</span> <span class=o>(</span><span class=n>cacheManagers</span><span class=o>.</span><span class=na>getFirst</span><span class=o>().</span><span class=na>equals</span><span class=o>(</span><span class=n>redisCacheManager</span><span class=o>))</span> <span class=o>{</span>
+            <span class=n>logger</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;First cache manager already is redis cache manager&#34;</span><span class=o>);</span>
+            <span class=k>return</span><span class=o>;</span>
+        <span class=o>}</span>
+        <span class=n>cacheManagers</span><span class=o>.</span><span class=na>addFirst</span><span class=o>(</span><span class=n>redisCacheManager</span><span class=o>);</span>
+    <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>因为只给当前项目用，所以对 RedisCacheManager 做了特别对待，有两个函数 activateRedisCacheManager 和 deactivateRedisCacheManager，专门用于添加和删除它。那么什么时候调用这两个函数呢？也即，怎么判断 Redis 上线了、挂掉了呢？</p>
+<p>（未被采取的）第一反应是，HealthCheck，Springboot 流派中，最常用的就是 spring-boot-actuator 了，参考它的 RedisHealthIndicator 代码如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=nd>@Override</span>
+<span class=kd>protected</span> <span class=kt>void</span> <span class=nf>doHealthCheck</span><span class=o>(</span><span class=n>Health</span><span class=o>.</span><span class=na>Builder</span> <span class=n>builder</span><span class=o>)</span> <span class=kd>throws</span> <span class=n>Exception</span> <span class=o>{</span>
+    <span class=n>RedisConnection</span> <span class=n>connection</span> <span class=o>=</span> <span class=n>RedisConnectionUtils</span><span class=o>.</span><span class=na>getConnection</span><span class=o>(</span><span class=k>this</span><span class=o>.</span><span class=na>redisConnectionFactory</span><span class=o>);</span>
+    <span class=k>try</span> <span class=o>{</span>
+        <span class=k>if</span> <span class=o>(</span><span class=n>connection</span> <span class=k>instanceof</span> <span class=n>RedisClusterConnection</span><span class=o>)</span> <span class=o>{</span>
+            <span class=n>ClusterInfo</span> <span class=n>clusterInfo</span> <span class=o>=</span> <span class=o>((</span><span class=n>RedisClusterConnection</span><span class=o>)</span> <span class=n>connection</span><span class=o>).</span><span class=na>clusterGetClusterInfo</span><span class=o>();</span>
+            <span class=n>builder</span><span class=o>.</span><span class=na>up</span><span class=o>().</span><span class=na>withDetail</span><span class=o>(</span><span class=s>&#34;cluster_size&#34;</span><span class=o>,</span> <span class=n>clusterInfo</span><span class=o>.</span><span class=na>getClusterSize</span><span class=o>())</span>
+                    <span class=o>.</span><span class=na>withDetail</span><span class=o>(</span><span class=s>&#34;slots_up&#34;</span><span class=o>,</span> <span class=n>clusterInfo</span><span class=o>.</span><span class=na>getSlotsOk</span><span class=o>())</span>
+                    <span class=o>.</span><span class=na>withDetail</span><span class=o>(</span><span class=s>&#34;slots_fail&#34;</span><span class=o>,</span> <span class=n>clusterInfo</span><span class=o>.</span><span class=na>getSlotsFail</span><span class=o>());</span>
+        <span class=o>}</span>
+        <span class=k>else</span> <span class=o>{</span>
+            <span class=c1>// 因为项目中用到的 redis 是哨兵机制部署的，所以关键的就是下面这一行了
+</span><span class=c1></span>            <span class=n>Properties</span> <span class=n>info</span> <span class=o>=</span> <span class=n>connection</span><span class=o>.</span><span class=na>info</span><span class=o>();</span>
+            <span class=n>builder</span><span class=o>.</span><span class=na>up</span><span class=o>().</span><span class=na>withDetail</span><span class=o>(</span><span class=n>VERSION</span><span class=o>,</span> <span class=n>info</span><span class=o>.</span><span class=na>getProperty</span><span class=o>(</span><span class=n>REDIS_VERSION</span><span class=o>));</span>
+        <span class=o>}</span>
+    <span class=o>}</span>
+    <span class=k>finally</span> <span class=o>{</span>
+        <span class=n>RedisConnectionUtils</span><span class=o>.</span><span class=na>releaseConnection</span><span class=o>(</span><span class=n>connection</span><span class=o>,</span> <span class=k>this</span><span class=o>.</span><span class=na>redisConnectionFactory</span><span class=o>);</span>
+    <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>然而效果并不好，首先，它是被调用的一方，也就是说如果我要用类似的方式检测，还需要自己再起一个线程不断查询；其次，如果 redis 挂了，connection.info() 就会先等待超时，然后抛出异常，和正常的缓存操作数据流程没有什么区别，作为一个检测是否可用的机制，感觉很不优雅。</p>
+<p>兜兜转转，发现 lettuce 提供了<a href=https://github.com/lettuce-io/lettuce-core/wiki/Connection-Events>事件监听机制</a>，可以注册监听 reids 的上线、下线事件，正中下怀，于是修改 CacheConfig 配置类，添加事件注册如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=nd>@EnableCaching</span>
+<span class=nd>@PropertySource</span><span class=o>(</span><span class=s>&#34;classpath:cache-${spring.profiles.active}.properties&#34;</span><span class=o>)</span>
+<span class=nd>@Configuration</span>
+<span class=kd>public</span> <span class=kd>class</span> <span class=nc>CacheConfig</span> <span class=kd>extends</span> <span class=n>CachingConfigurerSupport</span> <span class=o>{</span>
+    <span class=nd>@Autowired</span>
+    <span class=kd>private</span> <span class=n>LettuceConnectionFactory</span> <span class=n>lettuceConnectionFactory</span><span class=o>;</span>
+
+    <span class=nd>@Autowired</span>
+    <span class=nd>@Lazy</span>
+    <span class=kd>private</span> <span class=n>CustomCompositeCacheManager</span> <span class=n>frequentCacheManager</span><span class=o>;</span>
+
+    <span class=nd>@Override</span>
+    <span class=kd>public</span> <span class=n>CacheErrorHandler</span> <span class=nf>errorHandler</span><span class=o>()</span> <span class=o>{</span>
+        <span class=k>return</span> <span class=k>new</span> <span class=n>CacheErrorLoggingHandler</span><span class=o>();;</span>
+    <span class=o>}</span>
+
+    <span class=nd>@PostConstruct</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>registerListener</span><span class=o>()</span> <span class=o>{</span>
+        <span class=n>LettuceClientConfiguration</span> <span class=n>clientConfiguration</span> <span class=o>=</span> <span class=n>lettuceConnectionFactory</span><span class=o>.</span><span class=na>getClientConfiguration</span><span class=o>();</span>
+        <span class=n>Optional</span><span class=o>&lt;</span><span class=n>ClientResources</span><span class=o>&gt;</span> <span class=n>clientResources</span> <span class=o>=</span> <span class=n>clientConfiguration</span><span class=o>.</span><span class=na>getClientResources</span><span class=o>();</span>
+
+        <span class=n>clientResources</span><span class=o>.</span><span class=na>ifPresent</span><span class=o>(</span><span class=n>resources</span> <span class=o>-&gt;</span> <span class=o>{</span>
+            <span class=n>resources</span><span class=o>.</span><span class=na>eventBus</span><span class=o>().</span><span class=na>get</span><span class=o>().</span><span class=na>subscribe</span><span class=o>(</span><span class=n>e</span> <span class=o>-&gt;</span> <span class=o>{</span>
+                <span class=n>logger</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;Caught cache event: {}&#34;</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
+                <span class=k>if</span> <span class=o>(</span><span class=n>e</span> <span class=k>instanceof</span> <span class=n>ConnectionDeactivatedEvent</span><span class=o>)</span> <span class=o>{</span>
+                    <span class=n>logger</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;ConnectionDeactivatedEvent&#34;</span><span class=o>);</span>
+                    <span class=n>frequentCacheManager</span><span class=o>.</span><span class=na>deactivateRedisCacheManager</span><span class=o>();</span>
+                <span class=o>}</span> <span class=k>else</span> <span class=k>if</span> <span class=o>(</span><span class=n>e</span> <span class=k>instanceof</span> <span class=n>ConnectionActivatedEvent</span><span class=o>)</span> <span class=o>{</span>
+                    <span class=n>logger</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;ConnectionActivatedEvent&#34;</span><span class=o>);</span>
+                    <span class=n>frequentCacheManager</span><span class=o>.</span><span class=na>activateRedisCacheManager</span><span class=o>();</span>
+                <span class=o>}</span>
+            <span class=o>});</span>
+        <span class=o>});</span>
+    <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>忍不住赞美 lettuce，测试程序运行过程中，将 redis 挂掉再启动，事件通知非常灵敏，整个运行流程完全如我预测：</p>
+<ul>
+<li>redis 服务下线，deactivateRedisCacheManager 方法被触发，RedisCacheManager 被从可用 cacheManagers 中移除，再次请求带缓存的方法时，由 cacheManagers 中下一顺位的 CacheManager （比如 NoOpCacheManager）处理</li>
+<li>redis 服务上线，activateRedisCacheManager() 方法被触发，RedisCacheManager 作为第一个节点重新回到 cacheManagers 队列，再次请求带缓存的方法时，优先缓存到 redis 中</li>
+</ul>
+<h2 id=与多级缓存对比>与多级缓存对比<a href=#与多级缓存对比 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>提到缓存，就肯定会想到多级缓存（吧？）本篇讨论的虽然也涉及多个缓存（假如把 NoOpCacheManager 也看作一种特殊缓存），但是侧重点不同：</p>
+<ul>
+<li>多级缓存主要目标是进一步提高访问速度，在 redis 这种远程的分布式缓存之上，再加一层本地内存缓存，比如 caffeine 或者 ehcache，更新缓存时，要考虑多级缓存中的数据一致性，显然也不是 CacheManager 的适用场景。</li>
+<li>本篇主要考虑缓存故障以及故障修复情况下，应用使用的缓存动态切换。需要考虑的是数据 stale 问题，比如故障期间数据已过期，由于 redis 故障未得到及时更新，修复后程序再次切换使用 redis，其中保存的已过期数据就会影响程序逻辑。</li>
+</ul>
+<h2 id=问题>问题<a href=#问题 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<h3 id=程序启动时-redis-未就绪>程序启动时 redis 未就绪<a href=#程序启动时-redis-未就绪 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>然而还是有问题的，如果程序启动前，redis 就挂了，那么 lettuce 是不会发布任何事件的，即使后来 redis 又上线了，也不会有事件通知，以后如果去请求带缓存的方法，就会次次进入 ErrorHandler 处理流程，也就是事件监听器没有起到任何作用。</p>
+<p>此处猜测（未验证），lettuce 的事件发布，是订阅了 redis 的事件频道，所以如果最开始没有正确连接到 reids 的话 ，程序中订阅的 lettuce 的事件也就废了。</p>
+<p>不过对于 standalone 的 redis 上线事件，又是怎么监听到的呢？不理解呀。</p>
+<h3 id=redis-故障期间缓存数据过期>redis 故障期间缓存数据过期<a href=#redis-故障期间缓存数据过期 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>一个是设置比较短的缓存过期时间，尽量减少遇到这种情况的概率 😂
+一个是比较保险的办法，但是也比较低效，就是故障修复后切回使用 redis 时，把所有缓存 evict 掉，等待下次请求重新 put。</p>
+<h2 id=题外话>题外话<a href=#题外话 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>关于缓存穿透问题，就是不怀好意的用户使用大量不存在的参数查询，击穿缓存层直接打到数据库，从而达到打挂数据的目的，最开始看到的办法是，来一个请求就缓存一个并且把返回值设置为 null 之类的，尽量减少到数据库的请求。虽然好像也能行，但是如果人家用的海量不重复的请求，不就顺带击垮你的 redis 了吗？😂</p>
+<p>后来看到一种解决办法是用布隆过滤器，感觉脑袋被敲了一下，哎呀，这个厉害呀！内存占用又少，又拦住了恶意请求。点赞！👍</p>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/spring-config/>使线上 Spring 应用更好部署和调试</a></li>
+<li><a href=/post/config-server-with-spring-boot-and-disconf/>基于 Spring Boot + Disconf 的配置中心</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/spring>spring</a></span><span class=tag><a href=https://kyon.life/tags/cache>cache</a></span><span class=tag><a href=https://kyon.life/tags/redis>redis</a></span><span class=tag><a href=https://kyon.life/tags/%E5%88%86%E4%BA%AB>分享</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 7676 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2020-09-29 07:40</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/a7666d216953621da5cea4c3710181cdfe449773 target=_blank rel=noopener>a7666d2</a> @ 2021-02-26</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#现状>现状</a></li>
+<li><a href=#目标>目标</a></li>
+<li><a href=#解决方案>解决方案</a>
+<ul>
+<li><a href=#方案一>方案一</a></li>
+<li><a href=#方案二>方案二</a></li>
+</ul>
+</li>
+<li><a href=#与多级缓存对比>与多级缓存对比</a></li>
+<li><a href=#问题>问题</a>
+<ul>
+<li><a href=#程序启动时-redis-未就绪>程序启动时 redis 未就绪</a></li>
+<li><a href=#redis-故障期间缓存数据过期>redis 故障期间缓存数据过期</a></li>
+</ul>
+</li>
+<li><a href=#题外话>题外话</a></li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=next-post href=https://kyon.life/post/java-garbage-collector/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>第三章 垃圾收集器与内存分配策略</span>
+</a>
+<a class=prev-post href=https://kyon.life/post/philosophy-of-software-design-3/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>Philosophy of Software Design 第三章 仅仅能工作的代码是不够的（编程时的战略 vs 战术思维）</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>

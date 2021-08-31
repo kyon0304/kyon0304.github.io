@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>产品 on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/%E4%BA%A7%E5%93%81/</link><description>Recent content in 产品 on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 03 Sep 2019 15:07:03 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/%E4%BA%A7%E5%93%81/index.xml" rel="self" type="application/rss+xml"/><item><title>The Three Buckets</title><link>https://kyon.life/post/the-three-buckets/</link><pubDate>Tue, 03 Sep 2019 15:07:03 +0800</pubDate><guid>https://kyon.life/post/the-three-buckets/</guid><description>翻译自 Guide to Product Planning: Three Feature Buckets，一篇 2009 年的文章。
+把将要开发的功能的概念分类到下面三个桶里的一个：
+Metric Movers: 这些功能会很大程度上改变商业目标和产品指标(These are features that will move your target business &amp;amp; product metrics significantly.)。在大多数健康的产品组织中，都会有具体的原因和策略支持对某个产品或功能的投资决定。受雇，增长，年报。一般来说，很少功能真正属于这一类。要提前知道哪些功能是，因为产品的成败很大程度上取决于指标的评估。 Customer Requests: 这些功能是你的客户不断要求的。没什么好说的。倾听你的客户，弄清楚哪些是他们最想要的。你不必非要实现他们要求的所有功能，但是专业的项目管理需要谨慎的倾听直接来自客户的要求，并且十分谦虚和考虑周全，因为没有什么比把客户曾经要求的功能回滚更能激怒他们。 Customer Delight: 这些功能客户没有要求过，但是使用的时候他们会很高兴。一般来说完成这些功能需要以下几点：倾听客户找到他们的痛点，了解在技术上如何可行，富有创新的设计以获得优雅而令人愉悦的操作体验。 有些功能可能可以同时放入多个桶，但是一般不会同时可以放到所有桶里。
+我发现，把功能从这三个桶的维度进行分类，会强迫产品团队直视他们为什么想要完成某项功能，是客户想要吗？还是公司想要（Metric Movers）？或者只是他们自己觉得很酷。
+以上算是摘抄式翻译，有两段介绍作者写这篇文章原因的文字略过，后面关于使用这种方式的好处也略过了。
+另外，最为关键的 Metrics Movers 这个分类，感觉吃不准，作者想表达的到底是完成这项功能以后，产品就会向着预期的目标迈进一大步，还是会大幅度改变产品原来的目标。搜了下原文的评论，似乎没人有这个困惑，可能属于 101 的内容，我这个大外行才不懂。</description></item><item><title>How to Be a Great Product Manager</title><link>https://kyon.life/post/how-to-be-a-great-product-manager/</link><pubDate>Tue, 03 Sep 2019 15:05:43 +0800</pubDate><guid>https://kyon.life/post/how-to-be-a-great-product-manager/</guid><description>翻译自 Be a Great Product Leader，一篇 2011 年的文章。
+了解我的人都知道，我对项目管理充满热情。我相信，项目管理可以帮助一个拥有技术和设计人员的跨功能模块的团队最好程度地完成工作。
+不幸的是，项目管理的工作描述要不就是太模糊（你对这个产品负责），要不就是过于具体（编写产品规格说明），都不能帮助人们成为厉害的项目管理。
+我花了很多时间来考虑项目管理的价值，怎么能够既可以和合作团队沟通清楚他们的需求，又能和项目管理新人交代明白他们的工作内容。这么多年过去了，我把这些沟通精简为三种责任：策略、优先级和实施。
+责任 #1: 产品策略 在顶级的商务课程中有很多探讨策略的内容，然而，我怀疑，其中并没有任何一个探讨产品的策略。
+非常简单，产品管理的任务是把两件事情说清楚：
+我们参与的竞争是什么 我们如何赢得分数 把这两件事情理清楚以后，忽然间，会有很多非常聪明的人一起来为这个产品贡献自己的力量，比如开发、运营、市场、质量保证、设计等。如果没有搞明白这两件事情，再好的优先级制定和实施也挽救不了你。架构杰出的软件需要各种个样的人才，原创性的理念可能来自各种地方，把我们参加的竞争和如何衡量是否成功说明白，可以帮助团队自主决定哪个主意更有完成的价值。
+清楚地定义参与的竞争是什么，包括对这个产品的愿景，给消费者提供的价值，以及和竟争对手的差异。但是，更重要的是，清楚地表达出为什么我们的产品可以在市场竞争中获胜。如果你选取了适当的衡量成败的指标，团队里的每个人都应该知道如何取胜。
+询问任何一个在职超过两周的项目管理这两个问题，你都应该得到一个坚实的答案。
+达成成就：步调一致的努力，更好的积极性，原创性的主意，获得反馈(product that moves a needle)。
+责任 #2: 优先级 一旦团队成员了解了目标和如何达成，制定优先级就变得简单了。这是项目管理的第二种责任——确保最初的策略贯彻到项目实施阶段。
+在拥有聪明人士的公司里，总是会有更多的好主意。随着公司规模的增大，这种状况并不会变好，因为更多的人总是会有不同的主意，关于什么可以做什么不能。最终，不留情面的制定优先级是必须面对的现实。
+团队接下来需要执行并完成的三个主意才是值得关注的，而不是在好主意清单中哪些是最棒的。
+目前所处的阶段是任何企业事业中最关键的部分，大多数产品的失败不是由于缺少好主意，而是错误地评估了哪些主意是目前急需实现的，哪些可以再等等。
+就个人来说，我认为线性的优先级在长远来看是低效的。在另一篇文章 The Three Buckets里详细解释了我赞成的划分优先级的流程。
+询问任何一个在职超过两周的项目经理，他们的团队目前开发产品的优先级列表，而且这个列表有着自己清晰的逻辑，团队里每个人都了解并支持。
+责任 #3: 实施 项目管理其实会做非常多的杂事。
+最终来看，项目管理会发布产品。这意味着，项目管理需要处理产品发布过程中的任何问题。有时需要完善内容，有时需要补设计，有时需要做 QA，有时又需要做 PR。总之是在人类能力所及范围内，去完成所有成功发布产品所需要的事情。
+然而，这其中有些事情对团队来说尤为重要，否则效率会变得相当低下。
+产品规格文档：需要清晰地指示团队在构建的东西 边缘场景取舍：意料外地复杂边缘场景经常会出现。一般来说，这是项目管理的责任，把这些边缘场景可能会造成的后果分散到产品的其他部分中去。（ Typically, the product manager is on the line to quickly triage those decisions for potentially ramifications to other parts of the product.</description></item></channel></rss>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>jvm on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/jvm/</link><description>Recent content in jvm on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Mon, 23 Nov 2020 21:53:51 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/jvm/index.xml" rel="self" type="application/rss+xml"/><item><title>第三章 垃圾收集器与内存分配策略</title><link>https://kyon.life/post/java-garbage-collector/</link><pubDate>Mon, 23 Nov 2020 21:53:51 +0800</pubDate><guid>https://kyon.life/post/java-garbage-collector/</guid><description>3.3 垃圾收集算法 分代假说 从如何判定对象消亡的角度，垃圾收集算法可以分为两大类：「引用计数式垃圾收集」和「追踪式垃圾收集」，主流 Java 虚拟机都采用第二种。
+分代垃圾收集理论基于三个假设：
+弱分代假说：大部分对象都是朝生夕死 强分代假说：活过越多次垃圾回收的对象越不容易被回收 跨代引用假说：跨代引用相对于同代引用来说占比极少 因此应当将内存划分为不同区域，根据对象存活过的回收年龄放到不同区域，适用不同的回收算法，对象间即使存在跨代引用，也是极少数，不需要扫描整个老年代，只需要通过记忆集存储即可。泛泛而论，大部分对象位于新生代，适用标记-复制算法回收，熬过多轮回收的对象位于老年代，适用标记-整理算法。
+标记-清除算法 最初始、最基本的追踪式垃圾回收算法，先标记出需要回收的对象，然后清除，相应内存位置变为可用状态。容易产生内存碎片。
+标记-复制算法 简称为复制算法，为了解决内存碎片问题，留出一半空间不使用，开始回收内存时，先标记，然后将不可回收对象复制到未使用空间，另外一半空间直接清除。时间效率高，但是浪费一半空间。
+基于 IBM 一项研究，新生代对象 98% 都可以在第一次垃圾回收时被回收掉，因此可以降低空间浪费，hotspot 虚拟机中，新生代分为 eden、s0、s1 三个区域，大小比例为 8:1:1 空间浪费由 50% 降低为 10%。新生成对象先进入 eden 区，s0, s1 两个区域总有一个保持未使用状态，假设开始垃圾回收时，s1 未使用，将不可回收对象放入 s1，然后清除 eden 和 s0。如果 s1 不够用，就放入老年代。
+标记-整理算法 如果存活对象过多，比如老年队，标记-复制算法的效率就会显而易见降低。而且，如果不想浪费 50% 空间，就必须有另外的担保空间，在 s0 或 s1 区域不够放时接住对象。
+在标记-清除算法基础上改进，标记完毕后，不是直接清除可回收对象，而是将存活对象移动到内存区域一端，然后将剩下的区域清除，相当于做了个整理操作。
+移动存活对象，垃圾回收过程会复杂，执行效率低，并且需要 stop the world，不移动存活对象，由于内存碎片，内存分配过程会复杂。但是总体而言，还是移动存活对象会使得整个内存使用的吞吐量更高。关注低延迟的 CMS 是基于标记-清除算法，关注总吞吐量的 Parallel Scavenge 是基于标记-整理算法。内存碎片过多时，CMS 会触发一次内存整理。
+3.4 Hotspot 虚拟机的算法细节实现 枚举根节点 GC Roots 遍历需要 stop the world，因此要尽可能快，由于 Java 虚拟机主流基本都使用准确式内存管理，即记录了内存中数据类型，因此使用 (Ordinary Object Pointer)OOPMap 数据结构记录对象引用就可以快速拿到所有 GC Roots。</description></item></channel></rss>
