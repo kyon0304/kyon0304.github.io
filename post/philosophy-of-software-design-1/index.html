@@ -1,12 +1,4 @@
-<!doctype html><html lang=zh-cn>
-<head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta http-equiv=x-ua-compatible content="ie=edge">
-<meta name=theme-color content="#494f5c">
-<meta name=msapplication-TileColor content="#494f5c">
-<meta itemprop=name content="Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）">
-<meta itemprop=description content="编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=theme-color content="#494f5c"><meta name=msapplication-TileColor content="#494f5c"><meta itemprop=name content="Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）"><meta itemprop=description content="编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。
 这表明编写软件时最大的限制是对我们正在创造的系统的理解能力。随着一个程序不停演进并获得更多功能，它会变得复杂，组件之间会有不起眼的依赖。时间流逝，复杂度会累积，程序员在修改系统时，越来越难以把所有相关的因素都记在脑子里。这就会拖慢研发速度，并且导致 bug 产生，然后形成一个恶性循环。任何程序的复杂度都会不可避免的变高。越大型的程序，越多的人参与开发，就越难以控制复杂度。
 好的开发工具可以帮助我们处理复杂度，过去的几十年中有许多很厉害的工具被创造了出来。但是仅仅使用这些工具，我们能做到的事情是有限制的。如果我们想要把编写软件变得简单，使得构建强大的系统变得更容易，我们必须找到使软件更简单的方式。尽管我们尽了最大的努力，复杂度还是会随着时间增长，但是更简单的设计允许我们在复杂度不可控之前构建出更大型更强大的系统。
 控制复杂度有两种通用的方式，这本书都会讨论。第一种方式使通过使代码更简单更清晰来消除复杂度。比如，通过去除特殊场景或使用一致的标识可以减少复杂性。
@@ -23,11 +15,7 @@
 提升你的设计技能的最好的方式之一是学习识别 红色警告：一段代码可能比它实际需要的更复杂的信号。在本书的课程中，我会指出和每个主要设计问题相关的表示问题出现的红色警告；最重要的几个在书的最后做了总结。当你编码时可以使用：当你看到一个红色警告，停止工作并寻找可以消除问题的其他设计。当你第一次尝试这种方式时，在找到可以消除红色警告的设计前，可能不得不尝试好几种设计。不要轻易放弃：在修复问题前尝试地越多，你学到的越多。随着时间流逝，你会发现代码中的红色警告越来越少，你的设计变得越来越简洁。你的经验也会向你展示其他红色警告，你可以用来识别设计问题（我会很乐意听到你新发现的这些红色警告）。
 当应用本书中的理念时，应当注意节制和谨慎。每条规则都有例外，每个规范都有限制。如果你把每个设计理念都发挥到极致，可能最终会陷入困境。漂亮的设计反应了理念和实现之间较量的平衡。有几个章节中包含名为“过度实践”的部分，描述了如何发现你已经过度了。
 这本书几乎所有例子都是 Java 或 C++ 的，大多数讨论都是针对面向对象语言中的设计类。然而，这些理念也可以很好的应用于其他领域。几乎所有和方法有关的理念也可以应用于没有面向对象功能的语言中的函数，比如 C。设计理念也可以应用于模块而不是类，比如子系统或网络服务。
-有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。"><meta itemprop=datePublished content="2020-02-19T10:16:53+08:00">
-<meta itemprop=dateModified content="2020-02-19T19:19:58+08:00">
-<meta itemprop=wordCount content="33"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
-<meta itemprop=keywords content="鹦鹉学舌,学习笔记,"><meta property="og:title" content="Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）">
-<meta property="og:description" content="编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。
+有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。"><meta itemprop=datePublished content="2020-02-19T10:16:53+08:00"><meta itemprop=dateModified content="2020-02-19T19:19:58+08:00"><meta itemprop=wordCount content="33"><meta itemprop=image content="https://kyon.life/mstile-150x150.png"><meta itemprop=keywords content="鹦鹉学舌,学习笔记,"><meta property="og:title" content="Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）"><meta property="og:description" content="编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。
 这表明编写软件时最大的限制是对我们正在创造的系统的理解能力。随着一个程序不停演进并获得更多功能，它会变得复杂，组件之间会有不起眼的依赖。时间流逝，复杂度会累积，程序员在修改系统时，越来越难以把所有相关的因素都记在脑子里。这就会拖慢研发速度，并且导致 bug 产生，然后形成一个恶性循环。任何程序的复杂度都会不可避免的变高。越大型的程序，越多的人参与开发，就越难以控制复杂度。
 好的开发工具可以帮助我们处理复杂度，过去的几十年中有许多很厉害的工具被创造了出来。但是仅仅使用这些工具，我们能做到的事情是有限制的。如果我们想要把编写软件变得简单，使得构建强大的系统变得更容易，我们必须找到使软件更简单的方式。尽管我们尽了最大的努力，复杂度还是会随着时间增长，但是更简单的设计允许我们在复杂度不可控之前构建出更大型更强大的系统。
 控制复杂度有两种通用的方式，这本书都会讨论。第一种方式使通过使代码更简单更清晰来消除复杂度。比如，通过去除特殊场景或使用一致的标识可以减少复杂性。
@@ -44,24 +32,7 @@
 提升你的设计技能的最好的方式之一是学习识别 红色警告：一段代码可能比它实际需要的更复杂的信号。在本书的课程中，我会指出和每个主要设计问题相关的表示问题出现的红色警告；最重要的几个在书的最后做了总结。当你编码时可以使用：当你看到一个红色警告，停止工作并寻找可以消除问题的其他设计。当你第一次尝试这种方式时，在找到可以消除红色警告的设计前，可能不得不尝试好几种设计。不要轻易放弃：在修复问题前尝试地越多，你学到的越多。随着时间流逝，你会发现代码中的红色警告越来越少，你的设计变得越来越简洁。你的经验也会向你展示其他红色警告，你可以用来识别设计问题（我会很乐意听到你新发现的这些红色警告）。
 当应用本书中的理念时，应当注意节制和谨慎。每条规则都有例外，每个规范都有限制。如果你把每个设计理念都发挥到极致，可能最终会陷入困境。漂亮的设计反应了理念和实现之间较量的平衡。有几个章节中包含名为“过度实践”的部分，描述了如何发现你已经过度了。
 这本书几乎所有例子都是 Java 或 C++ 的，大多数讨论都是针对面向对象语言中的设计类。然而，这些理念也可以很好的应用于其他领域。几乎所有和方法有关的理念也可以应用于没有面向对象功能的语言中的函数，比如 C。设计理念也可以应用于模块而不是类，比如子系统或网络服务。
-有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-1/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
-<meta property="article:published_time" content="2020-02-19T10:16:53+08:00">
-<meta property="article:modified_time" content="2020-02-19T19:19:58+08:00">
-<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
-<link rel=manifest href=/site.webmanifest>
-<link rel=mask-icon href=/safari-pinned-tab.svg color>
-<link rel="shortcut icon" href=/favicon.ico>
-<title>Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）</title>
-<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
-<link rel=stylesheet href=https://kyon.life/css/share.min.css>
-<meta name=twitter:card content="summary">
-<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
-<meta name=twitter:title content="Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）">
-<meta name=twitter:description content="编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。
+有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。"><meta property="og:type" content="article"><meta property="og:url" content="https://kyon.life/post/philosophy-of-software-design-1/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:published_time" content="2020-02-19T10:16:53+08:00"><meta property="article:modified_time" content="2020-02-19T19:19:58+08:00"><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color><link rel="shortcut icon" href=/favicon.ico><title>Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）</title><link rel=stylesheet href=https://kyon.life/css/style.min.eac77496566fd7d5768fd650ddb0b2b181ca6a2d7c5fdd6fe6b8ba4bf47e566f.css integrity="sha256-6sd0llZv19V2j9ZQ3bCysYHKai18X91v5ri6S/R+Vm8=" crossorigin=anonymous><link rel=stylesheet href=https://kyon.life/css/share.min.css><meta name=twitter:card content="summary"><meta name=twitter:image content="https://kyon.life/mstile-150x150.png"><meta name=twitter:title content="Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）"><meta name=twitter:description content="编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。
 这表明编写软件时最大的限制是对我们正在创造的系统的理解能力。随着一个程序不停演进并获得更多功能，它会变得复杂，组件之间会有不起眼的依赖。时间流逝，复杂度会累积，程序员在修改系统时，越来越难以把所有相关的因素都记在脑子里。这就会拖慢研发速度，并且导致 bug 产生，然后形成一个恶性循环。任何程序的复杂度都会不可避免的变高。越大型的程序，越多的人参与开发，就越难以控制复杂度。
 好的开发工具可以帮助我们处理复杂度，过去的几十年中有许多很厉害的工具被创造了出来。但是仅仅使用这些工具，我们能做到的事情是有限制的。如果我们想要把编写软件变得简单，使得构建强大的系统变得更容易，我们必须找到使软件更简单的方式。尽管我们尽了最大的努力，复杂度还是会随着时间增长，但是更简单的设计允许我们在复杂度不可控之前构建出更大型更强大的系统。
 控制复杂度有两种通用的方式，这本书都会讨论。第一种方式使通过使代码更简单更清晰来消除复杂度。比如，通过去除特殊场景或使用一致的标识可以减少复杂性。
@@ -78,124 +49,7 @@
 提升你的设计技能的最好的方式之一是学习识别 红色警告：一段代码可能比它实际需要的更复杂的信号。在本书的课程中，我会指出和每个主要设计问题相关的表示问题出现的红色警告；最重要的几个在书的最后做了总结。当你编码时可以使用：当你看到一个红色警告，停止工作并寻找可以消除问题的其他设计。当你第一次尝试这种方式时，在找到可以消除红色警告的设计前，可能不得不尝试好几种设计。不要轻易放弃：在修复问题前尝试地越多，你学到的越多。随着时间流逝，你会发现代码中的红色警告越来越少，你的设计变得越来越简洁。你的经验也会向你展示其他红色警告，你可以用来识别设计问题（我会很乐意听到你新发现的这些红色警告）。
 当应用本书中的理念时，应当注意节制和谨慎。每条规则都有例外，每个规范都有限制。如果你把每个设计理念都发挥到极致，可能最终会陷入困境。漂亮的设计反应了理念和实现之间较量的平衡。有几个章节中包含名为“过度实践”的部分，描述了如何发现你已经过度了。
 这本书几乎所有例子都是 Java 或 C++ 的，大多数讨论都是针对面向对象语言中的设计类。然而，这些理念也可以很好的应用于其他领域。几乎所有和方法有关的理念也可以应用于没有面向对象功能的语言中的函数，比如 C。设计理念也可以应用于模块而不是类，比如子系统或网络服务。
-有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。">
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
-<link href=/css/zoom.css rel=stylesheet>
-<script src=/js/zoom.js></script>
-<script src=/js/transition.js></script>
-</head>
-<body id=page>
-<header id=site-header class="animated slideInUp">
-<div class="hdr-wrapper section-inner">
-<div class=hdr-left>
-<div class=site-branding>
-<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
-</div>
-<nav class="site-nav hide-in-mobile">
-<a href=https://kyon.life/post/>博文</a>
-<a href=https://kyon.life/about/>关于</a>
-</nav>
-</div>
-<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-</div>
-</div>
-</header>
-<div id=mobile-menu class="animated fast">
-<ul>
-<li><a href=https://kyon.life/post/>博文</a></li>
-<li><a href=https://kyon.life/about/>关于</a></li>
-</ul>
-</div>
-<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
-<article class=thin>
-<header class=post-header>
-<div class=post-meta><span>2 月 19 号, 2020</span></div>
-<h1>Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）</h1>
-</header>
-<div class=content>
-<p>编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。</p>
-<p>这表明编写软件时最大的限制是对我们正在创造的系统的理解能力。随着一个程序不停演进并获得更多功能，它会变得复杂，组件之间会有不起眼的依赖。时间流逝，复杂度会累积，程序员在修改系统时，越来越难以把所有相关的因素都记在脑子里。这就会拖慢研发速度，并且导致 bug 产生，然后形成一个恶性循环。任何程序的复杂度都会不可避免的变高。越大型的程序，越多的人参与开发，就越难以控制复杂度。</p>
-<p>好的开发工具可以帮助我们处理复杂度，过去的几十年中有许多很厉害的工具被创造了出来。但是仅仅使用这些工具，我们能做到的事情是有限制的。如果我们想要把编写软件变得简单，使得构建强大的系统变得更容易，我们必须找到使软件更简单的方式。尽管我们尽了最大的努力，复杂度还是会随着时间增长，但是更简单的设计允许我们在复杂度不可控之前构建出更大型更强大的系统。</p>
-<p>控制复杂度有两种通用的方式，这本书都会讨论。第一种方式使通过使代码更简单更清晰来消除复杂度。比如，通过去除特殊场景或使用一致的标识可以减少复杂性。</p>
-<p>第二种方式是封装复杂性，这样程序员可以在不完全了解它的复杂性的情况下基于这个系统进行开发。这种方式被称作 <em>模块化设计</em>。在模块化设计中，一个软件系统划分为不同的模块，比如面向对象语言中的类。模块被设计为相对独立的，这样程序员可以在不了解其他模块细节的情况下开发当前模块。</p>
-<p>由于软件是如此具有延展性，所以软件设计是一个会横跨整个软件系统生命周期的持续的过程；这使得软件设计不同于物理系统比如建筑、轮船或桥梁的设计。然而，软件设计并不是一致被这样看待的。对于编程的历史上大多数时候，设计都集中于项目的开始阶段，就像其他工程原则一样。这种方式的极端被称为 <em>瀑布模型</em>，项目被划分为分散的阶段比如需求定义、设计、开发、测试和维护。在瀑布模型中，每个阶段都在下一个阶段开始前结束；大多数情况下，每个阶段是由不同的人来负责。整个系统在设计阶段一次性设计完成。这个阶段结束时设计就固定了，余下的阶段只是充实和设计这个设计。</p>
-<p>不幸的是，瀑布模型对软件来说几乎无法奏效。软件系统本质上要比物理系统更复杂；对于大型软件系统来说，在没有搭建任何东西之前，不可能将设计考虑地足够全面。结果，最初的设计会有许多问题。在进行实现之前这些问题都不会明显地暴露出来。然而，这时瀑布模型无法应对重大设计的变更（比如，设计者已经调去其他项目）。因此，程序员会尝试在不改变整体设计的情况下修补问题。这会导致复杂度爆炸性增长。</p>
-<p>由于这些问题的存在，当今的大多数软件开发项目采用一种增量的方式，比如 <em>敏捷开发</em>，最初的设计只关注总体功能的一小部分。这一部分被设计、实现，然后被评估。发现并更正原来设计中的问题，然后设计、实现和评估更多的功能。每次迭代都会暴露已有设计中的问题，并在设计下一部分的功能前修复。通过以这样的方式将设计扩散出去，最初设计中的问题可以在系统仍旧比较小型时修复；后面的功能可以从早期功能开发的经验中获益，所以出的问题会变少。</p>
-<p>增量的方式对软件奏效是因为软件具有足够的延展性，允许在实现的过程中出现重大的设计变更。相反，对物理系统来说，重大的设计变更会更具有挑战性：比如，在建造过程中修改桥墩的数量是不切实际的。</p>
-<p>增量研发意味着软件设计永远未完成。在系统的生命中设计持续存在：开发者应该一直考虑设计问题。增量研发也意味着持续的重新设计。系统或组件的初始设计几乎从来不是最好的；经验会不可避免地展示出完成这件事情的更好方式。作为一名软件开发者，应该始终寻找提升你正在开发的系统的设计的机会，而且应该为设计改进预留出一部分时间。</p>
-<p>如果软件开发者应该使用考虑设计问题，并且降低复杂性是软件设计最重要的元素，那么软件开发者应该始终考虑复杂性。这本书就是关于如何使用复杂性指导软件设计的。</p>
-<p>这本书有两个整体目标。第一个是描述软件复杂性的天性：“复杂性”意味着什么，为什么重要，以及如何识别出程序中存在不必要的复杂性？这本书第二个，而且更具挑战性的目标是给出在软件开发期间可以用来最小化复杂性的技术。不幸的是，并没有能够保证很棒的软件设计的简单的处方。相反，我会给出一系列哲学化的高层的概念，比如“类应该有深度” 或者 “通过定义使得错误不复存在”。这些概念可能无法立即区分出最好的设计，但是你可以使用它们比较不同的设计选择，并指导你在设计领域的探索。</p>
-<h2 id=11-如何使用这本书>1.1 如何使用这本书<a href=#11-如何使用这本书 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
-<p>这里讨论的设计原则很多都在一定程度上抽象，所以不看实际的代码可能会很难理解。寻找既足够小到可以放到书中又足够大到可以展示问题的例子非常困难（如果你遇到了好例子，请把它们发送给我）。所以，学习如何应用这些原则，只看这本书可能不够。</p>
-<p>使用这本书最好的方式是和代码审查联合起来。当你阅读别人的代码时，考虑它是否遵循了这里讨论的概念，以及如何影响代码的复杂度。在别人的代码中更容易看到设计问题。你可以用本书中描述的红色警告来识别问题并且提出改进建议。审查代码也会使你接触到新的设计方式以及编程技巧。</p>
-<p>提升你的设计技能的最好的方式之一是学习识别 <em>红色警告</em>：一段代码可能比它实际需要的更复杂的信号。在本书的课程中，我会指出和每个主要设计问题相关的表示问题出现的红色警告；最重要的几个在书的最后做了总结。当你编码时可以使用：当你看到一个红色警告，停止工作并寻找可以消除问题的其他设计。当你第一次尝试这种方式时，在找到可以消除红色警告的设计前，可能不得不尝试好几种设计。不要轻易放弃：在修复问题前尝试地越多，你学到的越多。随着时间流逝，你会发现代码中的红色警告越来越少，你的设计变得越来越简洁。你的经验也会向你展示其他红色警告，你可以用来识别设计问题（我会很乐意听到你新发现的这些红色警告）。</p>
-<p>当应用本书中的理念时，应当注意节制和谨慎。每条规则都有例外，每个规范都有限制。如果你把每个设计理念都发挥到极致，可能最终会陷入困境。漂亮的设计反应了理念和实现之间较量的平衡。有几个章节中包含名为“过度实践”的部分，描述了如何发现你已经过度了。</p>
-<p>这本书几乎所有例子都是 Java 或 C++ 的，大多数讨论都是针对面向对象语言中的设计类。然而，这些理念也可以很好的应用于其他领域。几乎所有和方法有关的理念也可以应用于没有面向对象功能的语言中的函数，比如 C。设计理念也可以应用于模块而不是类，比如子系统或网络服务。</p>
-<p>有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。</p>
-</div>
-<div class="related-posts thin">
-<h2>相关推荐</h2>
-<ul>
-<li><a href=/post/philosophy-of-software-design-11/>Philosophy of Software Design 第十一章 设计两次</a></li>
-<li><a href=/post/philosophy-of-software-design-10/>Philosophy of Software Design 第十章 通过定义使得错误不复存在</a></li>
-<li><a href=/post/philosophy-of-software-design-9/>Philosophy of Software Design 第九章 - 合并还是拆分</a></li>
-<li><a href=/post/philosophy-of-software-design-8/>Philosophy of Software Design - 第八章 降低复杂性</a></li>
-<li><a href=/post/philosophy-of-software-design/>Philosophy of Software Design - 第七章 不同层，不同抽象</a></li>
-</ul>
-</div>
-<hr class=post-end>
-<footer class=post-info>
-<p>
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C>鹦鹉学舌</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span>
-</p>
-<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2769 字</p>
-<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2020-02-19 02:16</p>
-<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d target=_blank rel=noopener>5d1291e</a> @ 2020-02-19</p>
-</footer>
-<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
-<center>
-<span style=font-size:16px;color:#c05b4d>分享到：</span>
-<a href=# class="social-share-icon icon-weibo"></a>
-<a href=# class="social-share-icon icon-wechat"></a>
-<a href=# class="social-share-icon icon-twitter"></a>
-<a href=# class="social-share-icon icon-qq"></a>
-<a href=# class="social-share-icon icon-qzone"></a>
-</center>
-</div>
-<script src=/js/social-share.min.js></script>
-</article>
-<aside class=post-toc id=toc>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#11-如何使用这本书>1.1 如何使用这本书</a></li>
-</ul>
-</nav>
-</aside>
-</main>
-<div class="post-nav thin">
-<a class=next-post href=https://kyon.life/post/philosophy-of-software-design-2/>
-<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>Philosophy of Software Design 第二章 复杂度的天性</span>
-</a>
-<a class=prev-post href=https://kyon.life/post/spring-config/>
-<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>使线上 Spring 应用更好部署和调试</span>
-</a>
-</div>
-<div id=comments class=thin>
-<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
-</div>
-<footer id=site-footer class="section-inner thin animated fadeIn faster">
-<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
-<p>
-Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
-</p>
-</footer>
-<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
-<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
-<script async src=https://www.google-analytics.com/analytics.js></script>
-<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
-<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
-<script async src=https://www.google-analytics.com/analytics.js></script>
-<script src=/js/social-share.min.js></script>
-</body>
-</html>
+有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。"><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script><link href=/css/zoom.css rel=stylesheet><script src=/js/zoom.js></script><script src=/js/transition.js></script></head><body id=page><header id=site-header class="animated slideInUp"><div class="hdr-wrapper section-inner"><div class=hdr-left><div class=site-branding><a href=https://kyon.life/>kyon's wonderland with ❤️</a></div><nav class="site-nav hide-in-mobile"><a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a></nav></div><div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77a5.44 5.44.0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><div id=mobile-menu class="animated fast"><ul><li><a href=https://kyon.life/post/>博文</a></li><li><a href=https://kyon.life/about/>关于</a></li></ul></div><main class="site-main main-content section-inner animated fadeIn faster" id=site-main><article class=thin><header class=post-header><div class=post-meta><span>2 月 19 号, 2020</span></div><h1>Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）</h1></header><div class=content><p>编写软件是人类历史上最纯粹的创造性活动。程序员不受实践限制的约束，比如物理定律；我们可以创造有着现实世界中不可能存在的行为的令人兴奋的虚拟世界。编写程序不像芭蕾或篮球那样要求有很棒的身体技能或协调性。编写程序所需要的是创造性思维以及组织你的想法的能力。如果你可以想象出一个系统，那么你就有可能在电脑程序中把它实现出来。</p><p>这表明编写软件时最大的限制是对我们正在创造的系统的理解能力。随着一个程序不停演进并获得更多功能，它会变得复杂，组件之间会有不起眼的依赖。时间流逝，复杂度会累积，程序员在修改系统时，越来越难以把所有相关的因素都记在脑子里。这就会拖慢研发速度，并且导致 bug 产生，然后形成一个恶性循环。任何程序的复杂度都会不可避免的变高。越大型的程序，越多的人参与开发，就越难以控制复杂度。</p><p>好的开发工具可以帮助我们处理复杂度，过去的几十年中有许多很厉害的工具被创造了出来。但是仅仅使用这些工具，我们能做到的事情是有限制的。如果我们想要把编写软件变得简单，使得构建强大的系统变得更容易，我们必须找到使软件更简单的方式。尽管我们尽了最大的努力，复杂度还是会随着时间增长，但是更简单的设计允许我们在复杂度不可控之前构建出更大型更强大的系统。</p><p>控制复杂度有两种通用的方式，这本书都会讨论。第一种方式使通过使代码更简单更清晰来消除复杂度。比如，通过去除特殊场景或使用一致的标识可以减少复杂性。</p><p>第二种方式是封装复杂性，这样程序员可以在不完全了解它的复杂性的情况下基于这个系统进行开发。这种方式被称作 <em>模块化设计</em>。在模块化设计中，一个软件系统划分为不同的模块，比如面向对象语言中的类。模块被设计为相对独立的，这样程序员可以在不了解其他模块细节的情况下开发当前模块。</p><p>由于软件是如此具有延展性，所以软件设计是一个会横跨整个软件系统生命周期的持续的过程；这使得软件设计不同于物理系统比如建筑、轮船或桥梁的设计。然而，软件设计并不是一致被这样看待的。对于编程的历史上大多数时候，设计都集中于项目的开始阶段，就像其他工程原则一样。这种方式的极端被称为 <em>瀑布模型</em>，项目被划分为分散的阶段比如需求定义、设计、开发、测试和维护。在瀑布模型中，每个阶段都在下一个阶段开始前结束；大多数情况下，每个阶段是由不同的人来负责。整个系统在设计阶段一次性设计完成。这个阶段结束时设计就固定了，余下的阶段只是充实和设计这个设计。</p><p>不幸的是，瀑布模型对软件来说几乎无法奏效。软件系统本质上要比物理系统更复杂；对于大型软件系统来说，在没有搭建任何东西之前，不可能将设计考虑地足够全面。结果，最初的设计会有许多问题。在进行实现之前这些问题都不会明显地暴露出来。然而，这时瀑布模型无法应对重大设计的变更（比如，设计者已经调去其他项目）。因此，程序员会尝试在不改变整体设计的情况下修补问题。这会导致复杂度爆炸性增长。</p><p>由于这些问题的存在，当今的大多数软件开发项目采用一种增量的方式，比如 <em>敏捷开发</em>，最初的设计只关注总体功能的一小部分。这一部分被设计、实现，然后被评估。发现并更正原来设计中的问题，然后设计、实现和评估更多的功能。每次迭代都会暴露已有设计中的问题，并在设计下一部分的功能前修复。通过以这样的方式将设计扩散出去，最初设计中的问题可以在系统仍旧比较小型时修复；后面的功能可以从早期功能开发的经验中获益，所以出的问题会变少。</p><p>增量的方式对软件奏效是因为软件具有足够的延展性，允许在实现的过程中出现重大的设计变更。相反，对物理系统来说，重大的设计变更会更具有挑战性：比如，在建造过程中修改桥墩的数量是不切实际的。</p><p>增量研发意味着软件设计永远未完成。在系统的生命中设计持续存在：开发者应该一直考虑设计问题。增量研发也意味着持续的重新设计。系统或组件的初始设计几乎从来不是最好的；经验会不可避免地展示出完成这件事情的更好方式。作为一名软件开发者，应该始终寻找提升你正在开发的系统的设计的机会，而且应该为设计改进预留出一部分时间。</p><p>如果软件开发者应该使用考虑设计问题，并且降低复杂性是软件设计最重要的元素，那么软件开发者应该始终考虑复杂性。这本书就是关于如何使用复杂性指导软件设计的。</p><p>这本书有两个整体目标。第一个是描述软件复杂性的天性：“复杂性”意味着什么，为什么重要，以及如何识别出程序中存在不必要的复杂性？这本书第二个，而且更具挑战性的目标是给出在软件开发期间可以用来最小化复杂性的技术。不幸的是，并没有能够保证很棒的软件设计的简单的处方。相反，我会给出一系列哲学化的高层的概念，比如“类应该有深度” 或者 “通过定义使得错误不复存在”。这些概念可能无法立即区分出最好的设计，但是你可以使用它们比较不同的设计选择，并指导你在设计领域的探索。</p><h2 id=11-如何使用这本书>1.1 如何使用这本书<a href=#11-如何使用这本书 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2><p>这里讨论的设计原则很多都在一定程度上抽象，所以不看实际的代码可能会很难理解。寻找既足够小到可以放到书中又足够大到可以展示问题的例子非常困难（如果你遇到了好例子，请把它们发送给我）。所以，学习如何应用这些原则，只看这本书可能不够。</p><p>使用这本书最好的方式是和代码审查联合起来。当你阅读别人的代码时，考虑它是否遵循了这里讨论的概念，以及如何影响代码的复杂度。在别人的代码中更容易看到设计问题。你可以用本书中描述的红色警告来识别问题并且提出改进建议。审查代码也会使你接触到新的设计方式以及编程技巧。</p><p>提升你的设计技能的最好的方式之一是学习识别 <em>红色警告</em>：一段代码可能比它实际需要的更复杂的信号。在本书的课程中，我会指出和每个主要设计问题相关的表示问题出现的红色警告；最重要的几个在书的最后做了总结。当你编码时可以使用：当你看到一个红色警告，停止工作并寻找可以消除问题的其他设计。当你第一次尝试这种方式时，在找到可以消除红色警告的设计前，可能不得不尝试好几种设计。不要轻易放弃：在修复问题前尝试地越多，你学到的越多。随着时间流逝，你会发现代码中的红色警告越来越少，你的设计变得越来越简洁。你的经验也会向你展示其他红色警告，你可以用来识别设计问题（我会很乐意听到你新发现的这些红色警告）。</p><p>当应用本书中的理念时，应当注意节制和谨慎。每条规则都有例外，每个规范都有限制。如果你把每个设计理念都发挥到极致，可能最终会陷入困境。漂亮的设计反应了理念和实现之间较量的平衡。有几个章节中包含名为“过度实践”的部分，描述了如何发现你已经过度了。</p><p>这本书几乎所有例子都是 Java 或 C++ 的，大多数讨论都是针对面向对象语言中的设计类。然而，这些理念也可以很好的应用于其他领域。几乎所有和方法有关的理念也可以应用于没有面向对象功能的语言中的函数，比如 C。设计理念也可以应用于模块而不是类，比如子系统或网络服务。</p><p>有了这些基础以后，让我们更细致地讨论是什么导致了复杂性，以及如何使软件系统更简单。</p></div><div class="related-posts thin"><h2>相关推荐</h2><ul><li><a href=/post/philosophy-of-software-design-11/>Philosophy of Software Design 第十一章 设计两次</a></li><li><a href=/post/philosophy-of-software-design-10/>Philosophy of Software Design 第十章 通过定义使得错误不复存在</a></li><li><a href=/post/philosophy-of-software-design-9/>Philosophy of Software Design 第九章 - 合并还是拆分</a></li><li><a href=/post/philosophy-of-software-design-8/>Philosophy of Software Design - 第八章 降低复杂性</a></li><li><a href=/post/philosophy-of-software-design/>Philosophy of Software Design - 第七章 不同层，不同抽象</a></li></ul></div><hr class=post-end><footer class=post-info><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/%E9%B9%A6%E9%B9%89%E5%AD%A6%E8%88%8C>鹦鹉学舌</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span></p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2769 字</p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2020-02-19 02:16</p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d target=_blank rel=noopener>5d1291e</a> @ 2020-02-19</p></footer><div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享><center><span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a><a href=# class="social-share-icon icon-wechat"></a><a href=# class="social-share-icon icon-twitter"></a><a href=# class="social-share-icon icon-qq"></a><a href=# class="social-share-icon icon-qzone"></a></center></div><script src=/js/social-share.min.js></script></article><aside class=post-toc id=toc><nav id=TableOfContents><ul><li><a href=#11-如何使用这本书>1.1 如何使用这本书</a></li></ul></nav></aside></main><div class="post-nav thin"><a class=next-post href=https://kyon.life/post/philosophy-of-software-design-2/><span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>Philosophy of Software Design 第二章 复杂度的天性</span></a>
+<a class=prev-post href=https://kyon.life/post/spring-config/><span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>使线上 Spring 应用更好部署和调试</span></a></div><div id=comments class=thin><script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script></div><footer id=site-footer class="section-inner thin animated fadeIn faster"><p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p><p>Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a></p></footer><script src=https://kyon.life/js/bundle.min.79c6d5f9ef3feaf373d9e8be6686758cedbc40420054863902f5b9bc97cf4f2d.js integrity="sha256-ecbV+e8/6vNz2ei+ZoZ1jO28QEIAVIY5AvW5vJfPTy0=" crossorigin=anonymous></script><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-131420074-1','auto');ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script><script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:false,messageStyle:'none'};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-131420074-1','auto');ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script><script src=/js/social-share.min.js></script></body></html>
