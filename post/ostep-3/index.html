@@ -6,39 +6,15 @@
 <meta name=theme-color content="#494f5c">
 <meta name=msapplication-TileColor content="#494f5c">
 <meta itemprop=name content="操作系统导论学习笔记（三）">
-<meta itemprop=description content="只有少量的物理 CPU，操作系统如何提供有几乎无限 CPU 可用的假象？
-操作系统通过虚拟化(Virutalization) CPU 来提供这种假象。通过让每个程序只运行一个时间片，然后切换到其他进程，操作系统提供了存在多个虚拟 CPU 的假象。这就是时分共享(time sharing) CPU 共享技术。
-潜在的开销就是性能降低，因为如果 CPU 必须共享，每个进程的运行就会变慢。
-要实现 CPU 的虚拟化，操作系统需要提供底层 机制（mechanism） 和高层 策略（policy） 的支持：
- 机制是一些低级方法或协议，比如上下文切换（context switch），让操作系统可以停止运行当前程序，并在给定的 CPU 上运行另一个程序。 策略是操作系统作出某种决定的算法，比如调度策略（scheduling policy）决定当前 CPU 运行一组待运行程序中的哪一个。  分离机制和策略：机制为 how 提供答案，策略为 which 提供答案，将两者分开可以轻松地替换策略，而不必重新考虑机制。这是一种通用的软件设计原则：模块化。
-关键问题：如何高效、可控地虚拟化 CPU
-操作系统必须以高性能的方式虚拟化 CPU，同时保持对系统的控制。为此，操作系统会巧妙地利用硬件的支持。
-受限的直接执行 基本技巧：受限的直接执行 LDE Limited Direct Execution
-「直接执行」是指程序直接运行在 CPU 上
-「受限」的体现之一，是 CPU 执行模式区分「用户模式 user mode」 和 「内核模式 kernel mode」，用户模式下，程序执行是受限制的，比如不能执行特权操作的（比如访问磁盘 I/O）。
-LDE 协议的具体实现方式：
- 操作系统启动时，内核使用特权指令设置陷阱表 (trap table)，告知硬件接收到特定指令时，到哪里寻找需要执行的程序。 用户程序运行在用户模式下，发出系统调用后，硬件检测到变化，保存当前程序的状态（比如寄存器入栈），转为内核模式，查询陷阱表，然后跳转到对应的内核程序处执行。内核执行完程序后，调用返回用户模式指令，硬件恢复寄存器，转为用户模式，回到应用程序中继续执行。  系统调用类似过程调用，但隐藏在系统接口里的实现，是著名的陷阱指令。为了仔细遵循与内核一致的调用约定（例如将参数放在知名位置），库函数的系统调用部分是用汇编语言手动实现的。
-LDE 协议的两阶段实现时间线"><meta itemprop=datePublished content="2021-09-01T14:39:48+08:00">
-<meta itemprop=dateModified content="2021-09-01T14:51:25+08:00">
+<meta itemprop=description content="介绍虚拟化 CPU 的底层机制：受限直接执行以及上下文切换"><meta itemprop=datePublished content="2021-09-01T14:39:48+08:00">
+<meta itemprop=dateModified content="2021-09-01T17:34:29+08:00">
 <meta itemprop=wordCount content="116"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
 <meta itemprop=keywords content="ostep,学习笔记,virtualization,"><meta property="og:title" content="操作系统导论学习笔记（三）">
-<meta property="og:description" content="只有少量的物理 CPU，操作系统如何提供有几乎无限 CPU 可用的假象？
-操作系统通过虚拟化(Virutalization) CPU 来提供这种假象。通过让每个程序只运行一个时间片，然后切换到其他进程，操作系统提供了存在多个虚拟 CPU 的假象。这就是时分共享(time sharing) CPU 共享技术。
-潜在的开销就是性能降低，因为如果 CPU 必须共享，每个进程的运行就会变慢。
-要实现 CPU 的虚拟化，操作系统需要提供底层 机制（mechanism） 和高层 策略（policy） 的支持：
- 机制是一些低级方法或协议，比如上下文切换（context switch），让操作系统可以停止运行当前程序，并在给定的 CPU 上运行另一个程序。 策略是操作系统作出某种决定的算法，比如调度策略（scheduling policy）决定当前 CPU 运行一组待运行程序中的哪一个。  分离机制和策略：机制为 how 提供答案，策略为 which 提供答案，将两者分开可以轻松地替换策略，而不必重新考虑机制。这是一种通用的软件设计原则：模块化。
-关键问题：如何高效、可控地虚拟化 CPU
-操作系统必须以高性能的方式虚拟化 CPU，同时保持对系统的控制。为此，操作系统会巧妙地利用硬件的支持。
-受限的直接执行 基本技巧：受限的直接执行 LDE Limited Direct Execution
-「直接执行」是指程序直接运行在 CPU 上
-「受限」的体现之一，是 CPU 执行模式区分「用户模式 user mode」 和 「内核模式 kernel mode」，用户模式下，程序执行是受限制的，比如不能执行特权操作的（比如访问磁盘 I/O）。
-LDE 协议的具体实现方式：
- 操作系统启动时，内核使用特权指令设置陷阱表 (trap table)，告知硬件接收到特定指令时，到哪里寻找需要执行的程序。 用户程序运行在用户模式下，发出系统调用后，硬件检测到变化，保存当前程序的状态（比如寄存器入栈），转为内核模式，查询陷阱表，然后跳转到对应的内核程序处执行。内核执行完程序后，调用返回用户模式指令，硬件恢复寄存器，转为用户模式，回到应用程序中继续执行。  系统调用类似过程调用，但隐藏在系统接口里的实现，是著名的陷阱指令。为了仔细遵循与内核一致的调用约定（例如将参数放在知名位置），库函数的系统调用部分是用汇编语言手动实现的。
-LDE 协议的两阶段实现时间线">
+<meta property="og:description" content="介绍虚拟化 CPU 的底层机制：受限直接执行以及上下文切换">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://kyon.life/post/ostep-3/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
 <meta property="article:published_time" content="2021-09-01T14:39:48+08:00">
-<meta property="article:modified_time" content="2021-09-01T14:51:25+08:00">
+<meta property="article:modified_time" content="2021-09-01T17:34:29+08:00">
 <link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
 <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
 <link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
@@ -51,19 +27,7 @@ LDE 协议的两阶段实现时间线">
 <meta name=twitter:card content="summary">
 <meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
 <meta name=twitter:title content="操作系统导论学习笔记（三）">
-<meta name=twitter:description content="只有少量的物理 CPU，操作系统如何提供有几乎无限 CPU 可用的假象？
-操作系统通过虚拟化(Virutalization) CPU 来提供这种假象。通过让每个程序只运行一个时间片，然后切换到其他进程，操作系统提供了存在多个虚拟 CPU 的假象。这就是时分共享(time sharing) CPU 共享技术。
-潜在的开销就是性能降低，因为如果 CPU 必须共享，每个进程的运行就会变慢。
-要实现 CPU 的虚拟化，操作系统需要提供底层 机制（mechanism） 和高层 策略（policy） 的支持：
- 机制是一些低级方法或协议，比如上下文切换（context switch），让操作系统可以停止运行当前程序，并在给定的 CPU 上运行另一个程序。 策略是操作系统作出某种决定的算法，比如调度策略（scheduling policy）决定当前 CPU 运行一组待运行程序中的哪一个。  分离机制和策略：机制为 how 提供答案，策略为 which 提供答案，将两者分开可以轻松地替换策略，而不必重新考虑机制。这是一种通用的软件设计原则：模块化。
-关键问题：如何高效、可控地虚拟化 CPU
-操作系统必须以高性能的方式虚拟化 CPU，同时保持对系统的控制。为此，操作系统会巧妙地利用硬件的支持。
-受限的直接执行 基本技巧：受限的直接执行 LDE Limited Direct Execution
-「直接执行」是指程序直接运行在 CPU 上
-「受限」的体现之一，是 CPU 执行模式区分「用户模式 user mode」 和 「内核模式 kernel mode」，用户模式下，程序执行是受限制的，比如不能执行特权操作的（比如访问磁盘 I/O）。
-LDE 协议的具体实现方式：
- 操作系统启动时，内核使用特权指令设置陷阱表 (trap table)，告知硬件接收到特定指令时，到哪里寻找需要执行的程序。 用户程序运行在用户模式下，发出系统调用后，硬件检测到变化，保存当前程序的状态（比如寄存器入栈），转为内核模式，查询陷阱表，然后跳转到对应的内核程序处执行。内核执行完程序后，调用返回用户模式指令，硬件恢复寄存器，转为用户模式，回到应用程序中继续执行。  系统调用类似过程调用，但隐藏在系统接口里的实现，是著名的陷阱指令。为了仔细遵循与内核一致的调用约定（例如将参数放在知名位置），库函数的系统调用部分是用汇编语言手动实现的。
-LDE 协议的两阶段实现时间线">
+<meta name=twitter:description content="介绍虚拟化 CPU 的底层机制：受限直接执行以及上下文切换">
 <script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
 <link href=/css/zoom.css rel=stylesheet>
 <script src=/js/zoom.js></script>
@@ -168,7 +132,7 @@ LDE 协议的两阶段实现时间线">
 </p>
 <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 1905 字</p>
 <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-09-01 06:39</p>
-<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/48ce114ee4a0625b47c2443a08f608b90f92e92b target=_blank rel=noopener>48ce114</a> @ 2021-09-01</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/e7e36372214fe2887214f5987f722b2f737612d8 target=_blank rel=noopener>e7e3637</a> @ 2021-09-01</p>
 </footer>
 <div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
 <center>

@@ -6,27 +6,15 @@
 <meta name=theme-color content="#494f5c">
 <meta name=msapplication-TileColor content="#494f5c">
 <meta itemprop=name content="操作系统导论学习笔记（二）">
-<meta itemprop=description content="进程 操作系统为正在运行的程序提供的抽象，就是进程。
-操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 程序控制块 PCB Program Control Block
-在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的机器状态（machine state）
-机器状态包括：
- 内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间 通用寄存器 一些特殊寄存器  PC 指针：程序正在执行的指令 栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址   I/O 信息： 程序访问的持久化存储设备  现代系统进程都会提供的 API
- 创建：程序变成进程的过程 销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程 等待：有时等待进程停止运行是有用的 其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行 状态：查看进程状态  操作系统创建进程
- 从磁盘加载代码和静态数据（比如初始化变量）到内存中  尽早加载 eagerly load 惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持   分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈 也可能会给程序分配堆内存 其他初始化任务，特别是 I/O 相关的  在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出   启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行  进程的 3 种状态及相互转换"><meta itemprop=datePublished content="2021-09-01T13:46:35+08:00">
-<meta itemprop=dateModified content="2021-09-01T14:51:25+08:00">
+<meta itemprop=description content="虚拟化 CPU 前置知识：进程以及相关 API 介绍"><meta itemprop=datePublished content="2021-09-01T13:46:35+08:00">
+<meta itemprop=dateModified content="2021-09-01T17:34:29+08:00">
 <meta itemprop=wordCount content="185"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
 <meta itemprop=keywords content="ostep,学习笔记,process,"><meta property="og:title" content="操作系统导论学习笔记（二）">
-<meta property="og:description" content="进程 操作系统为正在运行的程序提供的抽象，就是进程。
-操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 程序控制块 PCB Program Control Block
-在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的机器状态（machine state）
-机器状态包括：
- 内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间 通用寄存器 一些特殊寄存器  PC 指针：程序正在执行的指令 栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址   I/O 信息： 程序访问的持久化存储设备  现代系统进程都会提供的 API
- 创建：程序变成进程的过程 销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程 等待：有时等待进程停止运行是有用的 其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行 状态：查看进程状态  操作系统创建进程
- 从磁盘加载代码和静态数据（比如初始化变量）到内存中  尽早加载 eagerly load 惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持   分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈 也可能会给程序分配堆内存 其他初始化任务，特别是 I/O 相关的  在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出   启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行  进程的 3 种状态及相互转换">
+<meta property="og:description" content="虚拟化 CPU 前置知识：进程以及相关 API 介绍">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://kyon.life/post/ostep-2/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
 <meta property="article:published_time" content="2021-09-01T13:46:35+08:00">
-<meta property="article:modified_time" content="2021-09-01T14:51:25+08:00">
+<meta property="article:modified_time" content="2021-09-01T17:34:29+08:00">
 <link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
 <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
 <link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
@@ -39,13 +27,7 @@
 <meta name=twitter:card content="summary">
 <meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
 <meta name=twitter:title content="操作系统导论学习笔记（二）">
-<meta name=twitter:description content="进程 操作系统为正在运行的程序提供的抽象，就是进程。
-操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 程序控制块 PCB Program Control Block
-在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的机器状态（machine state）
-机器状态包括：
- 内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间 通用寄存器 一些特殊寄存器  PC 指针：程序正在执行的指令 栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址   I/O 信息： 程序访问的持久化存储设备  现代系统进程都会提供的 API
- 创建：程序变成进程的过程 销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程 等待：有时等待进程停止运行是有用的 其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行 状态：查看进程状态  操作系统创建进程
- 从磁盘加载代码和静态数据（比如初始化变量）到内存中  尽早加载 eagerly load 惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持   分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈 也可能会给程序分配堆内存 其他初始化任务，特别是 I/O 相关的  在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出   启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行  进程的 3 种状态及相互转换">
+<meta name=twitter:description content="虚拟化 CPU 前置知识：进程以及相关 API 介绍">
 <script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
 <link href=/css/zoom.css rel=stylesheet>
 <script src=/js/zoom.js></script>
@@ -192,7 +174,7 @@
 </p>
 <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2083 字</p>
 <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-09-01 05:46</p>
-<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/48ce114ee4a0625b47c2443a08f608b90f92e92b target=_blank rel=noopener>48ce114</a> @ 2021-09-01</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/e7e36372214fe2887214f5987f722b2f737612d8 target=_blank rel=noopener>e7e3637</a> @ 2021-09-01</p>
 </footer>
 <div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
 <center>
