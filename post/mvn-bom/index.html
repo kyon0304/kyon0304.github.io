@@ -1,8 +1,74 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=theme-color content="#494f5c"><meta name=msapplication-TileColor content="#494f5c"><meta itemprop=name content="更科学地使用 maven 管理项目版本"><meta itemprop=description content="假设一个 demo 项目，按功能划分为组件模块和服务模块，组件模块包含 component-a 和 component-b，服务模块包含 service-1 和 service-2。结构如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28  ╰─demo$ tree -L 4 -P *.xml --dirsfirst . ├── component-bom │ ├── component-container │ │ ├── component-a │ │ │ ├── src │ │ │ └── pom.xml │ │ ├── component-b │ │ │ ├── src │ │ │ └── pom."><meta itemprop=datePublished content="2021-02-26T20:21:48+08:00"><meta itemprop=dateModified content="2021-02-26T20:26:39+08:00"><meta itemprop=wordCount content="493"><meta itemprop=image content="https://kyon.life/mstile-150x150.png"><meta itemprop=keywords content="maven,mvn,模块管理,分享,"><meta property="og:title" content="更科学地使用 maven 管理项目版本"><meta property="og:description" content="假设一个 demo 项目，按功能划分为组件模块和服务模块，组件模块包含 component-a 和 component-b，服务模块包含 service-1 和 service-2。结构如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28  ╰─demo$ tree -L 4 -P *.xml --dirsfirst . ├── component-bom │ ├── component-container │ │ ├── component-a │ │ │ ├── src │ │ │ └── pom.xml │ │ ├── component-b │ │ │ ├── src │ │ │ └── pom."><meta property="og:type" content="article"><meta property="og:url" content="https://kyon.life/post/mvn-bom/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:published_time" content="2021-02-26T20:21:48+08:00"><meta property="article:modified_time" content="2021-02-26T20:26:39+08:00"><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color><link rel="shortcut icon" href=/favicon.ico><title>更科学地使用 maven 管理项目版本</title><link rel=stylesheet href=https://kyon.life/css/style.min.cc8092f337b406ae2cf62b71d2d7b0164c73e23a7a7a46b211eab7af33890034.css integrity="sha256-zICS8ze0Bq4s9itx0tewFkxz4jp6ekayEeq3rzOJADQ=" crossorigin=anonymous><link rel=stylesheet href=https://kyon.life/css/share.min.css><meta name=twitter:card content="summary"><meta name=twitter:image content="https://kyon.life/mstile-150x150.png"><meta name=twitter:title content="更科学地使用 maven 管理项目版本"><meta name=twitter:description content="假设一个 demo 项目，按功能划分为组件模块和服务模块，组件模块包含 component-a 和 component-b，服务模块包含 service-1 和 service-2。结构如下：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28  ╰─demo$ tree -L 4 -P *.xml --dirsfirst . ├── component-bom │ ├── component-container │ │ ├── component-a │ │ │ ├── src │ │ │ └── pom.xml │ │ ├── component-b │ │ │ ├── src │ │ │ └── pom."><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script><link href=/css/zoom.css rel=stylesheet><script src=/js/zoom.js></script><script src=/js/transition.js></script></head><body id=page><header id=site-header class="animated slideInUp"><div class="hdr-wrapper section-inner"><div class=hdr-left><div class=site-branding><a href=https://kyon.life/>kyon's wonderland with ❤️</a></div><nav class="site-nav hide-in-mobile"><a href=https://kyon.life/post/>博文</a>
-<a href=https://kyon.life/about/>关于</a></nav></div><div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77a5.44 5.44.0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><div id=mobile-menu class="animated fast"><ul><li><a href=https://kyon.life/post/>博文</a></li><li><a href=https://kyon.life/about/>关于</a></li></ul></div><main class="site-main main-content section-inner animated fadeIn faster" id=site-main><article class=thin><header class=post-header><div class=post-meta><span>2 月 26 号, 2021</span></div><h1>更科学地使用 maven 管理项目版本</h1></header><div class=content><p>假设一个 <code>demo</code> 项目，按功能划分为组件模块和服务模块，组件模块包含 <code>component-a</code> 和 <code>component-b</code>，服务模块包含 <code>service-1</code> 和 <code>service-2</code>。结构如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="更科学地使用 maven 管理项目版本">
+<meta itemprop=description content="假设一个 demo 项目，按功能划分为组件模块和服务模块，组件模块包含 component-a 和 component-b，服务模块包含 service-1 和 service-2。结构如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28  ╰─demo$ tree -L 4 -P *.xml --dirsfirst . ├── component-bom │ ├── component-container │ │ ├── component-a │ │ │ ├── src │ │ │ └── pom.xml │ │ ├── component-b │ │ │ ├── src │ │ │ └── pom."><meta itemprop=datePublished content="2021-02-26T20:21:48+08:00">
+<meta itemprop=dateModified content="2021-02-26T20:26:39+08:00">
+<meta itemprop=wordCount content="493"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="maven,mvn,模块管理,分享,"><meta property="og:title" content="更科学地使用 maven 管理项目版本">
+<meta property="og:description" content="假设一个 demo 项目，按功能划分为组件模块和服务模块，组件模块包含 component-a 和 component-b，服务模块包含 service-1 和 service-2。结构如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28  ╰─demo$ tree -L 4 -P *.xml --dirsfirst . ├── component-bom │ ├── component-container │ │ ├── component-a │ │ │ ├── src │ │ │ └── pom.xml │ │ ├── component-b │ │ │ ├── src │ │ │ └── pom.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/mvn-bom/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-02-26T20:21:48+08:00">
+<meta property="article:modified_time" content="2021-02-26T20:26:39+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>更科学地使用 maven 管理项目版本</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="更科学地使用 maven 管理项目版本">
+<meta name=twitter:description content="假设一个 demo 项目，按功能划分为组件模块和服务模块，组件模块包含 component-a 和 component-b，服务模块包含 service-1 和 service-2。结构如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28  ╰─demo$ tree -L 4 -P *.xml --dirsfirst . ├── component-bom │ ├── component-container │ │ ├── component-a │ │ │ ├── src │ │ │ └── pom.xml │ │ ├── component-b │ │ │ ├── src │ │ │ └── pom.">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>2 月 26 号, 2021</span></div>
+<h1>更科学地使用 maven 管理项目版本</h1>
+</header>
+<div class=content>
+<p>假设一个 <code>demo</code> 项目，按功能划分为组件模块和服务模块，组件模块包含 <code>component-a</code> 和 <code>component-b</code>，服务模块包含 <code>service-1</code> 和 <code>service-2</code>。结构如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -30,7 +96,9 @@
 </span><span class=lnt>26
 </span><span class=lnt>27
 </span><span class=lnt>28
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-sh data-lang=sh>╰─demo$ tree -L <span class=m>4</span> -P *.xml --dirsfirst
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-sh data-lang=sh>╰─demo$ tree -L <span class=m>4</span> -P *.xml --dirsfirst
 .
 ├── component-bom
 │   ├── component-container
@@ -58,7 +126,26 @@
 │   ├── src
 │   └── pom.xml
 └── pom.xml
-</code></pre></td></tr></table></div></div><p>现在想要实现这样的效果：组件可以单独升级，而不会影响其他组件的版本，升级后也不用到每个服务里去修改组件的版本号。</p><p>这里就会用到 maven 提供的 <strong>BOM(Bills Of Material)</strong> 功能：在 component-bom 中统一定义所有组件的版本号，并且作为组件模块的根 pom。</p><p>为方便讨论会省略 component，如 component-a 会简写为 a：</p><p>要开辟一个地方专门用于存放组件模块版本号（也就是使用 BOM）的意义，是降低管理版本号的复杂度：</p><ul><li>bom 中定义组件版本号，当升级组件 a 时，只要 bom 和 a 的版本号升级即可，b、c 组件不受影响</li><li>服务模块在根 pom 中引入组件的 bom，某个服务需要引入某个组件依赖时，不再需要指定版本，由 bom 统一管理</li><li>当服务模块需要升级依赖的组件时，只需要修改 bom 版本号即可，不需要在每个服务中单独修改版本号</li></ul><p>Spring cloud 的伞项目管理方式就是通过 bom 的方式实现的。</p><p>当然也有一定的不方便之处，比如 bom 的中定义的某个组件的版本号不是你想要的，这时候只要在依赖中显式指定你需要的版本号就会覆盖 bom 中给出的版本号。但是确定 bom 中每个组件模块的版本号还是有点点麻烦。</p><p>原本作为所有组件模块根的是 container，由于需要在 bom 中定义所有组件模块的版本号，因此在 contaienr 上再引入一层就是比较自然的做法了，这样 bom 就代替 container 成了组件模块的根。</p><p>再往上引入一层，而不是在 container 模块的文件夹中新建 bom 的原因在于，maven 会默认父子模块在文件夹中的结构也是父子文件夹，(即 属性的默认取值是 <code>../</code>)。不过如果不愿意修改 container 在文件系统中的位置（移入 bom 之下），也可以将 bom 放在 container 的文件夹内，通过修改 等属性达到文件夹结构和 maven 项目模块结构颠倒的效果：在文件夹上看 container 是 bom 的外层，在模块结构上看，container 是 bom 的子模块。</p><p>之所以可以达到单个组件升级而不影响其他组件的效果，是由于各个组件中声明的 指向 container，而组件的版本信息声明在 bom 中，这样实现了解耦，组件 a 升级时，只需要修改组件 a 本身的版本定义，bom 中组件 a 的版本声明以及 bom 的版本，container 则不受影响，其他组件也就不会受影响。</p><p>bom 中声明组件版本的定义如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table>
+</div>
+</div><p>现在想要实现这样的效果：组件可以单独升级，而不会影响其他组件的版本，升级后也不用到每个服务里去修改组件的版本号。</p>
+<p>这里就会用到 maven 提供的 <strong>BOM(Bills Of Material)</strong> 功能：在 component-bom 中统一定义所有组件的版本号，并且作为组件模块的根 pom。</p>
+<p>为方便讨论会省略 component，如 component-a 会简写为 a：</p>
+<p>要开辟一个地方专门用于存放组件模块版本号（也就是使用 BOM）的意义，是降低管理版本号的复杂度：</p>
+<ul>
+<li>bom 中定义组件版本号，当升级组件 a 时，只要 bom 和 a 的版本号升级即可，b、c 组件不受影响</li>
+<li>服务模块在根 pom 中引入组件的 bom，某个服务需要引入某个组件依赖时，不再需要指定版本，由 bom 统一管理</li>
+<li>当服务模块需要升级依赖的组件时，只需要修改 bom 版本号即可，不需要在每个服务中单独修改版本号</li>
+</ul>
+<p>Spring cloud 的伞项目管理方式就是通过 bom 的方式实现的。</p>
+<p>当然也有一定的不方便之处，比如 bom 的中定义的某个组件的版本号不是你想要的，这时候只要在依赖中显式指定你需要的版本号就会覆盖 bom 中给出的版本号。但是确定 bom 中每个组件模块的版本号还是有点点麻烦。</p>
+<p>原本作为所有组件模块根的是 container，由于需要在 bom 中定义所有组件模块的版本号，因此在 contaienr 上再引入一层就是比较自然的做法了，这样 bom 就代替 container 成了组件模块的根。</p>
+<p>再往上引入一层，而不是在 container 模块的文件夹中新建 bom 的原因在于，maven 会默认父子模块在文件夹中的结构也是父子文件夹，(即 属性的默认取值是 <code>../</code>)。不过如果不愿意修改 container 在文件系统中的位置（移入 bom 之下），也可以将 bom 放在 container 的文件夹内，通过修改 等属性达到文件夹结构和 maven 项目模块结构颠倒的效果：在文件夹上看 container 是 bom 的外层，在模块结构上看，container 是 bom 的子模块。</p>
+<p>之所以可以达到单个组件升级而不影响其他组件的效果，是由于各个组件中声明的 指向 container，而组件的版本信息声明在 bom 中，这样实现了解耦，组件 a 升级时，只需要修改组件 a 本身的版本定义，bom 中组件 a 的版本声明以及 bom 的版本，container 则不受影响，其他组件也就不会受影响。</p>
+<p>bom 中声明组件版本的定义如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -77,7 +164,9 @@
 </span><span class=lnt>17
 </span><span class=lnt>18
 </span><span class=lnt>19
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;dependencyManagement&gt;</span>
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;dependencyManagement&gt;</span>
     <span class=nt>&lt;dependencies&gt;</span>
       <span class=nt>&lt;dependency&gt;</span>
         <span class=nt>&lt;groupId&gt;</span>life.kyon<span class=nt>&lt;/groupId&gt;</span>
@@ -96,7 +185,13 @@
       <span class=nt>&lt;/dependency&gt;</span>
     <span class=nt>&lt;/dependencies&gt;</span>
   <span class=nt>&lt;/dependencyManagement&gt;</span>
-</code></pre></td></tr></table></div></div><p>由于 bom 是组件 a, b, c 的祖父 pom，也就是顺着 parent 继承树就可以找到 的定义，因此这些组件可以免费享受到 bom 用法带来的便利。</p><p>在 service 服务中，则需要在 service-base 的 中添加如下声明：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table>
+</div>
+</div><p>由于 bom 是组件 a, b, c 的祖父 pom，也就是顺着 parent 继承树就可以找到 的定义，因此这些组件可以免费享受到 bom 用法带来的便利。</p>
+<p>在 service 服务中，则需要在 service-base 的 中添加如下声明：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -107,7 +202,9 @@
 </span><span class=lnt> 9
 </span><span class=lnt>10
 </span><span class=lnt>11
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;dependencyManagement&gt;</span>
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;dependencyManagement&gt;</span>
     <span class=nt>&lt;dependencies&gt;</span>
       <span class=nt>&lt;dependency&gt;</span>
         <span class=nt>&lt;groupId&gt;</span>life.kyon<span class=nt>&lt;/groupId&gt;</span>
@@ -118,7 +215,17 @@
       <span class=nt>&lt;/dependency&gt;</span>
     <span class=nt>&lt;/dependencies&gt;</span>
   <span class=nt>&lt;/dependencyManagement&gt;</span>
-</code></pre></td></tr></table></div></div><p>这样，在 service-1, service-2 中就可以直接添加依赖而不需操心版本，版本信息会顺着 service-base 的 中 component-bom 的声明到 component-bom 的 中读取。</p><p>基本说明告一段落，下面来看一个组件模块升级的例子：如果组件 c 依赖 b，a 是单独的组件，service-1 依赖了 a，service-2 依赖 c，这时 b 有更新，会发生什么。</p><p>首先，更新 b 不应该影响 a，service-1 不应该受到影响；</p><p>其次，由于 bom 中有着 b 的版本声明，b 升级后，版本声明处也应当随之更新，bom 内容发生变化，bom 版本也随着更新</p><p>最后，由于 c 依赖 b，所以 b 升级以后，c 也需要升级；相应的，需要决定 service-2 是否依赖升级后的 c，如果不升级，service-base 中的 bom 声明维持不变即可；如果需要升级，只改一个地方即可全部生效。因为例子里只有一个服务依赖了 c，bom 的优势不是很明显，实际项目中，可能有 7、8 个服务都依赖一个组件，尤其是基础组件，这种情况，还请脑补一下。</p><p>修改后的 bom 定义：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table>
+</div>
+</div><p>这样，在 service-1, service-2 中就可以直接添加依赖而不需操心版本，版本信息会顺着 service-base 的 中 component-bom 的声明到 component-bom 的 中读取。</p>
+<p>基本说明告一段落，下面来看一个组件模块升级的例子：如果组件 c 依赖 b，a 是单独的组件，service-1 依赖了 a，service-2 依赖 c，这时 b 有更新，会发生什么。</p>
+<p>首先，更新 b 不应该影响 a，service-1 不应该受到影响；</p>
+<p>其次，由于 bom 中有着 b 的版本声明，b 升级后，版本声明处也应当随之更新，bom 内容发生变化，bom 版本也随着更新</p>
+<p>最后，由于 c 依赖 b，所以 b 升级以后，c 也需要升级；相应的，需要决定 service-2 是否依赖升级后的 c，如果不升级，service-base 中的 bom 声明维持不变即可；如果需要升级，只改一个地方即可全部生效。因为例子里只有一个服务依赖了 c，bom 的优势不是很明显，实际项目中，可能有 7、8 个服务都依赖一个组件，尤其是基础组件，这种情况，还请脑补一下。</p>
+<p>修改后的 bom 定义：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -153,7 +260,9 @@
 </span><span class=lnt>33
 </span><span class=lnt>34
 </span><span class=lnt>35
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;parent&gt;</span>
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;parent&gt;</span>
     <span class=nt>&lt;artifactId&gt;</span>demo<span class=nt>&lt;/artifactId&gt;</span>
     <span class=nt>&lt;groupId&gt;</span>life.kyon<span class=nt>&lt;/groupId&gt;</span>
     <span class=nt>&lt;version&gt;</span>1.0<span class=nt>&lt;/version&gt;</span>
@@ -188,7 +297,12 @@
     <span class=nt>&lt;/dependencies&gt;</span>
   <span class=nt>&lt;/dependencyManagement&gt;</span>
 <span class=nt>&lt;/project&gt;</span>
-</code></pre></td></tr></table></div></div><p>组件 b 升级后，service-base 中 bom 声明修改为，即升级 bom 版本号，service-2 就可以直接感知到组件 c 的升级：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table>
+</div>
+</div><p>组件 b 升级后，service-base 中 bom 声明修改为，即升级 bom 版本号，service-2 就可以直接感知到组件 c 的升级：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -199,7 +313,9 @@
 </span><span class=lnt> 9
 </span><span class=lnt>10
 </span><span class=lnt>11
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;dependencyManagement&gt;</span>
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-xml data-lang=xml>  <span class=nt>&lt;dependencyManagement&gt;</span>
     <span class=nt>&lt;dependencies&gt;</span>
       <span class=nt>&lt;dependency&gt;</span>
         <span class=nt>&lt;groupId&gt;</span>life.kyon<span class=nt>&lt;/groupId&gt;</span>
@@ -210,6 +326,70 @@
       <span class=nt>&lt;/dependency&gt;</span>
     <span class=nt>&lt;/dependencies&gt;</span>
   <span class=nt>&lt;/dependencyManagement&gt;</span>
-</code></pre></td></tr></table></div></div><p>可以通过这个 <a href=https://github.com/kyon0304/maven-pom-demo/commit/a25e0149016ae851b45e638942180a23306744fb>commit</a> 看到更具体的变更。</p><p>最后，示例项目已上传至 <a href=https://github.com/kyon0304/maven-pom-demo>github</a>，master 分支中所有组件版本都是 1.0，update-b 分支中，b 组件升级至 2.0 版本。欢迎参考～</p><p>成文仓促，如果有更好的解决方案，或者没说明白的地方，欢迎留言讨论。✨</p></div><div class="related-posts thin"><h2>相关推荐</h2><ul><li><a href=/post/tricks-with-feign/>使用 spring cloud openfeign 的一些小技巧</a></li><li><a href=/post/dynamic-switch-cache-in-spring/>Spring 框架缓存故障自动切换</a></li><li><a href=/post/spring-config/>使线上 Spring 应用更好部署和调试</a></li><li><a href=/post/config-server-with-spring-boot-and-disconf/>基于 Spring Boot + Disconf 的配置中心</a></li></ul></div><hr class=post-end><footer class=post-info><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/maven>maven</a></span><span class=tag><a href=https://kyon.life/tags/mvn>mvn</a></span><span class=tag><a href=https://kyon.life/tags/%E6%A8%A1%E5%9D%97%E7%AE%A1%E7%90%86>模块管理</a></span><span class=tag><a href=https://kyon.life/tags/%E5%88%86%E4%BA%AB>分享</a></span></p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 4558 字</p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-02-26 12:21</p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/a7666d216953621da5cea4c3710181cdfe449773 target=_blank rel=noopener>a7666d2</a> @ 2021-02-26</p></footer><div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享><center><span style=font-size:16px;color:#c05b4d>分享到：</span>
-<a href=# class="social-share-icon icon-weibo"></a><a href=# class="social-share-icon icon-wechat"></a><a href=# class="social-share-icon icon-twitter"></a><a href=# class="social-share-icon icon-qq"></a><a href=# class="social-share-icon icon-qzone"></a></center></div><script src=/js/social-share.min.js></script></article><aside class=post-toc id=toc><nav id=TableOfContents></nav></aside></main><div class="post-nav thin"><a class=next-post href=https://kyon.life/post/ostep-1/><span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>操作系统导论学习笔记（一）</span></a>
-<a class=prev-post href=https://kyon.life/post/xdg-open-tips/><span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>禁用烦人的网页弹框 Xdg Open</span></a></div><div id=comments class=thin><script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script></div><footer id=site-footer class="section-inner thin animated fadeIn faster"><p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p><p>Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a></p></footer><script src=https://kyon.life/js/bundle.min.79c6d5f9ef3feaf373d9e8be6686758cedbc40420054863902f5b9bc97cf4f2d.js integrity="sha256-ecbV+e8/6vNz2ei+ZoZ1jO28QEIAVIY5AvW5vJfPTy0=" crossorigin=anonymous></script><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-131420074-1','auto');ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script><script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:false,messageStyle:'none'};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-131420074-1','auto');ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script><script src=/js/social-share.min.js></script></body></html>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以通过这个 <a href=https://github.com/kyon0304/maven-pom-demo/commit/a25e0149016ae851b45e638942180a23306744fb>commit</a> 看到更具体的变更。</p>
+<p>最后，示例项目已上传至 <a href=https://github.com/kyon0304/maven-pom-demo>github</a>，master 分支中所有组件版本都是 1.0，update-b 分支中，b 组件升级至 2.0 版本。欢迎参考～</p>
+<p>成文仓促，如果有更好的解决方案，或者没说明白的地方，欢迎留言讨论。✨</p>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/tricks-with-feign/>使用 spring cloud openfeign 的一些小技巧</a></li>
+<li><a href=/post/dynamic-switch-cache-in-spring/>Spring 框架缓存故障自动切换</a></li>
+<li><a href=/post/spring-config/>使线上 Spring 应用更好部署和调试</a></li>
+<li><a href=/post/config-server-with-spring-boot-and-disconf/>基于 Spring Boot + Disconf 的配置中心</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/maven>maven</a></span><span class=tag><a href=https://kyon.life/tags/mvn>mvn</a></span><span class=tag><a href=https://kyon.life/tags/%E6%A8%A1%E5%9D%97%E7%AE%A1%E7%90%86>模块管理</a></span><span class=tag><a href=https://kyon.life/tags/%E5%88%86%E4%BA%AB>分享</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 4558 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-02-26 12:21</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/a7666d216953621da5cea4c3710181cdfe449773 target=_blank rel=noopener>a7666d2</a> @ 2021-02-26</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents></nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=next-post href=https://kyon.life/post/ostep-1/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>操作系统导论学习笔记（一）</span>
+</a>
+<a class=prev-post href=https://kyon.life/post/xdg-open-tips/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>禁用烦人的网页弹框 Xdg Open</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>
