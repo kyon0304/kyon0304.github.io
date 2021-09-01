@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>virtualization on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/virtualization/</link><description>Recent content in virtualization on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 31 Aug 2021 22:45:12 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/virtualization/index.xml" rel="self" type="application/rss+xml"/><item><title>操作系统导论学习笔记（一）</title><link>https://kyon.life/post/ostep-1/</link><pubDate>Tue, 31 Aug 2021 22:45:12 +0800</pubDate><guid>https://kyon.life/post/ostep-1/</guid><description>为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)
-设计和实现操作系统的目标 提供高性能，尽可能降低操作系统的性能开销 minimize the overhead 在应用程序之间以及操作系统和应用系统之间提供保护 protection 让进程间彼此隔离是实现保护的关键 isolation 保证高可靠性 reliability 能源效率 energy efficiency, 安全性 security, 移动性 mobility 操作系统的 3 个“简单”部分 虚拟化 virtualizing 持久性 persistence 并行 concurrency 虚拟化 virtualizing 虚拟化又分为虚拟化 CPU 和虚拟化内存。
-虚拟化 CPU
-在硬件的一些帮助下，操作系统负责提供这种假象（illusion），即系统拥有非常多的虚拟CPU的假象。将单个CPU（或其中一小部分）转换为看似无限数量的CPU，从而让许多程序看似同时运行，这就是所谓的虚拟化CPU（virtualizing the CPU）
-虚拟化内存
-每个进程访问自己的私有虚拟地址空间（virtual address space）（有时称为地址空间，address space），操作系统以某种方式映射到机器的物理内存上。一个正在运行的程序中的内存引用不会影响其他进程（或操作系统本身）的地址空间。对于正在运行的程序，它完全拥有自己的物理内存。但实际情况是，物理内存是由操作系统管理的共享资源。
-持久化 persistence 内存 DRAM 中的数据是易失的，如果断电或系统崩溃，内存中的数据都会丢失。因此我们需要硬件和软件支持来持久地存储数据。
-硬件以某种输入/输出设备（Input/Output, I/O）的形式出现。
-操作系统中管理磁盘的软件通常称为文件系统（file system）。因此它负责以可靠和高效的方式，将用户创建的任何文件（file）存储在系统的磁盘上。
-关键问题：如何持久地存储数据
-文件系统是操作系统的一部分，负责管理持久的数据。持久性需要哪些技术才能正确地实现？需要哪些机制和策略才能高性能地实现？面对硬件和软件故障，可靠性如何实现？
-并行 concurrency 关键问题：如何构建正确的并发程序
-如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？
-操作系统的简单历史 早期操作系统：只是一些库 引入保护机制：借助硬件的帮助，区分用户模式和内核模式 多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix 摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>virtualization on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/virtualization/</link><description>Recent content in virtualization on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Wed, 01 Sep 2021 14:39:48 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/virtualization/index.xml" rel="self" type="application/rss+xml"/><item><title>操作系统导论学习笔记（三）</title><link>https://kyon.life/post/ostep-3/</link><pubDate>Wed, 01 Sep 2021 14:39:48 +0800</pubDate><guid>https://kyon.life/post/ostep-3/</guid><description>只有少量的物理 CPU，操作系统如何提供有几乎无限 CPU 可用的假象？
+操作系统通过虚拟化(Virutalization) CPU 来提供这种假象。通过让每个程序只运行一个时间片，然后切换到其他进程，操作系统提供了存在多个虚拟 CPU 的假象。这就是时分共享(time sharing) CPU 共享技术。
+潜在的开销就是性能降低，因为如果 CPU 必须共享，每个进程的运行就会变慢。
+要实现 CPU 的虚拟化，操作系统需要提供底层 机制（mechanism） 和高层 策略（policy） 的支持：
+机制是一些低级方法或协议，比如上下文切换（context switch），让操作系统可以停止运行当前程序，并在给定的 CPU 上运行另一个程序。 策略是操作系统作出某种决定的算法，比如调度策略（scheduling policy）决定当前 CPU 运行一组待运行程序中的哪一个。 分离机制和策略：机制为 how 提供答案，策略为 which 提供答案，将两者分开可以轻松地替换策略，而不必重新考虑机制。这是一种通用的软件设计原则：模块化。
+关键问题：如何高效、可控地虚拟化 CPU
+操作系统必须以高性能的方式虚拟化 CPU，同时保持对系统的控制。为此，操作系统会巧妙地利用硬件的支持。
+受限的直接执行 基本技巧：受限的直接执行 LDE Limited Direct Execution
+「直接执行」是指程序直接运行在 CPU 上
+「受限」的体现之一，是 CPU 执行模式区分「用户模式 user mode」 和 「内核模式 kernel mode」，用户模式下，程序执行是受限制的，比如不能执行特权操作的（比如访问磁盘 I/O）。
+LDE 协议的具体实现方式：
+操作系统启动时，内核使用特权指令设置陷阱表 (trap table)，告知硬件接收到特定指令时，到哪里寻找需要执行的程序。 用户程序运行在用户模式下，发出系统调用后，硬件检测到变化，保存当前程序的状态（比如寄存器入栈），转为内核模式，查询陷阱表，然后跳转到对应的内核程序处执行。内核执行完程序后，调用返回用户模式指令，硬件恢复寄存器，转为用户模式，回到应用程序中继续执行。 系统调用类似过程调用，但隐藏在系统接口里的实现，是著名的陷阱指令。为了仔细遵循与内核一致的调用约定（例如将参数放在知名位置），库函数的系统调用部分是用汇编语言手动实现的。
+LDE 协议的两阶段实现时间线</description></item></channel></rss>

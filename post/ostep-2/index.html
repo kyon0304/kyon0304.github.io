@@ -1,0 +1,251 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="操作系统导论学习笔记（二）">
+<meta itemprop=description content="进程 操作系统为正在运行的程序提供的抽象，就是进程。
+操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 程序控制块 PCB Program Control Block
+在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的机器状态（machine state）
+机器状态包括：
+ 内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间 通用寄存器 一些特殊寄存器  PC 指针：程序正在执行的指令 栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址   I/O 信息： 程序访问的持久化存储设备  现代系统进程都会提供的 API
+ 创建：程序变成进程的过程 销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程 等待：有时等待进程停止运行是有用的 其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行 状态：查看进程状态  操作系统创建进程
+ 从磁盘加载代码和静态数据（比如初始化变量）到内存中  尽早加载 eagerly load 惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持   分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈 也可能会给程序分配堆内存 其他初始化任务，特别是 I/O 相关的  在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出   启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行  进程的 3 种状态及相互转换"><meta itemprop=datePublished content="2021-09-01T13:46:35+08:00">
+<meta itemprop=dateModified content="2021-09-01T14:51:25+08:00">
+<meta itemprop=wordCount content="185"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="ostep,学习笔记,process,"><meta property="og:title" content="操作系统导论学习笔记（二）">
+<meta property="og:description" content="进程 操作系统为正在运行的程序提供的抽象，就是进程。
+操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 程序控制块 PCB Program Control Block
+在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的机器状态（machine state）
+机器状态包括：
+ 内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间 通用寄存器 一些特殊寄存器  PC 指针：程序正在执行的指令 栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址   I/O 信息： 程序访问的持久化存储设备  现代系统进程都会提供的 API
+ 创建：程序变成进程的过程 销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程 等待：有时等待进程停止运行是有用的 其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行 状态：查看进程状态  操作系统创建进程
+ 从磁盘加载代码和静态数据（比如初始化变量）到内存中  尽早加载 eagerly load 惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持   分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈 也可能会给程序分配堆内存 其他初始化任务，特别是 I/O 相关的  在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出   启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行  进程的 3 种状态及相互转换">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/ostep-2/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-09-01T13:46:35+08:00">
+<meta property="article:modified_time" content="2021-09-01T14:51:25+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>操作系统导论学习笔记（二）</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="操作系统导论学习笔记（二）">
+<meta name=twitter:description content="进程 操作系统为正在运行的程序提供的抽象，就是进程。
+操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 程序控制块 PCB Program Control Block
+在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的机器状态（machine state）
+机器状态包括：
+ 内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间 通用寄存器 一些特殊寄存器  PC 指针：程序正在执行的指令 栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址   I/O 信息： 程序访问的持久化存储设备  现代系统进程都会提供的 API
+ 创建：程序变成进程的过程 销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程 等待：有时等待进程停止运行是有用的 其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行 状态：查看进程状态  操作系统创建进程
+ 从磁盘加载代码和静态数据（比如初始化变量）到内存中  尽早加载 eagerly load 惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持   分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈 也可能会给程序分配堆内存 其他初始化任务，特别是 I/O 相关的  在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出   启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行  进程的 3 种状态及相互转换">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://instagram.com/kyon_wy target=_blank rel="noopener me" title=Instagram><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>9 月 1 号, 2021</span></div>
+<h1>操作系统导论学习笔记（二）</h1>
+</header>
+<div class=content>
+<h2 id=进程>进程<a href=#进程 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>操作系统为正在运行的程序提供的抽象，就是进程。</p>
+<p>操作系统也是一种应用程序，会使用数据结构保存进程相关的信息。比如保存正在运行的进程的一些附加信息，保存就绪进程列表，跟踪阻塞进程的信息，以便在合适的时机进行唤醒。进程列表这种数据结构，有时也会被称为 <strong>程序控制块 PCB</strong> Program Control Block</p>
+<p>在任何时刻，都可以清点进程在读取和修改什么内容，机器的哪部分会对进程造成影响，我们称之为进程的<strong>机器状态（machine state）</strong></p>
+<p>机器状态包括：</p>
+<ul>
+<li>内存：程序执行的指令和读取及修改的数据，进程可访问的内存称为进程的地址空间</li>
+<li>通用寄存器</li>
+<li>一些特殊寄存器
+<ul>
+<li>PC 指针：程序正在执行的指令</li>
+<li>栈指针 stack pointer，帧指针 frame pointer 用于管理函数参数栈、局部变量和返回地址</li>
+</ul>
+</li>
+<li>I/O 信息： 程序访问的持久化存储设备</li>
+</ul>
+<p>现代系统进程都会提供的 API</p>
+<ul>
+<li>创建：程序变成进程的过程</li>
+<li>销毁：如果程序不肯自己退出，操作系统提供了接口让用户结束进程</li>
+<li>等待：有时等待进程停止运行是有用的</li>
+<li>其他控制：除等待和销毁外的其他控制接口，比如暂停执行和恢复执行</li>
+<li>状态：查看进程状态</li>
+</ul>
+<p>操作系统创建进程</p>
+<ol>
+<li>从磁盘加载代码和静态数据（比如初始化变量）到内存中
+<ol>
+<li>尽早加载 eagerly load</li>
+<li>惰性加载 lazily load 只加载执行到的片段，需要内存分页和交换机制支持</li>
+</ol>
+</li>
+<li>分配内存，提供给程序的运行时栈使用，也可能会使用参数（argc, argv）初始化栈</li>
+<li>也可能会给程序分配堆内存</li>
+<li>其他初始化任务，特别是 I/O 相关的
+<ol>
+<li>在 Unix 中，所有进程都默认有 3 个打开的文件描述符：标准输入、标准输出和错误输出</li>
+</ol>
+</li>
+<li>启动程序：通过跳转到 main() 例程，操作系统将 CPU 的控制权交到新创建的进程中，从而程序开始执行</li>
+</ol>
+<p>进程的 3 种状态及相互转换</p>
+<ul>
+<li>运行：在处理器中执行指令</li>
+<li>就绪：进程已准备好执行，但是操作系统没有选择它在此时执行</li>
+<li>阻塞：常见的例子是进程向磁盘发起了 I/O 请求时，它会进入阻塞状态，其他进程可以使用处理器</li>
+</ul>
+<p><img src=/media/ostep-2/process-state.png alt=进程状态转换></p>
+<h2 id=进程-api-简介>进程 API 简介<a href=#进程-api-简介 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<h3 id=fork>fork()<a href=#fork class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>fork() 创建的子进程，是调用 fork() 接口的进程的一份拷贝，但是也有其特殊的地方，包括：</p>
+<ul>
+<li>地址空间（私有的内存）</li>
+<li>寄存器</li>
+<li>PC 指针 等等</li>
+</ul>
+<p>并且 fork() 创建的子进程，入口不是 main 函数，而是 fork() 返回处，好像自己调用了 fork() 函数，不过区别于父进程，子进程 fork() 返回值是 0, 父进程返回值是子进程的 PID</p>
+<h3 id=waitwaitpid>wait()/waitpid()<a href=#waitwaitpid class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>父进程可以通过调用 wait() 或 waitpid() 来延迟自己的执行，直到子进程结束执行，wait() 函数返回至父进程。</p>
+<h3 id=exec>exec()<a href=#exec class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>成功的 exec() 调用不会返回。执行 exec() 调用不会创建新的进程，而是把当前进程转化为另一个进程，包括：</p>
+<ul>
+<li>替换当前进程内存空间中的内容，包括代码段和静态变量</li>
+<li>重新初始化栈空间和堆空间</li>
+<li>重置寄存器和 PC 指针</li>
+</ul>
+<p>创建进程的操作，分为 fork() 和 exec() 两个接口，因此在 fork() 和 exec() 之间可以执行其他操作，父进程可以为子进程执行一些准备环境的操作，比如设置环境变量等。</p>
+<p>shell 是一个用户程序，它展示一个提示符并等待输入。收到一个命令（以及参数）后，大部分情况下，它会在文件系统中查找这个命令对应的可执行程序，调用 fork() 创建一个用来执行命令的子进程，然后调用 exec() 的某个变体执行命令，最后调用 wait() 等待命令执行完成。当子进程执行结束后，shell 从 wait() 函数返回，重新显示提示符，等待下一个命令的输入。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-sh data-lang=sh>cat test1 &gt; test2
+</code></pre></td></tr></table>
+</div>
+</div><p>重定向操作实现：shell 程序调用 fork() 创建子进程后，先将标准输出关闭，并打开 test2 文件描述符，然后通过 exec() 执行 cat 命令，这样输出就会到 test2 中。</p>
+<p>Unix 的管道和重定向实现方式是类似的，关闭标准输出后，输出连接至内核中的管道（pipe, 其实是个队列），管道的另一端连接至另外一个命令的输入。从而可以实现很长的命令链。简单举例：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-sh data-lang=sh>grep foo test.txt<span class=p>|</span>wc -l
+</code></pre></td></tr></table>
+</div>
+</div><h3 id=其他>其他<a href=#其他 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>除了 fork(), exec(), wait() 外，还有很多控制进程的系统调用。比如 kill() 用来向进程发送信号，方便起见，很多 Unix 系统为 kill() 系统调用发送的不同信号绑定了快捷键：</p>
+<ul>
+<li>ctrl+c 发送 SIGINT 信号（通常会终止进程）</li>
+<li>ctrl+z 发送 SIGTSTP 信号，通常是暂停进程，可以通过内置的 fg 命令唤起进程继续执行</li>
+</ul>
+<p>Unix 系统有一套丰富的 <strong>信号子系统</strong>，提供了向进程传递外部事件的丰富基础设施，包括在单个进程中接收和处理信号的方法，以及向进程组发送信号。为了使用这套通信方式，进程需要调用 signal() 来捕获特定信号，这样当这个信号发给它时，进程会暂停当前程序执行并运行一段特定的代码来响应这个信号。</p>
+<p>谁可以向进程发信号，谁不可以？一般系统会同时有多个人在使用，如果任何人可以向任何程序发出终止信号，是很危险的，因此引入了 user 用户的概念：通过提供密码等认证信息，用户登入系统，获得系统资源的使用权限范围，在这个范围内，用户具有进程的完全控制权，包括创建、暂停、终止等。</p>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/ostep-1/>操作系统导论学习笔记（一）</a></li>
+<li><a href=/post/philosophy-of-software-design-3/>Philosophy of Software Design 第三章 仅仅能工作的代码是不够的（编程时的战略 vs 战术思维）</a></li>
+<li><a href=/post/philosophy-of-software-design-2/>Philosophy of Software Design 第二章 复杂度的天性</a></li>
+<li><a href=/post/philosophy-of-software-design-1/>Philosophy of Software Design 第一章 介绍（一切都与复杂性有关）</a></li>
+<li><a href=/post/philosophy-of-software-design-11/>Philosophy of Software Design 第十一章 设计两次</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/ostep>ostep</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span><span class=tag><a href=https://kyon.life/tags/process>process</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2083 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-09-01 05:46</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/48ce114ee4a0625b47c2443a08f608b90f92e92b target=_blank rel=noopener>48ce114</a> @ 2021-09-01</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#进程>进程</a></li>
+<li><a href=#进程-api-简介>进程 API 简介</a>
+<ul>
+<li><a href=#fork>fork()</a></li>
+<li><a href=#waitwaitpid>wait()/waitpid()</a></li>
+<li><a href=#exec>exec()</a></li>
+<li><a href=#其他>其他</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=next-post href=https://kyon.life/post/ostep-3/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>操作系统导论学习笔记（三）</span>
+</a>
+<a class=prev-post href=https://kyon.life/post/ostep-1/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>操作系统导论学习笔记（一）</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>
