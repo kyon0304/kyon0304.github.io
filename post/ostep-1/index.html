@@ -20,8 +20,8 @@
 并行 concurrency 关键问题：如何构建正确的并发程序
 如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？
 操作系统的简单历史  早期操作系统：只是一些库 引入保护机制：借助硬件的帮助，区分用户模式和内核模式 多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix 摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。  "><meta itemprop=datePublished content="2021-08-31T22:45:12+08:00">
-<meta itemprop=dateModified content="2021-09-01T14:51:25+08:00">
-<meta itemprop=wordCount content="74"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=dateModified content="2021-09-01T15:08:37+08:00">
+<meta itemprop=wordCount content="74"><meta itemprop=image content="https://kyon.life/media/ostep-1/ostep.jpg">
 <meta itemprop=keywords content="ostep,学习笔记,"><meta property="og:title" content="操作系统导论学习笔记（一）">
 <meta property="og:description" content="为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)
 设计和实现操作系统的目标  提供高性能，尽可能降低操作系统的性能开销 minimize the overhead 在应用程序之间以及操作系统和应用系统之间提供保护 protection 让进程间彼此隔离是实现保护的关键 isolation 保证高可靠性 reliability 能源效率 energy efficiency, 安全性 security, 移动性 mobility  操作系统的 3 个“简单”部分  虚拟化 virtualizing 持久性 persistence 并行 concurrency  虚拟化 virtualizing 虚拟化又分为虚拟化 CPU 和虚拟化内存。
@@ -38,9 +38,9 @@
 如果同一个内存空间中有很多并发执行的线程，如何构建一个正确工作的程序？操作系统需要什么原语？硬件应该提供哪些机制？我们如何利用它们来解决并发问题？
 操作系统的简单历史  早期操作系统：只是一些库 引入保护机制：借助硬件的帮助，区分用户模式和内核模式 多道程序 multiprogram: 提高 CPU 执行效率，避免 I/O 处理拖慢 CPU 执行。出现 Unix 摩登时代：出现个人计算机，遗憾的是，对于操作系统来说，个人计算机起初代表了一次巨大的倒退，因为早期的系统忘记了（或从未知道）小型机时代的经验教训。幸运的是，经过一段时间的苦难后，小型计算机操作系统的老功能开始进入台式机。  ">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://kyon.life/post/ostep-1/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="og:url" content="https://kyon.life/post/ostep-1/"><meta property="og:image" content="https://kyon.life/media/ostep-1/ostep.jpg"><meta property="article:section" content="post">
 <meta property="article:published_time" content="2021-08-31T22:45:12+08:00">
-<meta property="article:modified_time" content="2021-09-01T14:51:25+08:00">
+<meta property="article:modified_time" content="2021-09-01T15:08:37+08:00">
 <link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
 <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
 <link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
@@ -50,8 +50,8 @@
 <title>操作系统导论学习笔记（一）</title>
 <link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
 <link rel=stylesheet href=https://kyon.life/css/share.min.css>
-<meta name=twitter:card content="summary">
-<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://kyon.life/media/ostep-1/ostep.jpg">
 <meta name=twitter:title content="操作系统导论学习笔记（一）">
 <meta name=twitter:description content="为了让程序运行变得更容易，操作系统出现了。操作系统完成的事情包括，允许多个程序同时运行、让程序共享内存、让程序能够与设备交互等。操作系统负责确保系统既易于使用又正确高效的运行。操作系统通过虚拟化（virtualization）做到这一点，操作系统将物理资源（如 CPU、内存或磁盘）转换为更通用、更强大且更易于使用的虚拟形式。因此，我们有时将操作系统称为虚拟机(virtual machine)
 设计和实现操作系统的目标  提供高性能，尽可能降低操作系统的性能开销 minimize the overhead 在应用程序之间以及操作系统和应用系统之间提供保护 protection 让进程间彼此隔离是实现保护的关键 isolation 保证高可靠性 reliability 能源效率 energy efficiency, 安全性 security, 移动性 mobility  操作系统的 3 个“简单”部分  虚拟化 virtualizing 持久性 persistence 并行 concurrency  虚拟化 virtualizing 虚拟化又分为虚拟化 CPU 和虚拟化内存。
@@ -157,7 +157,7 @@
 </p>
 <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 1341 字</p>
 <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-08-31 14:45</p>
-<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/48ce114ee4a0625b47c2443a08f608b90f92e92b target=_blank rel=noopener>48ce114</a> @ 2021-09-01</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/20b22fde8c05c9c8dc5b9eaef151b74b26ac87a4 target=_blank rel=noopener>20b22fd</a> @ 2021-09-01</p>
 </footer>
 <div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
 <center>
