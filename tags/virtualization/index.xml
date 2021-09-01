@@ -1,4 +1,39 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>virtualization on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/virtualization/</link><description>Recent content in virtualization on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Wed, 01 Sep 2021 14:39:48 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/virtualization/index.xml" rel="self" type="application/rss+xml"/><item><title>操作系统导论学习笔记（三）</title><link>https://kyon.life/post/ostep-3/</link><pubDate>Wed, 01 Sep 2021 14:39:48 +0800</pubDate><guid>https://kyon.life/post/ostep-3/</guid><description>只有少量的物理 CPU，操作系统如何提供有几乎无限 CPU 可用的假象？
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>virtualization on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/virtualization/</link><description>Recent content in virtualization on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Wed, 01 Sep 2021 18:37:33 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/virtualization/index.xml" rel="self" type="application/rss+xml"/><item><title>操作系统导论学习笔记（六）</title><link>https://kyon.life/post/ostep-6/</link><pubDate>Wed, 01 Sep 2021 18:37:33 +0800</pubDate><guid>https://kyon.life/post/ostep-6/</guid><description>地址转换的二次尝试：分段 打破三个 简化假设 中的第一条：「用户的地址空间必须连续地放在物理内存中」。在 MMU 中引入不止一个基址和界限寄存器，而是给地址空间内的每个逻辑段（segment）一对。在典型的地址空间里，有 3 个逻辑不同的段：代码段、栈和堆。
+段寄存器的值
+分段机制 使得操作系统可以将不同的段放到不同物理内存区域，避免了地址空间中未使用的部分占用内存。
+分段的地址空间示意图
+在物理内存中放置段
+计算地址转换时，需要先减去地址空间中的偏移，比如要访问堆的虚拟地址为 4200, 需要先减去地址空间中 4k 的偏移量，然后再根据基址寄存器中得到实际地址：4200-4096+34816=34920
+分段的引入的问题：虚拟地址属于哪个段 将地址空间分段映射后，除了需要多对基址和界限寄存器，还需要辨识要访问的地址属于哪个段
+显式方式：
+虚拟地址 4200 的二进制形式
+在虚拟地址中，前 2 位用于标识属于哪个段，上图中 01 表示属于堆，后面是段内偏移量，0000 0110 1000（即十六进制 0x068 或十进制 104 ），然后和基址寄存器中的地址相加得到物理地址 104+34816=34920
+有的实现中，会把堆和栈当作一个段，这样就只有两个段，只需要一个标识位。
+隐式方式：
+硬件通过地址产生方式来判断属于哪个段，如果地址由程序计数器（ PC 指针）产生，那么无疑是代码段，如果基于栈或基址指针，那么这个虚拟地址在栈段，其他情况则来自堆段。
+分段的引入的问题：栈段增长方向 栈的增长方向和代码段以及堆不一样，是反向增长的，比如栈被分配到 28k 地址，大小为 2k, 那么结束地址是 26k，因此需要硬件支持：新增一位标识地址是否反向增长。
+分段的引入的问题：共享 随着分段机制的改进，内存使用效率纳入考虑，如果内存可以跨地址空间共享，可以明显提升使用率，对于代码段这种只读形式的内存，完全可以由操作系统同时映射到多个地址空间中，而不会担心隔离遭到破坏。
+如果要支持内存共享，则需要区分内存的访问方式（只读、读写、可执行等），段寄存器再追加一位保护位，如下图所示。
+段寄存器的值（有保护位）
+另外，地址转换算法也需要改进，除了判断是否越界，还需要检查特定访问是否允许：如果用户试图写入只读区域，或从非执行段执行指令，硬件会触发异常，让操作系统来处理出错进程。
+分段：小结 代码段、栈、堆这种划分段的方式是 粗粒度（coarse grained），相对的，有的操作系统支持将地址空间划分为成千上万的段，这种是 细粒度（fine grained）。</description></item><item><title>操作系统导论学习笔记（五）</title><link>https://kyon.life/post/ostep-5/</link><pubDate>Wed, 01 Sep 2021 14:57:48 +0800</pubDate><guid>https://kyon.life/post/ostep-5/</guid><description>内存使用的演化 最开始，操作系统只是库函数，和用户程序各占有一部分物理内存
+接着，为了更有效地共享机器，多道程序开始流行，但很快，人们希望提高系统的交互性，时分系统开始流行，需要让多个程序共享内存，一种方式是类似上下文切换，将内存中的数据移动到磁盘中保存，以及从磁盘加载恢复，但是这个方式的问题是太慢了，尤其是程序占用内存越来越大的情况下，另一种方式是多个程序的内存同时驻留，CPU 选择某个进程执行，这种方式带来的问题是如何隔离及保护内存，毕竟不希望其他进程访问甚至修改当前进程的内存。
+基于此，操作系统提供了易于使用的物理内存抽象，这个抽象叫做 地址空间 address space，是运行程序看到的系统中的内存。理解这个抽象，是理解虚拟内存的关键。
+地址空间 一个进程的 地址空间 包含运行的程序的所有内存状态，比如代码需要加载到内存中，需要栈空间保存函数调用信息，为局部变量、参数、函数返回地址开辟空间，堆管理用户动态申请的空间，还有其他东西，比如静态变量等，这些都是地址空间的一部分。
+不过为了简化讨论，我们假设只有代码、栈、堆这 3 部分。
+地址空间简单示例
+代码是固定的，程序运行期间不会发生变化，我们把它放在起始 0-1KB 部分
+堆和栈在程序运行期间都有可能增长或缩小，比如用户申请内存、调用函数等情况，堆放在代码段后面向下增长，栈在地址空间底端向上增长。
+以上是一种约定俗称，不是强制（比如当多个线程在地址空间中共存时）。
+这里的地址空间，是操作系统提供给程序的抽象，而不是实际的物理内存地址，而是加载在任意的物理地址。
+操作系统将程序看到的地址空间，转换为实际的物理地址，并从物理内存中获取内容，这是虚拟化内存中的关键。
+虚拟内存目标 关键问题：操作系统如何在单一的物理内存上为多个运行的进程（所有进程共享内存）构建一个私有的、很大的地址空间抽象？
+当操作系统这样做时，我们就说操作系统在 虚拟化内存 virtualizing memory
+虚拟内存的 3 个目标
+透明：应用程序不会察觉虚拟内存的存在，这些工作由操作系统和硬件在幕后完成，站在应用程序的角度，和直接使用物理内存无异 高效：时间上（不会因为虚拟内存而使应用程序运行变慢）和空间上（不会需要太多额外内存来支持虚拟内存实现），因此操作系统需要硬件支持来达到高效虚拟化内存的目的（比如 TLB） 保护：当一个进程加载、存储或执行指令时，不应该以任何形式访问或修改其他程序或操作系统本身的内存（即它地址空间之外的任何内存）。每个进程都应该在自己独立的环境中运行，避免其他出错或恶意进程的影响 虚拟内存所需 API 关键问题：如何分配和管理内存
+在 UNIX/C 程序中，理解如何分配和管理内存是构建健壮和可靠软件的重要基础。通常使用哪些接口？需要避免哪些错误？
+内存分配 malloc() 在运行一个 C 程序的时候，会分配两种内存
+栈内存 由编译器自动分配，隐式管理 进入函数时，编译器自动在栈上开辟内存，退出函数后，自动释放 堆内存 所有的申请和释放都由程序员显式完成 void *malloc(size_t size); 存活时间由程序员决定 内存释放 free() 申请内存是内存管理中简单的部分，复杂并且容易出错的部分是释放内存 free(void* x);</description></item><item><title>操作系统导论学习笔记（三）</title><link>https://kyon.life/post/ostep-3/</link><pubDate>Wed, 01 Sep 2021 14:39:48 +0800</pubDate><guid>https://kyon.life/post/ostep-3/</guid><description>只有少量的物理 CPU，操作系统如何提供有几乎无限 CPU 可用的假象？
 操作系统通过虚拟化(Virutalization) CPU 来提供这种假象。通过让每个程序只运行一个时间片，然后切换到其他进程，操作系统提供了存在多个虚拟 CPU 的假象。这就是时分共享(time sharing) CPU 共享技术。
 潜在的开销就是性能降低，因为如果 CPU 必须共享，每个进程的运行就会变慢。
 要实现 CPU 的虚拟化，操作系统需要提供底层 机制（mechanism） 和高层 策略（policy） 的支持：

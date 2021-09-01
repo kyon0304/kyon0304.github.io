@@ -1,0 +1,252 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="操作系统导论学习笔记（五）">
+<meta itemprop=description content="虚拟化内存相关笔记：内存使用方式的演化、地址空间、虚拟内存的目标，支持虚拟化内存的机制：地址转换，以及在简化假设下的第一次尝试"><meta itemprop=datePublished content="2021-09-01T14:57:48+08:00">
+<meta itemprop=dateModified content="2021-09-01T22:47:36+08:00">
+<meta itemprop=wordCount content="128"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="ostep,学习笔记,virtualization,"><meta property="og:title" content="操作系统导论学习笔记（五）">
+<meta property="og:description" content="虚拟化内存相关笔记：内存使用方式的演化、地址空间、虚拟内存的目标，支持虚拟化内存的机制：地址转换，以及在简化假设下的第一次尝试">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/ostep-5/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-09-01T14:57:48+08:00">
+<meta property="article:modified_time" content="2021-09-01T22:47:36+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>操作系统导论学习笔记（五）</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="操作系统导论学习笔记（五）">
+<meta name=twitter:description content="虚拟化内存相关笔记：内存使用方式的演化、地址空间、虚拟内存的目标，支持虚拟化内存的机制：地址转换，以及在简化假设下的第一次尝试">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://twitter.com/kyon_wy target=_blank rel="noopener me" title=Twitter><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9.0 01-3.14 1.53 4.48 4.48.0 00-7.86 3v1A10.66 10.66.0 013 4s-4 9 5 13a11.64 11.64.0 01-7 2c9 5 20 0 20-11.5a4.5 4.5.0 00-.08-.83A7.72 7.72.0 0023 3z"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>9 月 1 号, 2021</span></div>
+<h1>操作系统导论学习笔记（五）</h1>
+</header>
+<div class=content>
+<h2 id=内存使用的演化>内存使用的演化<a href=#内存使用的演化 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>最开始，操作系统只是库函数，和用户程序各占有一部分物理内存</p>
+<p>接着，为了更有效地共享机器，多道程序开始流行，但很快，人们希望提高系统的交互性，时分系统开始流行，需要让多个程序共享内存，一种方式是类似上下文切换，将内存中的数据移动到磁盘中保存，以及从磁盘加载恢复，但是这个方式的问题是太慢了，尤其是程序占用内存越来越大的情况下，另一种方式是多个程序的内存同时驻留，CPU 选择某个进程执行，这种方式带来的问题是如何隔离及保护内存，毕竟不希望其他进程访问甚至修改当前进程的内存。</p>
+<p>基于此，操作系统提供了易于使用的物理内存抽象，这个抽象叫做 <strong>地址空间 address space</strong>，是运行程序看到的系统中的内存。理解这个抽象，是理解虚拟内存的关键。</p>
+<h2 id=地址空间>地址空间<a href=#地址空间 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>一个进程的 地址空间 包含运行的程序的所有内存状态，比如代码需要加载到内存中，需要栈空间保存函数调用信息，为局部变量、参数、函数返回地址开辟空间，堆管理用户动态申请的空间，还有其他东西，比如静态变量等，这些都是地址空间的一部分。</p>
+<p>不过为了简化讨论，我们假设只有代码、栈、堆这 3 部分。</p>
+<figure>
+<img class=big src=/media/ostep-5/address-space.png alt=地址空间简单示例 data-action=zoom>
+</img>
+<figcaption><p>地址空间简单示例</p></figcaption>
+</figure>
+<p>代码是固定的，程序运行期间不会发生变化，我们把它放在起始 0-1KB 部分</p>
+<p>堆和栈在程序运行期间都有可能增长或缩小，比如用户申请内存、调用函数等情况，堆放在代码段后面向下增长，栈在地址空间底端向上增长。</p>
+<p>以上是一种约定俗称，不是强制（比如当多个线程在地址空间中共存时）。</p>
+<p>这里的地址空间，是操作系统提供给程序的抽象，而不是实际的物理内存地址，而是加载在任意的物理地址。</p>
+<p>操作系统将程序看到的地址空间，转换为实际的物理地址，并从物理内存中获取内容，这是虚拟化内存中的关键。</p>
+<h2 id=虚拟内存目标>虚拟内存目标<a href=#虚拟内存目标 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<blockquote>
+<p>关键问题：操作系统如何在单一的物理内存上为多个运行的进程（所有进程共享内存）构建一个私有的、很大的地址空间抽象？<br>
+当操作系统这样做时，我们就说操作系统在 <strong>虚拟化内存</strong> virtualizing memory</p>
+</blockquote>
+<p>虚拟内存的 3 个目标</p>
+<ol>
+<li>透明：应用程序不会察觉虚拟内存的存在，这些工作由操作系统和硬件在幕后完成，站在应用程序的角度，和直接使用物理内存无异</li>
+<li>高效：时间上（不会因为虚拟内存而使应用程序运行变慢）和空间上（不会需要太多额外内存来支持虚拟内存实现），因此操作系统需要硬件支持来达到高效虚拟化内存的目的（比如 TLB）</li>
+<li>保护：当一个进程加载、存储或执行指令时，不应该以任何形式访问或修改其他程序或操作系统本身的内存（即它地址空间之外的任何内存）。每个进程都应该在自己独立的环境中运行，避免其他出错或恶意进程的影响</li>
+</ol>
+<h2 id=虚拟内存所需-api>虚拟内存所需 API<a href=#虚拟内存所需-api class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<blockquote>
+<p>关键问题：如何分配和管理内存<br>
+在 UNIX/C 程序中，理解如何分配和管理内存是构建健壮和可靠软件的重要基础。通常使用哪些接口？需要避免哪些错误？</p>
+</blockquote>
+<h3 id=内存分配-malloc>内存分配 malloc()<a href=#内存分配-malloc class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>在运行一个 C 程序的时候，会分配两种内存</p>
+<ul>
+<li>栈内存
+<ul>
+<li>由编译器自动分配，隐式管理</li>
+<li>进入函数时，编译器自动在栈上开辟内存，退出函数后，自动释放</li>
+</ul>
+</li>
+<li>堆内存
+<ul>
+<li>所有的申请和释放都由程序员显式完成 void *malloc(size_t size);</li>
+<li>存活时间由程序员决定</li>
+</ul>
+</li>
+</ul>
+<h3 id=内存释放-free>内存释放 free()<a href=#内存释放-free class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>申请内存是内存管理中简单的部分，复杂并且容易出错的部分是释放内存 free(void* x);</p>
+<p>容易出现的错误包括：</p>
+<ul>
+<li>忘记释放</li>
+<li>重复释放</li>
+<li>提前释放</li>
+<li>传入 free 的值不是 malloc 返回值</li>
+<li>忘记分配内存</li>
+<li>忘记初始化内存</li>
+<li>分配内存空间不足，最常见是给字符串分配内存时没有为字符串结束符 \0 预留空间 malloc(strlen(str)+1);</li>
+</ul>
+<h2 id=内存管理分级>内存管理分级<a href=#内存管理分级 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>内存管理分为两级：</p>
+<ol>
+<li>第一级是由操作系统执行的内存管理，操作系统在进程执行时，将内存交给进程，并在进程退出（或以其他形式退出）时将其回收。</li>
+<li>第二级管理在每个进程中，例如在调用 malloc() 和 free() 时，在堆内管理。</li>
+</ol>
+<p>操作系统会在程序执行结束时，收回进程的所有内存（包括用于代码、栈、以及相关堆的内存页）。无论地址空间中堆的状态如何，操作系统都会在进程终止时收回所有这些页面，从而确保即使没有释放内存，也不会丢失内存。</p>
+<p>因此短时间运行的程序，泄露内存通常不会导致问题，但是如果是长期运行的服务器（例如 Web 服务器或数据库管理系统），泄露内存就是很大的问题，最终会导致程序在内存不足时崩溃。</p>
+<h2 id=虚拟内存机制>虚拟内存机制<a href=#虚拟内存机制 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<blockquote>
+<p>关键问题：如何高效、灵活地虚拟化内存<br>
+如何实现高效的内存虚拟化？如何提供应用程序所需的灵活性？如何保持控制应用程序可访问的内存位置，从而确保应用程序的内存访问受到合理的限制？如何高效地实现这一切？</p>
+</blockquote>
+<p>利用一种通用技术，有时被称为基于硬件的地址转换（hardware-basedaddress translation），简称为 <strong>地址转换</strong>（address translation）</p>
+<p>硬件对每次内存访问进行处理，将指令中的虚拟地址转换为数据实际存储的物理地址，通过这种地址转换，将应用程序的内存引用重定位到内存中实际的位置。</p>
+<p>硬件完成的地址转换只是底层机制，还需要操作系统在关键的位置介入，设置好硬件，以便完成正确的转换。为了做到这点，操作系统需要对内存进行管理，记录被占用内存和空闲内存位置，并明智而谨慎地介入，保持对内存使用的控制。</p>
+<h2 id=simplify>简单化假设<a href=#simplify class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>对内存虚拟化的第一次尝试，做几个简化假设：</p>
+<ol>
+<li>假设用户的地址空间必须连续地放在物理内存中</li>
+<li>假设地址空间小于物理内存</li>
+<li>每个地址空间的大小相等</li>
+</ol>
+<p>我们会逐步放宽这些假设，从而得到现实中的内存虚拟化，目前先看下基于这 3 条简化假设的地址转换</p>
+<h2 id=地址转换的一次尝试>地址转换的一次尝试<a href=#地址转换的一次尝试 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>每个 CPU 需要两个寄存器：基址(base) 寄存器和界限 (bound) 寄存器，用于完成动态（基于硬件的）地址转换。</p>
+<ul>
+<li>基址寄存器提供定位，使用基址寄存器中的地址和地址空间的虚拟地址相加即可得到实际物理地址</li>
+<li>界限寄存器提供保护，限制地址空间大小，当程序想要访问超出界限的内存时，会触发异常中断</li>
+</ul>
+<figure>
+<img class=middle src=/media/ostep-5/hardware-translation.png alt=动态地址转换对硬件的要求 data-action=zoom>
+</img>
+<figcaption><p>动态地址转换对硬件的要求</p></figcaption>
+</figure>
+<p>除了硬件自动完成的地址转换，操作系统也需要完成一些事情，包括：</p>
+<ol>
+<li>程序执行之前，为进程寻找可用的内存，为了做到这一点，以及基于 3 个简化假设，操作系统需要维护一个空闲列表，用于记录空闲内存位置</li>
+<li>程序执行结束后（正常或异常结束），回收程序使用的内存，比如重新维护空闲列表</li>
+<li>程序执行过程中，发生上下文切换时，从进程结构（比如 PCB）中保存或恢复基址和界限寄存器</li>
+<li>操作系统需要提供异常处理程序，当越界访问内存发生时供硬件自动跳转并进行处理</li>
+</ol>
+<figure>
+<img class=middle src=/media/ostep-5/os-translation.png alt=动态地址转换对操作系统的要求 data-action=zoom>
+</img>
+<figcaption><p>动态地址转换对操作系统的要求</p></figcaption>
+</figure>
+<p>这种地址转换方式存在效率低的问题，固定的内存划分会导致大量空间被浪费：已经分配的内存单元内部有未使用的空间（即碎片）被称为 <strong>内部碎片</strong> internal fragmentation</p>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/ostep-3/>操作系统导论学习笔记（三）</a></li>
+<li><a href=/post/ostep-2/>操作系统导论学习笔记（二）</a></li>
+<li><a href=/post/ostep-1/>操作系统导论学习笔记（一）</a></li>
+<li><a href=/post/philosophy-of-software-design-3/>Philosophy of Software Design 第三章 仅仅能工作的代码是不够的（编程时的战略 vs 战术思维）</a></li>
+<li><a href=/post/philosophy-of-software-design-2/>Philosophy of Software Design 第二章 复杂度的天性</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/ostep>ostep</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span><span class=tag><a href=https://kyon.life/tags/virtualization>virtualization</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2674 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-09-01 06:57</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/c625e2515c1f6eb6b47251831050793bdef2b0f1 target=_blank rel=noopener>c625e25</a> @ 2021-09-01</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#内存使用的演化>内存使用的演化</a></li>
+<li><a href=#地址空间>地址空间</a></li>
+<li><a href=#虚拟内存目标>虚拟内存目标</a></li>
+<li><a href=#虚拟内存所需-api>虚拟内存所需 API</a>
+<ul>
+<li><a href=#内存分配-malloc>内存分配 malloc()</a></li>
+<li><a href=#内存释放-free>内存释放 free()</a></li>
+</ul>
+</li>
+<li><a href=#内存管理分级>内存管理分级</a></li>
+<li><a href=#虚拟内存机制>虚拟内存机制</a></li>
+<li><a href=#simplify>简单化假设</a></li>
+<li><a href=#地址转换的一次尝试>地址转换的一次尝试</a></li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=next-post href=https://kyon.life/post/ostep-6/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;新</span><br><span>操作系统导论学习笔记（六）</span>
+</a>
+<a class=prev-post href=https://kyon.life/post/ostep-3/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>操作系统导论学习笔记（三）</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>

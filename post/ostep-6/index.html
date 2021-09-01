@@ -1,0 +1,274 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="操作系统导论学习笔记（六）">
+<meta itemprop=description content="地址转换的第二次尝试：分段，带来的新问题及优势；空闲空间管理的数据结构及存储位置"><meta itemprop=datePublished content="2021-09-01T18:37:33+08:00">
+<meta itemprop=dateModified content="2021-09-01T22:47:36+08:00">
+<meta itemprop=wordCount content="136"><meta itemprop=image content="https://kyon.life/mstile-150x150.png">
+<meta itemprop=keywords content="ostep,学习笔记,virtualization,"><meta property="og:title" content="操作系统导论学习笔记（六）">
+<meta property="og:description" content="地址转换的第二次尝试：分段，带来的新问题及优势；空闲空间管理的数据结构及存储位置">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/ostep-6/"><meta property="og:image" content="https://kyon.life/mstile-150x150.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-09-01T18:37:33+08:00">
+<meta property="article:modified_time" content="2021-09-01T22:47:36+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>操作系统导论学习笔记（六）</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.b03ece134bc184525e52c6166866edaf7a587505abe57b4dc58aaf03f4540218.css integrity="sha256-sD7OE0vBhFJeUsYWaGbtr3pYdQWr5XtNxYqvA/RUAhg=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary">
+<meta name=twitter:image content="https://kyon.life/mstile-150x150.png">
+<meta name=twitter:title content="操作系统导论学习笔记（六）">
+<meta name=twitter:description content="地址转换的第二次尝试：分段，带来的新问题及优势；空闲空间管理的数据结构及存储位置">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://twitter.com/kyon_wy target=_blank rel="noopener me" title=Twitter><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9.0 01-3.14 1.53 4.48 4.48.0 00-7.86 3v1A10.66 10.66.0 013 4s-4 9 5 13a11.64 11.64.0 01-7 2c9 5 20 0 20-11.5a4.5 4.5.0 00-.08-.83A7.72 7.72.0 0023 3z"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>9 月 1 号, 2021</span></div>
+<h1>操作系统导论学习笔记（六）</h1>
+</header>
+<div class=content>
+<h2 id=地址转换的二次尝试分段>地址转换的二次尝试：分段<a href=#地址转换的二次尝试分段 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>打破三个 <a href=/post/ostep-5/#simplify><strong>简化假设</strong></a> 中的第一条：「用户的地址空间必须连续地放在物理内存中」。在 MMU 中引入不止一个基址和界限寄存器，而是给地址空间内的每个逻辑段（segment）一对。在典型的地址空间里，有 3 个逻辑不同的段：代码段、栈和堆。</p>
+<figure>
+<img class=middle src=/media/ostep-5/segment-register.png alt=段寄存器的值 data-action=zoom>
+</img>
+<figcaption><p>段寄存器的值</p></figcaption>
+</figure>
+<p><strong>分段机制</strong> 使得操作系统可以将不同的段放到不同物理内存区域，避免了地址空间中未使用的部分占用内存。</p>
+<p><figure>
+<img class=left src=/media/ostep-5/segment-address-space.png alt=分段的地址空间示意图 data-action=zoom>
+</img>
+<figcaption><p>分段的地址空间示意图</p></figcaption>
+</figure>
+<figure>
+<img class=right src=/media/ostep-5/segment-physical-address.png alt=在物理内存中放置段 data-action=zoom>
+</img>
+<figcaption><p>在物理内存中放置段</p></figcaption>
+</figure>
+</p>
+<p>计算地址转换时，需要先减去地址空间中的偏移，比如要访问堆的虚拟地址为 4200, 需要先减去地址空间中 4k 的偏移量，然后再根据基址寄存器中得到实际地址：4200-4096+34816=34920</p>
+<h3 id=分段的引入的问题虚拟地址属于哪个段>分段的引入的问题：虚拟地址属于哪个段<a href=#分段的引入的问题虚拟地址属于哪个段 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>将地址空间分段映射后，除了需要多对基址和界限寄存器，还需要辨识要访问的地址属于哪个段</p>
+<p>显式方式：</p>
+<figure>
+<img class=middle src=/media/ostep-5/segment-virtual-address.png alt="虚拟地址 4200 的二进制形式" data-action=zoom>
+</img>
+<figcaption><p>虚拟地址 4200 的二进制形式</p></figcaption>
+</figure>
+<p>在虚拟地址中，前 2 位用于标识属于哪个段，上图中 01 表示属于堆，后面是段内偏移量，0000 0110 1000（即十六进制 0x068 或十进制 104 ），然后和基址寄存器中的地址相加得到物理地址 104+34816=34920</p>
+<p>有的实现中，会把堆和栈当作一个段，这样就只有两个段，只需要一个标识位。</p>
+<p>隐式方式：</p>
+<p>硬件通过地址产生方式来判断属于哪个段，如果地址由程序计数器（ PC 指针）产生，那么无疑是代码段，如果基于栈或基址指针，那么这个虚拟地址在栈段，其他情况则来自堆段。</p>
+<h3 id=分段的引入的问题栈段增长方向>分段的引入的问题：栈段增长方向<a href=#分段的引入的问题栈段增长方向 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>栈的增长方向和代码段以及堆不一样，是反向增长的，比如栈被分配到 28k 地址，大小为 2k, 那么结束地址是 26k，因此需要硬件支持：新增一位标识地址是否反向增长。</p>
+<h3 id=分段的引入的问题共享>分段的引入的问题：共享<a href=#分段的引入的问题共享 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>随着分段机制的改进，内存使用效率纳入考虑，如果内存可以跨地址空间共享，可以明显提升使用率，对于代码段这种只读形式的内存，完全可以由操作系统同时映射到多个地址空间中，而不会担心隔离遭到破坏。</p>
+<p>如果要支持内存共享，则需要区分内存的访问方式（只读、读写、可执行等），段寄存器再追加一位保护位，如下图所示。</p>
+<figure>
+<img class=middle src=/media/ostep-5/segment-register2.png alt=段寄存器的值（有保护位） data-action=zoom>
+</img>
+<figcaption><p>段寄存器的值（有保护位）</p></figcaption>
+</figure>
+<p>另外，地址转换算法也需要改进，除了判断是否越界，还需要检查特定访问是否允许：如果用户试图写入只读区域，或从非执行段执行指令，硬件会触发异常，让操作系统来处理出错进程。</p>
+<h3 id=分段小结>分段：小结<a href=#分段小结 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>代码段、栈、堆这种划分段的方式是 <strong>粗粒度</strong>（coarse grained），相对的，有的操作系统支持将地址空间划分为成千上万的段，这种是 <strong>细粒度</strong>（fine grained）。</p>
+<p>细粒度的分段方式有助于操作系统更灵活地使用内存。</p>
+<p>有了分段的支持，堆和栈之间未使用的地址空间，不再需要分配物理内存，从而提高了内存利用率。但是也给操作系统带来了新问题：</p>
+<ol>
+<li>上下文切换时，操作系统需要额外保存和恢复段寄存器中的内容</li>
+<li>管理空闲空间变得复杂：之前假设地址空间大小都相同，现在一个进程中的不同分段大小都可能不同，这样物理内存会被使用的很零散，很快充满了许多空闲的小洞，很难分配新的段，也无法扩容已有的段，这种问题被称为外部碎片</li>
+</ol>
+<p>解决外部碎片有两种思路：</p>
+<ol>
+<li>重新整理紧凑内存：操作系统停止进程运行，然后将分散的已分配内存整理、拷贝到连续的内存空间中，但是内存密集型操作，占用大量处理器时间</li>
+<li>利用空闲内存管理算法：试图保存大的内存块用于分配，有非常多的算法，也说明没有特别好的算法来解决这个问题。</li>
+</ol>
+<p>解决外部碎片最根本的方案是，消除产生的原因：不要分配大小不一的内存块</p>
+<p>分段要求的算法简单易实现，提高了稀疏地址空间的内存利用率，并且带来了共享部分分段（主要指代码段）的好处，但是分段大小不一带来了外部碎片的问题，而且如果某个逻辑分段中地址空间本身就非常稀疏（比如堆空间申请和实际使用相差很大），这种情况分段是无法提高内存利用率的。</p>
+<h2 id=空闲空间管理>空闲空间管理<a href=#空闲空间管理 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<blockquote>
+<p>关键问题：如何管理空闲空间<br>
+要满足变长的分配请求，应该如何管理空闲空间？什么策略可以让碎片最小化，不同方法的时间和空间开销如何？</p>
+</blockquote>
+<p>用户程序中管理堆，操作系统管理进程的地址空间，都需要用到空闲空间管理。在开始具体的讨论之前，我们先做一些假设：</p>
+<ol>
+<li>聚焦于用户程序中的堆管理，类似 malloc 和 free 调用，free 只接受一个指针变量，因此管理方需要根据指针得到要释放的内存大小</li>
+<li>只关心外部碎片</li>
+<li>调用 malloc 分配内存返回指针后，地址就固定了，不可以移动，因此不能通过整理内存来减少碎片</li>
+<li>管理的内存是一片连续的区域，并且整个应用生命周期期间空间不变</li>
+</ol>
+<h3 id=底层机制>底层机制<a href=#底层机制 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>底层机制需要解决 3 个问题：</p>
+<ol>
+<li>内存的分割与合并：在空闲管理列表（链表）中记录空闲块的起始地址与块大小，分配内存时修改起始地址及块大小称为内存分割，内存释放时，会检查是否有连续的空间，如果有就将列表中的空闲块进行合并，称为内存合并</li>
+<li>追踪已分配内存大小：在分配的内存块中划分出一片头块（header）来记录分配内存大小，内存完整性校验值等，因此用户申请大小为 N 的内存块时，实际需要寻找 N+header 大小的区域分配，释放时也是同理。</li>
+<li>在哪里存储空闲管理列表：在空闲空间本身中，通过头块，建立空闲空间列表</li>
+</ol>
+<p>空闲空间管理逻辑链表示意图</p>
+<figure>
+<img class=middle src=/media/ostep-5/free-space-link-list.png alt=经过分配又释放后的空闲内存管理链表（未合并） data-action=zoom>
+</img>
+<figcaption><p>经过分配又释放后的空闲内存管理链表（未合并）</p></figcaption>
+</figure>
+<figure>
+<img class=middle src=/media/ostep-5/free-space-link-list-merged.png alt=合并后的空闲内存管理链表（和初始化时相同） data-action=zoom>
+</img>
+<figcaption><p>合并后的空闲内存管理链表（和初始化时相同）</p></figcaption>
+</figure>
+<p>分配头块后的内存区域示意图，hptr 和 ptr 之间是 malloc 库使用的头块</p>
+<figure>
+<img class=middle src=/media/ostep-5/header.png alt=一个已分配的区域加上头块 data-action=zoom>
+</img>
+<figcaption><p>一个已分配的区域加上头块</p></figcaption>
+</figure>
+<p>实际的空闲空间管理列表存储示意图</p>
+<figure>
+<img class=middle src=/media/ostep-5/heap-init.png alt=有一个空闲块的堆 data-action=zoom>
+</img>
+<figcaption><p>有一个空闲块的堆</p></figcaption>
+</figure>
+<figure>
+<img class=middle src=/media/ostep-5/heap-first.png alt=在一次分配之后的堆 data-action=zoom>
+</img>
+<figcaption><p>在一次分配之后的堆</p></figcaption>
+</figure>
+<figure>
+<img class=middle src=/media/ostep-5/heap-3.png alt="空闲空间和 3 个已分配块" data-action=zoom>
+</img>
+<figcaption><p>空闲空间和 3 个已分配块</p></figcaption>
+</figure>
+<figure>
+<img class=middle src=/media/ostep-5/heap-2.png alt="空闲空间和 2 个已分配块" data-action=zoom>
+</img>
+<figcaption><p>空闲空间和 2 个已分配块</p></figcaption>
+</figure>
+<figure>
+<img class=middle src=/media/ostep-5/heap-free.png alt=未合并的空闲空间列表 data-action=zoom>
+</img>
+<figcaption><p>未合并的空闲空间列表</p></figcaption>
+</figure>
+<p>如果用户申请内存时，堆中内存已耗尽，那么有两种处理方式：</p>
+<ol>
+<li>直接返回 NULL</li>
+<li>向操作系统申请新的空间映射到进程地址空间中（大多数 Unix 系统中，是通过 sbrk 系统调用）</li>
+</ol>
+<h3 id=基本策略>基本策略<a href=#基本策略 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>理想的分配程序可以保证快速和碎片最小化，但是由于申请及释放的随机性，没有最好的策略，只有特定情况会更合适的策略</p>
+<ul>
+<li>最优匹配 best fit：遍历整个空闲列表，找到和申请内存大小最接近的空闲块返回。优点是内存浪费小，缺点是由于需要全部遍历而性能降低，并且可能剩下很多无法利用的小块</li>
+<li>最差匹配 worst fit：找到最大的空闲块，分割满足用户需求后，将余下的块放回空闲列表。同样需要遍历列表，尝试在空闲列表中留下最大的块，但是表现往往很糟糕</li>
+<li>首次匹配 first fit：遇到第一个满足需求的空闲块时，按需求分割内存返回，将剩余的块放回空闲列表。有速度优势，但有时会让列表头部频繁的分割，充满内存碎片</li>
+<li>下次匹配 next fit：为了解决首次匹配头部频繁分割的问题，多一个指针记录上次分配的位置，再次申请时从这个位置开始寻找，将查找操作扩散到整个空闲列表中</li>
+</ul>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/ostep-5/>操作系统导论学习笔记（五）</a></li>
+<li><a href=/post/ostep-3/>操作系统导论学习笔记（三）</a></li>
+<li><a href=/post/ostep-2/>操作系统导论学习笔记（二）</a></li>
+<li><a href=/post/ostep-1/>操作系统导论学习笔记（一）</a></li>
+<li><a href=/post/philosophy-of-software-design-3/>Philosophy of Software Design 第三章 仅仅能工作的代码是不够的（编程时的战略 vs 战术思维）</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/ostep>ostep</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span><span class=tag><a href=https://kyon.life/tags/virtualization>virtualization</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 2675 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-09-01 10:37</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/c625e2515c1f6eb6b47251831050793bdef2b0f1 target=_blank rel=noopener>c625e25</a> @ 2021-09-01</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#地址转换的二次尝试分段>地址转换的二次尝试：分段</a>
+<ul>
+<li><a href=#分段的引入的问题虚拟地址属于哪个段>分段的引入的问题：虚拟地址属于哪个段</a></li>
+<li><a href=#分段的引入的问题栈段增长方向>分段的引入的问题：栈段增长方向</a></li>
+<li><a href=#分段的引入的问题共享>分段的引入的问题：共享</a></li>
+<li><a href=#分段小结>分段：小结</a></li>
+</ul>
+</li>
+<li><a href=#空闲空间管理>空闲空间管理</a>
+<ul>
+<li><a href=#底层机制>底层机制</a></li>
+<li><a href=#基本策略>基本策略</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=prev-post href=https://kyon.life/post/ostep-5/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>操作系统导论学习笔记（五）</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>
