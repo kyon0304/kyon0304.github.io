@@ -1,4 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ostep on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/ostep/</link><description>Recent content in ostep on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Wed, 01 Sep 2021 18:37:33 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/ostep/index.xml" rel="self" type="application/rss+xml"/><item><title>操作系统导论学习笔记（六）</title><link>https://kyon.life/post/ostep-6/</link><pubDate>Wed, 01 Sep 2021 18:37:33 +0800</pubDate><guid>https://kyon.life/post/ostep-6/</guid><description>地址转换的二次尝试：分段 打破三个 简化假设 中的第一条：「用户的地址空间必须连续地放在物理内存中」。在 MMU 中引入不止一个基址和界限寄存器，而是给地址空间内的每个逻辑段（segment）一对。在典型的地址空间里，有 3 个逻辑不同的段：代码段、栈和堆。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ostep on kyon's wonderland with ❤️</title><link>https://kyon.life/tags/ostep/</link><description>Recent content in ostep on kyon's wonderland with ❤️</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Thu, 02 Sep 2021 11:16:54 +0800</lastBuildDate><atom:link href="https://kyon.life/tags/ostep/index.xml" rel="self" type="application/rss+xml"/><item><title>操作系统导论学习笔记（七）</title><link>https://kyon.life/post/ostep-7/</link><pubDate>Thu, 02 Sep 2021 11:16:54 +0800</pubDate><guid>https://kyon.life/post/ostep-7/</guid><description>由于将地址空间划分为大小不等的逻辑分段（代码、堆、栈）的分段方式，大小不一的内存分配方式，会导致空闲空间管理复杂化，因此尝试固定大小的内存分配方式：将地址空间分割为固定大小的单元，每个单元称为一页。相应的，将物理内存看作固定大小的槽块的阵列，称为页帧（page frame），每个页帧包含一个虚拟内存的页
+关键问题：
+如何通过页来实现虚拟内存，从而避免分段带来的问题（空间碎片化）？基本技术是什么？如何让这些技术运行良好，并尽可能减少空间和时间开销？
+地址转换的第三次尝试：分页 操作系统需要为每个进程维护一个页表（page table）用于记录虚拟分页与页帧之间的转换关系
+使用分页实现虚拟内存时，虚拟地址分为两部分，一部分是 page number 表示对应的分页，一部分是页内偏移量 offset
+虚拟地址示例
+以在 64 字节长度的地址空间中寻址为例，需要 6 位长度表示，每个分页长度为 16 字节，分为 4 页，因此 2 位表示分页序号(VPN Virtual Page Number)，页内偏移量用 4 位表示。
+虚拟地址翻译为物理地址的示意图
+分页的机制 页表是非常关键的数据结构，他存储了由虚拟地址转换为物理地址的关键信息。
+页表可以采取的数据结构有很多，其中一种是线性页表数据结构，就是数组。操作系统通过 VPN 索引到分页条目 PTE Page Table Entity ，PTE 中存储有很多信息，其中包括物理帧页 PFN Page Frame Number 和其他一些关键的标识位。
+通常 PTE 中会包括：
+PFN 物理帧号 有效位 valid bit 标示当前页地址转换是否有效，如果程序访问无效位的地址，会陷入操作系统，对于稀疏地址空间非常有用 保护位 protection bit 表示页是否可读/可写/可执行，当程序违法访问时，会陷入操作系统，对于内存共享有用 还有其他一些重要的位，现在不会过多讨论，在 page replacement 页面替换的章节会涉及 存在位 present bit 表示该页在物理内存还是在磁盘（是否被换出 swap out） 脏位 dirty bit 表示页加载到内存中后是否被修改 参考位 reference bit 也称访问位 accessed bit 用于追踪页是否被访问，是否很受欢迎而应当留在内存中不被换出 x86 架构的示例页表条目</description></item><item><title>操作系统导论学习笔记（六）</title><link>https://kyon.life/post/ostep-6/</link><pubDate>Wed, 01 Sep 2021 18:37:33 +0800</pubDate><guid>https://kyon.life/post/ostep-6/</guid><description>地址转换的二次尝试：分段 打破三个 简化假设 中的第一条：「用户的地址空间必须连续地放在物理内存中」。在 MMU 中引入不止一个基址和界限寄存器，而是给地址空间内的每个逻辑段（segment）一对。在典型的地址空间里，有 3 个逻辑不同的段：代码段、栈和堆。
 段寄存器的值
 分段机制 使得操作系统可以将不同的段放到不同物理内存区域，避免了地址空间中未使用的部分占用内存。
 分段的地址空间示意图

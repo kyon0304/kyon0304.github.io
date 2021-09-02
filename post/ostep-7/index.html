@@ -1,0 +1,273 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="操作系统导论学习笔记（七）">
+<meta itemprop=description content="地址转换的第三次尝试，分页，分页带来的新问题以及如何解决"><meta itemprop=datePublished content="2021-09-02T11:16:54+08:00">
+<meta itemprop=dateModified content="2021-09-02T13:25:49+08:00">
+<meta itemprop=wordCount content="300"><meta itemprop=image content="https://kyon.life/media/ostep-7/pde.png">
+<meta itemprop=keywords content="ostep,学习笔记,virtualization,"><meta property="og:title" content="操作系统导论学习笔记（七）">
+<meta property="og:description" content="地址转换的第三次尝试，分页，分页带来的新问题以及如何解决">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kyon.life/post/ostep-7/"><meta property="og:image" content="https://kyon.life/media/ostep-7/pde.png"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2021-09-02T11:16:54+08:00">
+<meta property="article:modified_time" content="2021-09-02T13:25:49+08:00">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>操作系统导论学习笔记（七）</title>
+<link rel=stylesheet href=https://kyon.life/css/style.min.837de927310ea3197ded03d8aa5ba12a8b051eeea09464d7347ec1e7f334b8b4.css integrity="sha256-g33pJzEOoxl97QPYqluhKosFHu6glGTXNH7B5/M0uLQ=" crossorigin=anonymous>
+<link rel=stylesheet href=https://kyon.life/css/share.min.css>
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://kyon.life/media/ostep-7/pde.png">
+<meta name=twitter:title content="操作系统导论学习笔记（七）">
+<meta name=twitter:description content="地址转换的第三次尝试，分页，分页带来的新问题以及如何解决">
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js></script>
+<link href=/css/zoom.css rel=stylesheet>
+<script src=/js/zoom.js></script>
+<script src=/js/transition.js></script>
+<link href=/css/splide.min.css rel=stylesheet>
+<script src=/js/splide.min.js crossorigin=anonymous></script>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://kyon.life/>kyon's wonderland with ❤️</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://kyon.life/post/>博文</a>
+<a href=https://kyon.life/about/>关于</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons"><span class="hdr-social hide-in-mobile"><a href=https://twitter.com/kyon_wy target=_blank rel="noopener me" title=Twitter><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9.0 01-3.14 1.53 4.48 4.48.0 00-7.86 3v1A10.66 10.66.0 013 4s-4 9 5 13a11.64 11.64.0 01-7 2c9 5 20 0 20-11.5a4.5 4.5.0 00-.08-.83A7.72 7.72.0 0023 3z"/></svg></a><a href=https://github.com/kyon0304 target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a></span><button id=menu-btn class=hdr-btn title=菜单><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://kyon.life/post/>博文</a></li>
+<li><a href=https://kyon.life/about/>关于</a></li>
+</ul>
+</div>
+<main class="site-main main-content section-inner animated fadeIn faster" id=site-main>
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>9 月 2 号, 2021</span></div>
+<h1>操作系统导论学习笔记（七）</h1>
+</header>
+<div class=content>
+<p>由于将地址空间划分为大小不等的逻辑分段（代码、堆、栈）的分段方式，大小不一的内存分配方式，会导致空闲空间管理复杂化，因此尝试固定大小的内存分配方式：将地址空间分割为固定大小的单元，每个单元称为一页。相应的，将物理内存看作固定大小的槽块的阵列，称为页帧（page frame），每个页帧包含一个虚拟内存的页</p>
+<blockquote>
+<p>关键问题：<br>
+如何通过页来实现虚拟内存，从而避免分段带来的问题（空间碎片化）？基本技术是什么？如何让这些技术运行良好，并尽可能减少空间和时间开销？</p>
+</blockquote>
+<h2 id=地址转换的第三次尝试分页>地址转换的第三次尝试：分页<a href=#地址转换的第三次尝试分页 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>操作系统需要为每个进程维护一个页表（page table）用于记录虚拟分页与页帧之间的转换关系</p>
+<p>使用分页实现虚拟内存时，虚拟地址分为两部分，一部分是 page number 表示对应的分页，一部分是页内偏移量 offset</p>
+<figure>
+<img class=middle src=/media/ostep-7/virtual-address.png alt=虚拟地址示例 data-action=zoom>
+</img>
+<figcaption><p>虚拟地址示例</p></figcaption>
+</figure>
+<p>以在 64 字节长度的地址空间中寻址为例，需要 6 位长度表示，每个分页长度为 16 字节，分为 4 页，因此 2 位表示分页序号(VPN Virtual Page Number)，页内偏移量用 4 位表示。</p>
+<figure>
+<img class=middle src=/media/ostep-7/address-translation.png alt=地址转换示意图 data-action=zoom>
+</img>
+<figcaption><p>虚拟地址翻译为物理地址的示意图</p></figcaption>
+</figure>
+<h3 id=分页的机制>分页的机制<a href=#分页的机制 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>页表是非常关键的数据结构，他存储了由虚拟地址转换为物理地址的关键信息。</p>
+<p>页表可以采取的数据结构有很多，其中一种是线性页表数据结构，就是数组。操作系统通过 VPN 索引到分页条目 PTE Page Table Entity ，PTE 中存储有很多信息，其中包括物理帧页 PFN Page Frame Number 和其他一些关键的标识位。</p>
+<p>通常 PTE 中会包括：</p>
+<ul>
+<li>PFN 物理帧号</li>
+<li>有效位 valid bit 标示当前页地址转换是否有效，如果程序访问无效位的地址，会陷入操作系统，对于稀疏地址空间非常有用</li>
+<li>保护位 protection bit 表示页是否可读/可写/可执行，当程序违法访问时，会陷入操作系统，对于内存共享有用</li>
+<li>还有其他一些重要的位，现在不会过多讨论，在 page replacement 页面替换的章节会涉及
+<ul>
+<li>存在位 present bit 表示该页在物理内存还是在磁盘（是否被换出 swap out）</li>
+<li>脏位 dirty bit 表示页加载到内存中后是否被修改</li>
+<li>参考位 reference bit 也称访问位 accessed bit 用于追踪页是否被访问，是否很受欢迎而应当留在内存中不被换出</li>
+</ul>
+</li>
+</ul>
+<figure>
+<img class=middle src=/media/ostep-7/pte.png alt="x86 架构的示例页表条目" data-action=zoom>
+</img>
+<figcaption><p>x86 架构的示例页表条目</p></figcaption>
+</figure>
+<p>包含一个存在位（P），确定是否允许写入该页面的读/写位（R/W），确定用户模式进程是否可以访问该页面的用户/超级用户位（U/S），有几位（PWT、PCD、PAT和G）确定硬件缓存如何为这些页面工作，一个访问位（A）和一个脏位（D），最后是页帧号（PFN）本身。</p>
+<h3 id=分页引入的问题开销>分页引入的问题：开销<a href=#分页引入的问题开销 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>对于实际的 32 位操作系统，假设使用的每个页大小为 4KB，那么页内偏移量需要 12 位表示，分页数目更是有 2^20 个，因此需要 20 位表示 VPN，假设每个分页条目占据 4 字节空间，那么光是一个进程存储分页数据的页表大小，就需要 4MB，有一百个活动进程的系统，就需要为页表分配数百兆的内存，空间开销相当惊人，因此保存分页信息的页表本身也需要存储在内存中，这就意味着，每次内存引用，都需要操作系统访问页表这次额外的内存引用，时间开销也会倍增。</p>
+<p>如果是 64 位系统，这个空间和时间开销更是难以想象。</p>
+<h3 id=分页小结>分页小结<a href=#分页小结 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>分页相对分段的优点：</p>
+<p>由于分页大小固定，不会产生外部碎片，其次它非常灵活，支持稀疏虚拟地址空间</p>
+<p>缺点：</p>
+<p>如果不谨慎考虑，会导致机器变慢（有许多额外的内存访问来访问页表）和内存浪费（内存被页表塞满而不是应用数据）</p>
+<h2 id=解决分页时间开销快速地址转换-tlb>解决分页时间开销：快速地址转换 TLB<a href=#解决分页时间开销快速地址转换-tlb class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>可以认为是页表的缓存，为了解决查询页表带来的额外内存访问的问题引入。</p>
+<p>由于历史原因，这个小的、芯片内的地址转换缓存被称为地址转换旁路缓冲存储器 translation-lookaside buffer （TLB），其实更确切的名称应该是地址转换缓存 address-translate cache. 对每次内存访问，硬件都会先查看 TLB 是否命中，如果有就能快速完成转换，如果没有就查找页表完成地址转换并更新 TLB。</p>
+<p>TLB 有硬件管理和软件管理两种，硬件管理的 TLB 需要更复杂的指令支持（CISC），软件管理的 TLB 更加灵活，使用精简指令集（RISC）就可以完成功能，对于未命中 TLB 的情况硬件直接抛出异常，程序陷入操作系统处理即可，但是操作需要谨慎处理，防止出现 TLB 未命中的无限递归死循环中。</p>
+<p>和其他缓存一样，TLB 利用了程序访问内存的空间和时间局部性：</p>
+<ul>
+<li>时间局部性：程序在某个时间点访问了位置 N，那么接下来的时间里很可能会再次访问 N</li>
+<li>空间局部性：程序访问了位置 N，那么很可能会继续访问 N 附近的位置</li>
+</ul>
+<h3 id=tlb-的机制>TLB 的机制<a href=#tlb-的机制 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>TLB 中的内容可能像下面这样：</p>
+<p>VPN ｜ PFN ｜ 其他位</p>
+<p>其中 TLB 的有效位和页表的有效位的含义完全不同：</p>
+<p>TLB 的有效位表示当前 TLB 条目存储的地址转换是否有效，在系统上电时会把 TLB 中所有有效位设置为无效，当程序访问内存时发现 TLB 未命中，特权指令更新 TLB 后也会将对应的有效位设置为有效。</p>
+<p>页表的有效位表示地址空间的这一页未使用，不需要映射到物理内存，如果程序访问该地址，则会触发异常。</p>
+<p>除了有效位，TLB 的其他位还有保护位，表示该页是否有访问权限，例如代码页被标示为可读和可执行，堆的页被标示为可读和可写；地址空间标识符和脏位等。</p>
+<p>全局位 G 表示这个页是不是所有进程全局共享，如果全局位设置为 1，就会忽略 ASID 位</p>
+<figure>
+<img class=middle src=/media/ostep-7/tlb.png alt="TLB 项举例" data-action=zoom>
+</img>
+<figcaption><p>TLB 项举例</p></figcaption>
+</figure>
+<h3 id=tlb-引入的问题上下文切换>TLB 引入的问题：上下文切换<a href=#tlb-引入的问题上下文切换 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>有了 TLB，在进程间切换时（地址空间切换），会面临一些新问题。具体来说，TLB 中包含的虚拟到物理地址的转换关系，只对当前进程有效，对其他进程是没有意义的。所以在发生进程切换时，硬件或操作系统（或二者），必须要保证即将运行的程序不会误读之前进程的地址映射。</p>
+<blockquote>
+<p>关键问题：进程切换时，如何管理 TLB 的内容，硬件或操作系统应该做些什么来解决？</p>
+</blockquote>
+<p>一种解决方法是清空 TLB：将有效位全部置为无效。进程不会读到错误的地址映射，但是当前进程再次运行时，TLB 会全部未命中，当进程切换频繁时，开销会很大。</p>
+<figure>
+<img class=middle src=/media/ostep-7/tlb-with-asid.png alt="TLB 项举例" data-action=zoom>
+</img>
+<figcaption><p>TLB 项举例</p></figcaption>
+</figure>
+<p>为了解决这种开销，一些系统增加了硬件支持，实现跨上下文切换的 TLB 共享。比如有的系统在 TLB 中增加了一个地址空间标识符（Address Space Identifier ASID），可以把 ASID 看作 PID，不过一般 ASID 会比 PID 位数少（PID 一般 32 位，ASID 8 位）。加上 ASID 后，不同进程就可以共享 TLB 了。</p>
+<h3 id=tlb-引入的问题缓存更新>TLB 引入的问题：缓存更新<a href=#tlb-引入的问题缓存更新 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>和其他缓存一样，TLB 需要考虑缓存替换策略，当缓存满了以后，插入新项时，应当替换哪个旧项？</p>
+<ul>
+<li>一个常见策略是 LRU Least Recently Unused，最近最少使用的项被替换掉，基于局部性的原理，最近最少使用的项，可能是最好的换出候选项。</li>
+<li>另一个常见策略是随机选择一项换出。这种策略好处是简单，而且可以避免一些极端情况。</li>
+</ul>
+<p>MIPS 的 TLB 通常有 32 项或 64 项，大部分给用户程序使用，操作系统也会预留一些：操作系统可以设置一个被监听的寄存器，告诉硬件需要预留多少个 TLB 项。这些保留的 TLB 项用于保存操作系统在关键时刻需要使用的代码和数据的地址映射（比如 TLB 未命中时的异常处理，防止出现递归）</p>
+<p>MIPS 的 TLB 是软件管理的，因此有一些管理 TLB 的特权指令：</p>
+<ul>
+<li>TLBP 查找特定的转换映射是否在 TLB 中</li>
+<li>TLBR 将 TLB 中的特定内容读取到寄存器中</li>
+<li>TLBWI 替换指定的 TLB 项</li>
+<li>TLBWR 随机替换一个 TLB 项</li>
+</ul>
+<h3 id=tlb-小结>TLB 小结<a href=#tlb-小结 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>TLB 的存在，使得大多数内存引用不需要访问内存中的页表</p>
+<h2 id=解决分页空间开销>解决分页空间开销<a href=#解决分页空间开销 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<blockquote>
+<p>关键问题：简单的线性页表占用空间太大，如何让页表更小？关键思路是什么，由于这些新的数据结构，会出现什么效率影响？</p>
+</blockquote>
+<h3 id=增大页大小>增大页大小<a href=#增大页大小 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>一个简单的思路是，更大的页，可以换来更少的页表项，页表也可以随之变小。</p>
+<p>数据库管理系统 DBMS 通常会使用大页，但是主要目标不是为了降低页表大小，而是为了减少 TLB 压力，提高 TLB 命中率。</p>
+<p>大页带来的问题是可能会导致页内的内部碎片。</p>
+<h3 id=分段分页混合使用>分段分页混合使用<a href=#分段分页混合使用 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>在生活中，每当有两种合理但不同的方法时，你应该总是研究两者的结合，看看能否两全其美。</p>
+<p>假设进程使用的内存还是分为 代码、堆、栈 三个段，每个分段分别使用自己的页表，MMU 中仍然保留 3 对基址和界限寄存器，不同的是，基址寄存器中保存的是页表的物理地址，每个进程由原来使用一个页表变成使用 3 个页表。</p>
+<p>使用这种方式时，堆和栈之间为使用的空间，不再需要分配分页，有效减少了页表大小</p>
+<p>问题也很明显，堆和栈的大小是不确定的，因此页表大小也不固定，在内存中为页表寻找存放位置变得棘手。稀疏堆的内部碎片问题也无法解决。而且依赖于地址空间固定的地址空间使用模式才可以基于分段做文章。</p>
+<h3 id=多级页表>多级页表<a href=#多级页表 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<p>多级页表（multi-level page table）试图解决的问题和分段、分页混合使用时的思路一样：去掉页表中的无效区域，而不是将他们全部保留在内存中。</p>
+<p>多级页表的基本思想：对页表也做分页，如果某个分页中的全部 PTE 都无效，页表的这一页就不需要分配了。为了记录页表的页是否有效，以及如果有效在内存中的位置，新增页目录 Page Directory Entry 数据结构，页目录告诉你页表的页在内存中的位置，或者页表的整个页不包含有效页。</p>
+<p>与线性结构的简单页表相比，线性页表必须连续驻留在物理内存中，有了多级结构，我们增加了一个间接层，使用了页目录，它指向页表的各个部分，这种方式让我们能够将页表拆的相对分散，放在物理内存的任何地方。</p>
+<p>多级页表是一次时空折中，时间换空间，增加了 TLB 未命中时寻找 PTE 的复杂度。</p>
+<figure>
+<img class=middle src=/media/ostep-7/pde.png alt=线性页表与多级页表对比 data-action=zoom>
+</img>
+<figcaption><p>线性页表与多级页表对比</p></figcaption>
+</figure>
+</div>
+<div class="related-posts thin">
+<h2>相关推荐</h2>
+<ul>
+<li><a href=/post/ostep-6/>操作系统导论学习笔记（六）</a></li>
+<li><a href=/post/ostep-5/>操作系统导论学习笔记（五）</a></li>
+<li><a href=/post/ostep-3/>操作系统导论学习笔记（三）</a></li>
+<li><a href=/post/ostep-2/>操作系统导论学习笔记（二）</a></li>
+<li><a href=/post/ostep-1/>操作系统导论学习笔记（一）</a></li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://kyon.life/tags/ostep>ostep</a></span><span class=tag><a href=https://kyon.life/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0>学习笔记</a></span><span class=tag><a href=https://kyon.life/tags/virtualization>virtualization</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>约 3867 字</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2021-09-02 03:16</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg><a href=https://github.com/kyon0304/kyon0304.github.io/5d1291eff84f99177f2b55dc7ea896b2ecce2c8d/927533e4591ad25a19ab9774cfe65c31ecbfea08 target=_blank rel=noopener>927533e</a> @ 2021-09-02</p>
+</footer>
+<div class=social-share data-initialized=true data-wechat-qrcode-title=扫描分享>
+<center>
+<span style=font-size:16px;color:#c05b4d>分享到：</span>
+<a href=# class="social-share-icon icon-weibo"></a>
+<a href=# class="social-share-icon icon-wechat"></a>
+<a href=# class="social-share-icon icon-twitter"></a>
+<a href=# class="social-share-icon icon-qq"></a>
+<a href=# class="social-share-icon icon-qzone"></a>
+</center>
+</div>
+<script src=/js/social-share.min.js></script>
+</article>
+<aside class=post-toc id=toc>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#地址转换的第三次尝试分页>地址转换的第三次尝试：分页</a>
+<ul>
+<li><a href=#分页的机制>分页的机制</a></li>
+<li><a href=#分页引入的问题开销>分页引入的问题：开销</a></li>
+<li><a href=#分页小结>分页小结</a></li>
+</ul>
+</li>
+<li><a href=#解决分页时间开销快速地址转换-tlb>解决分页时间开销：快速地址转换 TLB</a>
+<ul>
+<li><a href=#tlb-的机制>TLB 的机制</a></li>
+<li><a href=#tlb-引入的问题上下文切换>TLB 引入的问题：上下文切换</a></li>
+<li><a href=#tlb-引入的问题缓存更新>TLB 引入的问题：缓存更新</a></li>
+<li><a href=#tlb-小结>TLB 小结</a></li>
+</ul>
+</li>
+<li><a href=#解决分页空间开销>解决分页空间开销</a>
+<ul>
+<li><a href=#增大页大小>增大页大小</a></li>
+<li><a href=#分段分页混合使用>分段分页混合使用</a></li>
+<li><a href=#多级页表>多级页表</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</aside>
+</main>
+<div class="post-nav thin">
+<a class=prev-post href=https://kyon.life/post/ostep-6/>
+<span class=post-nav-label>旧&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>操作系统导论学习笔记（六）</span>
+</a>
+</div>
+<div id=comments class=thin>
+<script src=https://utteranc.es/client.js repo=kyon0304/kyon0304.github.io issue-term=pathname label=Comment theme=github-light crossorigin=anonymous async></script>
+</div>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2021 <a href=https://kyon.life/>kyon</a> &#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://kyon.life/sitemap.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://kyon.life/js/bundle.min.424fb3fd7b1567f65bac76d06824a201d4d7f5c5b670a3c0827050af1755e9a1.js integrity="sha256-Qk+z/XsVZ/ZbrHbQaCSiAdTX9cW2cKPAgnBQrxdV6aE=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$'],['\\(','\\)']]},showProcessingMessages:!1,messageStyle:'none'}</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin=anonymous></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131420074-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+<script src=/js/social-share.min.js></script>
+</body>
+</html>
